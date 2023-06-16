@@ -40,34 +40,33 @@ namespace box2d
  **/
 class PolygonShape : public Shape
 {
-public:
+ public:
+  static love::Type type;
 
-	static love::Type type;
+  /**
+   * Create a new PolygonShape from a Box2D polygon definition.
+   * @param p The polygon definition.
+   **/
+  PolygonShape(b2PolygonShape *p, bool own = true);
 
-	/**
-	 * Create a new PolygonShape from a Box2D polygon definition.
-	 * @param p The polygon definition.
-	 **/
-	PolygonShape(b2PolygonShape *p, bool own = true);
+  virtual ~PolygonShape();
 
-	virtual ~PolygonShape();
+  /**
+   * Returns the transformed points of the polygon.
+   * This function is useful for debug drawing and such.
+   *
+   * The result can be directly passed into love.graphics.polygon().
+   **/
+  int getPoints(lua_State *L);
 
-	/**
-	 * Returns the transformed points of the polygon.
-	 * This function is useful for debug drawing and such.
-	 *
-	 * The result can be directly passed into love.graphics.polygon().
-	 **/
-	int getPoints(lua_State *L);
-
-	/**
-	 * Validate convexity.
-	 **/
-	bool validate() const;
+  /**
+   * Validate convexity.
+   **/
+  bool validate() const;
 };
 
-} // box2d
-} // physics
-} // love
+}  // namespace box2d
+}  // namespace physics
+}  // namespace love
 
-#endif // LOVE_PHYSICS_BOX2D_POLYGON_SHAPE_H
+#endif  // LOVE_PHYSICS_BOX2D_POLYGON_SHAPE_H

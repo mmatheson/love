@@ -22,8 +22,8 @@
 #define LOVE_KEYBOARD_SDL_KEYBOARD_H
 
 // LOVE
-#include "keyboard/Keyboard.h"
 #include "common/EnumMap.h"
+#include "keyboard/Keyboard.h"
 
 // SDL
 #include <SDL_keyboard.h>
@@ -37,45 +37,43 @@ namespace sdl
 
 class Keyboard : public love::keyboard::Keyboard
 {
-public:
+ public:
+  Keyboard();
 
-	Keyboard();
+  // Implements Module.
+  const char *getName() const;
 
-	// Implements Module.
-	const char *getName() const;
+  void setKeyRepeat(bool enable);
+  bool hasKeyRepeat() const;
+  bool isDown(const std::vector<Key> &keylist) const;
+  bool isScancodeDown(const std::vector<Scancode> &scancodelist) const;
 
-	void setKeyRepeat(bool enable);
-	bool hasKeyRepeat() const;
-	bool isDown(const std::vector<Key> &keylist) const;
-	bool isScancodeDown(const std::vector<Scancode> &scancodelist) const;
+  Key getKeyFromScancode(Scancode scancode) const;
+  Scancode getScancodeFromKey(Key key) const;
 
-	Key getKeyFromScancode(Scancode scancode) const;
-	Scancode getScancodeFromKey(Key key) const;
+  void setTextInput(bool enable);
+  void setTextInput(bool enable, double x, double y, double w, double h);
+  bool hasTextInput() const;
+  bool hasScreenKeyboard() const;
 
-	void setTextInput(bool enable);
-	void setTextInput(bool enable, double x, double y, double w, double h);
-	bool hasTextInput() const;
-	bool hasScreenKeyboard() const;
+  static bool getConstant(Scancode in, SDL_Scancode &out);
+  static bool getConstant(SDL_Scancode in, Scancode &out);
 
-	static bool getConstant(Scancode in, SDL_Scancode &out);
-	static bool getConstant(SDL_Scancode in, Scancode &out);
+ private:
+  // Whether holding down a key triggers repeated key press events.
+  // The real implementation is in love::event::sdl::Event::Convert.
+  bool key_repeat;
 
-private:
+  static const SDL_Keycode *createKeyMap();
+  static const SDL_Keycode *keymap;
 
-	// Whether holding down a key triggers repeated key press events.
-	// The real implementation is in love::event::sdl::Event::Convert.
-	bool key_repeat;
+  static EnumMap<Scancode, SDL_Scancode, SDL_NUM_SCANCODES>::Entry scancodeEntries[];
+  static EnumMap<Scancode, SDL_Scancode, SDL_NUM_SCANCODES> scancodes;
 
-	static const SDL_Keycode *createKeyMap();
-	static const SDL_Keycode *keymap;
+};  // Keyboard
 
-	static EnumMap<Scancode, SDL_Scancode, SDL_NUM_SCANCODES>::Entry scancodeEntries[];
-	static EnumMap<Scancode, SDL_Scancode, SDL_NUM_SCANCODES> scancodes;
+}  // namespace sdl
+}  // namespace keyboard
+}  // namespace love
 
-}; // Keyboard
-
-} // sdl
-} // keyboard
-} // love
-
-#endif // LOVE_KEYBOARD_SDL_KEYBOARD_H
+#endif  // LOVE_KEYBOARD_SDL_KEYBOARD_H

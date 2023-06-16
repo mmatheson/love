@@ -32,53 +32,51 @@ namespace love
  **/
 class Reference
 {
-public:
+ public:
+  /**
+   * Creates the reference object, but does not create
+   * the actual reference.
+   **/
+  Reference();
 
-	/**
-	 * Creates the reference object, but does not create
-	 * the actual reference.
-	 **/
-	Reference();
+  /**
+   * Creates the object and a reference to the value
+   * on the top of the stack.
+   **/
+  Reference(lua_State *L);
 
-	/**
-	 * Creates the object and a reference to the value
-	 * on the top of the stack.
-	 **/
-	Reference(lua_State *L);
+  /**
+   * Deletes the reference, if any.
+   **/
+  virtual ~Reference();
 
-	/**
-	 * Deletes the reference, if any.
-	 **/
-	virtual ~Reference();
+  /**
+   * Creates a reference to the value on the
+   * top of the stack.
+   **/
+  void ref(lua_State *L);
 
-	/**
-	 * Creates a reference to the value on the
-	 * top of the stack.
-	 **/
-	void ref(lua_State *L);
+  /**
+   * Unrefs the reference, if any.
+   **/
+  void unref();
 
-	/**
-	 * Unrefs the reference, if any.
-	 **/
-	void unref();
+  /**
+   * Pushes the referred value onto the stack of the specified Lua coroutine.
+   * NOTE: The coroutine *must* belong to the same Lua state that was used for
+   * Reference::ref.
+   **/
+  void push(lua_State *L);
 
-	/**
-	 * Pushes the referred value onto the stack of the specified Lua coroutine.
-	 * NOTE: The coroutine *must* belong to the same Lua state that was used for
-	 * Reference::ref.
-	 **/
-	void push(lua_State *L);
+ private:
+  // A pinned coroutine (probably the main thread) belonging to the Lua state
+  // in which the reference resides.
+  lua_State *pinnedL;
 
-private:
-
-	// A pinned coroutine (probably the main thread) belonging to the Lua state
-	// in which the reference resides.
-	lua_State *pinnedL;
-
-	// Index to the Lua reference.
-	int idx;
+  // Index to the Lua reference.
+  int idx;
 };
 
-} // love
+}  // namespace love
 
-#endif // LOVE_REFERENCE_H
+#endif  // LOVE_REFERENCE_H

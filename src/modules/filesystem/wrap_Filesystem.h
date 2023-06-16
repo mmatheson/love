@@ -22,9 +22,9 @@
 #define LOVE_FILESYSTEM_WRAP_FILESYSTEM_H
 
 // LOVE
-#include "common/runtime.h"
 #include "File.h"
 #include "FileData.h"
+#include "common/runtime.h"
 
 namespace love
 {
@@ -50,7 +50,7 @@ int loader(lua_State *L);
 int extloader(lua_State *L);
 extern "C" LOVE_EXPORT int luaopen_love_filesystem(lua_State *L);
 
-} // filesystem
-} // love
+}  // namespace filesystem
+}  // namespace love
 
-#endif // LOVE_FILESYSTEM_WRAP_FILESYSTEM_H
+#endif  // LOVE_FILESYSTEM_WRAP_FILESYSTEM_H

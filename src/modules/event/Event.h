@@ -25,9 +25,9 @@
 #include "common/Module.h"
 #include "common/StringMap.h"
 #include "common/Variant.h"
+#include "joystick/Joystick.h"
 #include "keyboard/Keyboard.h"
 #include "mouse/Mouse.h"
-#include "joystick/Joystick.h"
 #include "thread/threads.h"
 
 // C++
@@ -41,41 +41,40 @@ namespace event
 
 class Message : public Object
 {
-public:
+ public:
+  Message(const std::string &name, const std::vector<Variant> &vargs = {});
+  ~Message();
 
-	Message(const std::string &name, const std::vector<Variant> &vargs = {});
-	~Message();
+  int toLua(lua_State *L);
+  static Message *fromLua(lua_State *L, int n);
 
-	int toLua(lua_State *L);
-	static Message *fromLua(lua_State *L, int n);
+  const std::string name;
+  const std::vector<Variant> args;
 
-	const std::string name;
-	const std::vector<Variant> args;
-
-}; // Message
+};  // Message
 
 class Event : public Module
 {
-public:
-	virtual ~Event();
+ public:
+  virtual ~Event();
 
-	// Implements Module.
-	virtual ModuleType getModuleType() const { return M_EVENT; }
+  // Implements Module.
+  virtual ModuleType getModuleType() const { return M_EVENT; }
 
-	void push(Message *msg);
-	bool poll(Message *&msg);
-	virtual void clear();
+  void push(Message *msg);
+  bool poll(Message *&msg);
+  virtual void clear();
 
-	virtual void pump() = 0;
-	virtual Message *wait() = 0;
+  virtual void pump() = 0;
+  virtual Message *wait() = 0;
 
-protected:
-	love::thread::MutexRef mutex;
-	std::queue<Message *> queue;
+ protected:
+  love::thread::MutexRef mutex;
+  std::queue<Message *> queue;
 
-}; // Event
+};  // Event
 
-} // event
-} // love
+}  // namespace event
+}  // namespace love
 
-#endif // LOVE_EVENT_EVENT_H
+#endif  // LOVE_EVENT_EVENT_H

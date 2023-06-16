@@ -30,149 +30,138 @@ namespace thread
 love::Type Channel::type("Channel", &Object::type);
 
 Channel::Channel()
-	: sent(0)
-	, received(0)
+    : sent(0),
+      received(0)
 {
 }
 
-Channel::~Channel()
-{
-}
+Channel::~Channel() {}
 
 uint64 Channel::push(const Variant &var)
 {
-	Lock l(mutex);
+  Lock l(mutex);
 
-	queue.push(var);
-	cond->broadcast();
+  queue.push(var);
+  cond->broadcast();
 
-	return ++sent;
+  return ++sent;
 }
 
 bool Channel::supply(const Variant &var)
 {
-	Lock l(mutex);
-	uint64 id = push(var);
+  Lock l(mutex);
+  uint64 id = push(var);
 
-	while (received < id)
-		cond->wait(mutex);
+  while (received < id) cond->wait(mutex);
 
-	return true;
+  return true;
 }
 
 bool Channel::supply(const Variant &var, double timeout)
 {
-	Lock l(mutex);
-	uint64 id = push(var);
+  Lock l(mutex);
+  uint64 id = push(var);
 
-	while (timeout >= 0)
-	{
-		if (received >= id)
-			return true;
+  while (timeout >= 0)
+  {
+    if (received >= id)
+      return true;
 
-		double start = love::timer::Timer::getTime();
-		cond->wait(mutex, timeout*1000);
-		double stop = love::timer::Timer::getTime();
+    double start = love::timer::Timer::getTime();
+    cond->wait(mutex, timeout * 1000);
+    double stop = love::timer::Timer::getTime();
 
-		timeout -= (stop-start);
-	}
+    timeout -= (stop - start);
+  }
 
-	return false;
+  return false;
 }
 
 bool Channel::pop(Variant *var)
 {
-	Lock l(mutex);
+  Lock l(mutex);
 
-	if (queue.empty())
-		return false;
+  if (queue.empty())
+    return false;
 
-	*var = queue.front();
-	queue.pop();
+  *var = queue.front();
+  queue.pop();
 
-	received++;
-	cond->broadcast();
+  received++;
+  cond->broadcast();
 
-	return true;
+  return true;
 }
 
 bool Channel::demand(Variant *var)
 {
-	Lock l(mutex);
+  Lock l(mutex);
 
-	while (!pop(var))
-		cond->wait(mutex);
+  while (!pop(var)) cond->wait(mutex);
 
-	return true;
+  return true;
 }
 
 bool Channel::demand(Variant *var, double timeout)
 {
-	Lock l(mutex);
+  Lock l(mutex);
 
-	while (timeout >= 0)
-	{
-		if (pop(var))
-			return true;
+  while (timeout >= 0)
+  {
+    if (pop(var))
+      return true;
 
-		double start = love::timer::Timer::getTime();
-		cond->wait(mutex, timeout*1000);
-		double stop = love::timer::Timer::getTime();
+    double start = love::timer::Timer::getTime();
+    cond->wait(mutex, timeout * 1000);
+    double stop = love::timer::Timer::getTime();
 
-		timeout -= (stop-start);
-	}
+    timeout -= (stop - start);
+  }
 
-	return false;
+  return false;
 }
 
 bool Channel::peek(Variant *var)
 {
-	Lock l(mutex);
+  Lock l(mutex);
 
-	if (queue.empty())
-		return false;
+  if (queue.empty())
+    return false;
 
-	*var = queue.front();
-	return true;
+  *var = queue.front();
+  return true;
 }
 
 int Channel::getCount() const
 {
-	Lock l(mutex);
-	return (int) queue.size();
+  Lock l(mutex);
+  return (int) queue.size();
 }
 
 bool Channel::hasRead(uint64 id) const
 {
-	Lock l(mutex);
-	return received >= id;
+  Lock l(mutex);
+  return received >= id;
 }
 
 void Channel::clear()
 {
-	Lock l(mutex);
+  Lock l(mutex);
 
-	// We're already empty.
-	if (queue.empty())
-		return;
+  // We're already empty.
+  if (queue.empty())
+    return;
 
-	while (!queue.empty())
-		queue.pop();
+  while (!queue.empty()) queue.pop();
 
-	// Finish all the supply waits
-	received = sent;
-	cond->broadcast();
+  // Finish all the supply waits
+  received = sent;
+  cond->broadcast();
 }
 
-void Channel::lockMutex()
-{
-	mutex->lock();
-}
+void Channel::lockMutex() { mutex->lock(); }
 
-void Channel::unlockMutex()
-{
-	mutex->unlock();
-}
+void Channel::unlockMutex() { mutex->unlock(); }
 
-} // thread
-} // love
+}  // namespace thread
+}  // namespace love

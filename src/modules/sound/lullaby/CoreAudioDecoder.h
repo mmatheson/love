@@ -45,40 +45,38 @@ namespace lullaby
  **/
 class CoreAudioDecoder : public Decoder
 {
-public:
+ public:
+  CoreAudioDecoder(Data *data, int bufferSize);
+  virtual ~CoreAudioDecoder();
 
-	CoreAudioDecoder(Data *data, int bufferSize);
-	virtual ~CoreAudioDecoder();
+  static bool accepts(const std::string &ext);
 
-	static bool accepts(const std::string &ext);
+  love::sound::Decoder *clone();
+  int decode();
+  bool seek(double s);
+  bool rewind();
+  bool isSeekable();
+  int getChannelCount() const;
+  int getBitDepth() const;
+  double getDuration();
 
-	love::sound::Decoder *clone();
-	int decode();
-	bool seek(double s);
-	bool rewind();
-	bool isSeekable();
-	int getChannelCount() const;
-	int getBitDepth() const;
-	double getDuration();
+ private:
+  void closeAudioFile();
 
-private:
+  AudioFileID audioFile;
+  ExtAudioFileRef extAudioFile;
 
-	void closeAudioFile();
+  AudioStreamBasicDescription inputInfo;
+  AudioStreamBasicDescription outputInfo;
 
-	AudioFileID audioFile;
-	ExtAudioFileRef extAudioFile;
+  double duration;
 
-	AudioStreamBasicDescription inputInfo;
-	AudioStreamBasicDescription outputInfo;
+};  // CoreAudioDecoder
 
-	double duration;
+}  // namespace lullaby
+}  // namespace sound
+}  // namespace love
 
-}; // CoreAudioDecoder
+#endif  // LOVE_SUPPORT_COREAUDIO
 
-} // lullaby
-} // sound
-} // love
-
-#endif // LOVE_SUPPORT_COREAUDIO
-
-#endif // LOVE_SOUND_LULLABY_CORE_AUDIO_DECODER_H
+#endif  // LOVE_SOUND_LULLABY_CORE_AUDIO_DECODER_H

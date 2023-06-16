@@ -22,8 +22,8 @@
 
 // Module
 #include "Body.h"
-#include "World.h"
 #include "Physics.h"
+#include "World.h"
 
 namespace love
 {
@@ -35,85 +35,82 @@ namespace box2d
 love::Type EdgeShape::type("EdgeShape", &Shape::type);
 
 EdgeShape::EdgeShape(b2EdgeShape *e, bool own)
-	: Shape(e, own)
+    : Shape(e, own)
 {
 }
 
-EdgeShape::~EdgeShape()
-{
-}
+EdgeShape::~EdgeShape() {}
 
 void EdgeShape::setNextVertex(float x, float y)
 {
-	b2EdgeShape *e = (b2EdgeShape *)shape;
-	b2Vec2 v(x, y);
-	e->m_vertex3 = Physics::scaleDown(v);
-	e->m_hasVertex3 = true;
+  b2EdgeShape *e = (b2EdgeShape *) shape;
+  b2Vec2 v(x, y);
+  e->m_vertex3 = Physics::scaleDown(v);
+  e->m_hasVertex3 = true;
 }
 
 void EdgeShape::setNextVertex()
 {
-	b2EdgeShape *e = (b2EdgeShape *)shape;
-	e->m_hasVertex3 = false;
+  b2EdgeShape *e = (b2EdgeShape *) shape;
+  e->m_hasVertex3 = false;
 }
 
 bool EdgeShape::getNextVertex(float &x, float &y) const
 {
-	b2EdgeShape *e = (b2EdgeShape *)shape;
+  b2EdgeShape *e = (b2EdgeShape *) shape;
 
-	if (e->m_hasVertex3)
-	{
-		b2Vec2 v = Physics::scaleUp(e->m_vertex3);
-		x = v.x;
-		y = v.y;
-		return true;
-	}
+  if (e->m_hasVertex3)
+  {
+    b2Vec2 v = Physics::scaleUp(e->m_vertex3);
+    x = v.x;
+    y = v.y;
+    return true;
+  }
 
-	return false;
+  return false;
 }
 
 void EdgeShape::setPreviousVertex(float x, float y)
 {
-	b2EdgeShape *e = (b2EdgeShape *)shape;
-	b2Vec2 v(x, y);
-	e->m_vertex0 = Physics::scaleDown(v);
-	e->m_hasVertex0 = true;
+  b2EdgeShape *e = (b2EdgeShape *) shape;
+  b2Vec2 v(x, y);
+  e->m_vertex0 = Physics::scaleDown(v);
+  e->m_hasVertex0 = true;
 }
 
 void EdgeShape::setPreviousVertex()
 {
-	b2EdgeShape *e = (b2EdgeShape *)shape;
-	e->m_hasVertex0 = false;
+  b2EdgeShape *e = (b2EdgeShape *) shape;
+  e->m_hasVertex0 = false;
 }
 
 bool EdgeShape::getPreviousVertex(float &x, float &y) const
 {
-	b2EdgeShape *e = (b2EdgeShape *)shape;
+  b2EdgeShape *e = (b2EdgeShape *) shape;
 
-	if (e->m_hasVertex0)
-	{
-		b2Vec2 v = Physics::scaleUp(e->m_vertex0);
-		x = v.x;
-		y = v.y;
-		return true;
-	}
+  if (e->m_hasVertex0)
+  {
+    b2Vec2 v = Physics::scaleUp(e->m_vertex0);
+    x = v.x;
+    y = v.y;
+    return true;
+  }
 
-	return false;
+  return false;
 }
 
 int EdgeShape::getPoints(lua_State *L)
 {
-	b2EdgeShape *e = (b2EdgeShape *)shape;
-	b2Vec2 v1 = Physics::scaleUp(e->m_vertex1);
-	b2Vec2 v2 = Physics::scaleUp(e->m_vertex2);
-	lua_pushnumber(L, v1.x);
-	lua_pushnumber(L, v1.y);
-	lua_pushnumber(L, v2.x);
-	lua_pushnumber(L, v2.y);
-	return 4;
-
+  b2EdgeShape *e = (b2EdgeShape *) shape;
+  b2Vec2 v1 = Physics::scaleUp(e->m_vertex1);
+  b2Vec2 v2 = Physics::scaleUp(e->m_vertex2);
+  lua_pushnumber(L, v1.x);
+  lua_pushnumber(L, v1.y);
+  lua_pushnumber(L, v2.x);
+  lua_pushnumber(L, v2.y);
+  return 4;
 }
 
-} // box2d
-} // physics
-} // love
+}  // namespace box2d
+}  // namespace physics
+}  // namespace love

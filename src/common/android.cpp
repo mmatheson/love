@@ -22,18 +22,16 @@
 
 #ifdef LOVE_ANDROID
 
-#include <cerrno>
-#include <unordered_map>
-
 #include <SDL.h>
-
-#include <jni.h>
 #include <android/asset_manager.h>
 #include <android/asset_manager_jni.h>
-
+#include <jni.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+
+#include <cerrno>
+#include <unordered_map>
 
 #include "filesystem/physfs/PhysfsIo.h"
 
@@ -44,143 +42,144 @@ namespace android
 
 void setImmersive(bool immersive_active)
 {
-	JNIEnv *env = (JNIEnv*) SDL_AndroidGetJNIEnv();
+  JNIEnv *env = (JNIEnv *) SDL_AndroidGetJNIEnv();
 
-	jobject activity = (jobject) SDL_AndroidGetActivity();
+  jobject activity = (jobject) SDL_AndroidGetActivity();
 
-	jclass clazz(env->GetObjectClass(activity));
-	jmethodID method_id = env->GetMethodID(clazz, "setImmersiveMode", "(Z)V");
+  jclass clazz(env->GetObjectClass(activity));
+  jmethodID method_id = env->GetMethodID(clazz, "setImmersiveMode", "(Z)V");
 
-	env->CallVoidMethod(activity, method_id, immersive_active);
+  env->CallVoidMethod(activity, method_id, immersive_active);
 
-	env->DeleteLocalRef(activity);
-	env->DeleteLocalRef(clazz);
+  env->DeleteLocalRef(activity);
+  env->DeleteLocalRef(clazz);
 }
 
 bool getImmersive()
 {
-	JNIEnv *env = (JNIEnv*) SDL_AndroidGetJNIEnv();
+  JNIEnv *env = (JNIEnv *) SDL_AndroidGetJNIEnv();
 
-	jobject activity = (jobject) SDL_AndroidGetActivity();
+  jobject activity = (jobject) SDL_AndroidGetActivity();
 
-	jclass clazz(env->GetObjectClass(activity));
-	jmethodID method_id = env->GetMethodID(clazz, "getImmersiveMode", "()Z");
+  jclass clazz(env->GetObjectClass(activity));
+  jmethodID method_id = env->GetMethodID(clazz, "getImmersiveMode", "()Z");
 
-	jboolean immersive_active = env->CallBooleanMethod(activity, method_id);
+  jboolean immersive_active = env->CallBooleanMethod(activity, method_id);
 
-	env->DeleteLocalRef(activity);
-	env->DeleteLocalRef(clazz);
+  env->DeleteLocalRef(activity);
+  env->DeleteLocalRef(clazz);
 
-	return immersive_active;
+  return immersive_active;
 }
 
 double getScreenScale()
 {
-	static double result = -1.;
+  static double result = -1.;
 
-	if (result == -1.)
-	{
-		JNIEnv *env = (JNIEnv*) SDL_AndroidGetJNIEnv();
-		jclass activity = env->FindClass("org/love2d/android/GameActivity");
+  if (result == -1.)
+  {
+    JNIEnv *env = (JNIEnv *) SDL_AndroidGetJNIEnv();
+    jclass activity = env->FindClass("org/love2d/android/GameActivity");
 
-		jmethodID getMetrics = env->GetStaticMethodID(activity, "getMetrics", "()Landroid/util/DisplayMetrics;");
-		jobject metrics = env->CallStaticObjectMethod(activity, getMetrics);
-		jclass metricsClass = env->GetObjectClass(metrics);
+    jmethodID getMetrics =
+        env->GetStaticMethodID(activity, "getMetrics", "()Landroid/util/DisplayMetrics;");
+    jobject metrics = env->CallStaticObjectMethod(activity, getMetrics);
+    jclass metricsClass = env->GetObjectClass(metrics);
 
-		result = env->GetFloatField(metrics, env->GetFieldID(metricsClass, "density", "F"));
+    result = env->GetFloatField(metrics, env->GetFieldID(metricsClass, "density", "F"));
 
-		env->DeleteLocalRef(metricsClass);
-		env->DeleteLocalRef(metrics);
-		env->DeleteLocalRef(activity);
-	}
+    env->DeleteLocalRef(metricsClass);
+    env->DeleteLocalRef(metrics);
+    env->DeleteLocalRef(activity);
+  }
 
-	return result;
+  return result;
 }
 
 bool getSafeArea(int &top, int &left, int &bottom, int &right)
 {
-	JNIEnv *env = (JNIEnv*) SDL_AndroidGetJNIEnv();
-	jobject activity = (jobject) SDL_AndroidGetActivity();
-	jclass clazz(env->GetObjectClass(activity));
-	jmethodID methodID = env->GetMethodID(clazz, "initializeSafeArea", "()Z");
-	bool hasSafeArea = false;
+  JNIEnv *env = (JNIEnv *) SDL_AndroidGetJNIEnv();
+  jobject activity = (jobject) SDL_AndroidGetActivity();
+  jclass clazz(env->GetObjectClass(activity));
+  jmethodID methodID = env->GetMethodID(clazz, "initializeSafeArea", "()Z");
+  bool hasSafeArea = false;
 
-	if (methodID == nullptr)
-		// NoSuchMethodException is thrown in case methodID is null
-		env->ExceptionClear();
-	else if ((hasSafeArea = env->CallBooleanMethod(activity, methodID)))
-	{
-		top = env->GetIntField(activity, env->GetFieldID(clazz, "safeAreaTop", "I"));
-		left = env->GetIntField(activity, env->GetFieldID(clazz, "safeAreaLeft", "I"));
-		bottom = env->GetIntField(activity, env->GetFieldID(clazz, "safeAreaBottom", "I"));
-		right = env->GetIntField(activity, env->GetFieldID(clazz, "safeAreaRight", "I"));
-	}
+  if (methodID == nullptr)
+    // NoSuchMethodException is thrown in case methodID is null
+    env->ExceptionClear();
+  else if ((hasSafeArea = env->CallBooleanMethod(activity, methodID)))
+  {
+    top = env->GetIntField(activity, env->GetFieldID(clazz, "safeAreaTop", "I"));
+    left = env->GetIntField(activity, env->GetFieldID(clazz, "safeAreaLeft", "I"));
+    bottom = env->GetIntField(activity, env->GetFieldID(clazz, "safeAreaBottom", "I"));
+    right = env->GetIntField(activity, env->GetFieldID(clazz, "safeAreaRight", "I"));
+  }
 
-	env->DeleteLocalRef(clazz);
-	env->DeleteLocalRef(activity);
+  env->DeleteLocalRef(clazz);
+  env->DeleteLocalRef(activity);
 
-	return hasSafeArea;
+  return hasSafeArea;
 }
 
 const char *getSelectedGameFile()
 {
-	static const char *path = NULL;
+  static const char *path = NULL;
 
-	if (path)
-	{
-		delete path;
-		path = NULL;
-	}
+  if (path)
+  {
+    delete path;
+    path = NULL;
+  }
 
-	JNIEnv *env = (JNIEnv*) SDL_AndroidGetJNIEnv();
-	jclass activity = env->FindClass("org/love2d/android/GameActivity");
+  JNIEnv *env = (JNIEnv *) SDL_AndroidGetJNIEnv();
+  jclass activity = env->FindClass("org/love2d/android/GameActivity");
 
-	jmethodID getGamePath = env->GetStaticMethodID(activity, "getGamePath", "()Ljava/lang/String;");
-	jstring gamePath = (jstring) env->CallStaticObjectMethod(activity, getGamePath);
-	const char *utf = env->GetStringUTFChars(gamePath, 0);
-	if (utf)
-	{
-		path = SDL_strdup(utf);
-		env->ReleaseStringUTFChars(gamePath, utf);
-	}
+  jmethodID getGamePath = env->GetStaticMethodID(activity, "getGamePath", "()Ljava/lang/String;");
+  jstring gamePath = (jstring) env->CallStaticObjectMethod(activity, getGamePath);
+  const char *utf = env->GetStringUTFChars(gamePath, 0);
+  if (utf)
+  {
+    path = SDL_strdup(utf);
+    env->ReleaseStringUTFChars(gamePath, utf);
+  }
 
-	env->DeleteLocalRef(gamePath);
-	env->DeleteLocalRef(activity);
+  env->DeleteLocalRef(gamePath);
+  env->DeleteLocalRef(activity);
 
-	return path;
+  return path;
 }
 
 bool openURL(const std::string &url)
 {
-	JNIEnv *env = (JNIEnv*) SDL_AndroidGetJNIEnv();
-	jclass activity = env->FindClass("org/love2d/android/GameActivity");
+  JNIEnv *env = (JNIEnv *) SDL_AndroidGetJNIEnv();
+  jclass activity = env->FindClass("org/love2d/android/GameActivity");
 
-	jmethodID openURL = env->GetStaticMethodID(activity, "openURLFromLOVE", "(Ljava/lang/String;)Z");
+  jmethodID openURL = env->GetStaticMethodID(activity, "openURLFromLOVE", "(Ljava/lang/String;)Z");
 
-	if (openURL == nullptr)
-	{
-		env->ExceptionClear();
-		openURL = env->GetStaticMethodID(activity, "openURL", "(Ljava/lang/String;)Z");
-	}
+  if (openURL == nullptr)
+  {
+    env->ExceptionClear();
+    openURL = env->GetStaticMethodID(activity, "openURL", "(Ljava/lang/String;)Z");
+  }
 
-	jstring url_jstring = (jstring) env->NewStringUTF(url.c_str());
+  jstring url_jstring = (jstring) env->NewStringUTF(url.c_str());
 
-	jboolean result = env->CallStaticBooleanMethod(activity, openURL, url_jstring);
+  jboolean result = env->CallStaticBooleanMethod(activity, openURL, url_jstring);
 
-	env->DeleteLocalRef(url_jstring);
-	env->DeleteLocalRef(activity);
-	return result;
+  env->DeleteLocalRef(url_jstring);
+  env->DeleteLocalRef(activity);
+  return result;
 }
 
 void vibrate(double seconds)
 {
-	JNIEnv *env = (JNIEnv*) SDL_AndroidGetJNIEnv();
-	jclass activity = env->FindClass("org/love2d/android/GameActivity");
+  JNIEnv *env = (JNIEnv *) SDL_AndroidGetJNIEnv();
+  jclass activity = env->FindClass("org/love2d/android/GameActivity");
 
-	jmethodID vibrate_method = env->GetStaticMethodID(activity, "vibrate", "(D)V");
-	env->CallStaticVoidMethod(activity, vibrate_method, seconds);
+  jmethodID vibrate_method = env->GetStaticMethodID(activity, "vibrate", "(D)V");
+  env->CallStaticVoidMethod(activity, vibrate_method, seconds);
 
-	env->DeleteLocalRef(activity);
+  env->DeleteLocalRef(activity);
 }
 
 /*
@@ -188,187 +187,192 @@ void vibrate(double seconds)
  */
 void freeGameArchiveMemory(void *ptr)
 {
-	char *game_love_data = static_cast<char*>(ptr);
-	delete[] game_love_data;
+  char *game_love_data = static_cast<char *>(ptr);
+  delete[] game_love_data;
 }
 
-bool loadGameArchiveToMemory(const char* filename, char **ptr, size_t *size)
+bool loadGameArchiveToMemory(const char *filename, char **ptr, size_t *size)
 {
-	SDL_RWops *asset_game_file = SDL_RWFromFile(filename, "rb");
-	if (!asset_game_file) {
-		SDL_Log("Could not find %s", filename);
-		return false;
-	}
+  SDL_RWops *asset_game_file = SDL_RWFromFile(filename, "rb");
+  if (!asset_game_file)
+  {
+    SDL_Log("Could not find %s", filename);
+    return false;
+  }
 
-	Sint64 file_size = asset_game_file->size(asset_game_file);
-	if (file_size <= 0) {
-		SDL_Log("Could not load game from %s. File has invalid file size: %d.", filename, (int) file_size);
-		return false;
-	}
+  Sint64 file_size = asset_game_file->size(asset_game_file);
+  if (file_size <= 0)
+  {
+    SDL_Log("Could not load game from %s. File has invalid file size: %d.", filename,
+            (int) file_size);
+    return false;
+  }
 
-	*ptr = new char[file_size];
-	if (!*ptr) {
-		SDL_Log("Could not allocate memory for in-memory game archive");
-		return false;
-	}
+  *ptr = new char[file_size];
+  if (!*ptr)
+  {
+    SDL_Log("Could not allocate memory for in-memory game archive");
+    return false;
+  }
 
-	size_t bytes_copied = asset_game_file->read(asset_game_file, (void*) *ptr, sizeof(char), (size_t) file_size);
-	if (bytes_copied != file_size) {
-		SDL_Log("Incomplete copy of in-memory game archive!");
-		delete[] *ptr;
-		return false;
-	}
+  size_t bytes_copied =
+      asset_game_file->read(asset_game_file, (void *) *ptr, sizeof(char), (size_t) file_size);
+  if (bytes_copied != file_size)
+  {
+    SDL_Log("Incomplete copy of in-memory game archive!");
+    delete[] * ptr;
+    return false;
+  }
 
-	*size = (size_t) file_size;
-	return true;
+  *size = (size_t) file_size;
+  return true;
 }
 
 bool directoryExists(const char *path)
 {
-	struct stat s;
-	int err = stat(path, &s);
-	if (err == -1)
-	{
-		if (errno != ENOENT)
-			SDL_Log("Error checking for directory %s errno = %d: %s", path, errno, strerror(errno));
-		return false;
-	}
+  struct stat s;
+  int err = stat(path, &s);
+  if (err == -1)
+  {
+    if (errno != ENOENT)
+      SDL_Log("Error checking for directory %s errno = %d: %s", path, errno, strerror(errno));
+    return false;
+  }
 
-	return S_ISDIR(s.st_mode);
+  return S_ISDIR(s.st_mode);
 }
 
 bool mkdir(const char *path)
 {
-	int err = ::mkdir(path, 0770);
-	if (err == -1)
-	{
-		SDL_Log("Error: Could not create directory %s", path);
-		return false;
-	}
+  int err = ::mkdir(path, 0770);
+  if (err == -1)
+  {
+    SDL_Log("Error: Could not create directory %s", path);
+    return false;
+  }
 
-	return true;
+  return true;
 }
 
 bool createStorageDirectories()
 {
-	std::string internal_storage_path = SDL_AndroidGetInternalStoragePath();
+  std::string internal_storage_path = SDL_AndroidGetInternalStoragePath();
 
-	std::string save_directory = internal_storage_path + "/save";
-	if (!directoryExists(save_directory.c_str()) && !mkdir(save_directory.c_str()))
-		return false;
+  std::string save_directory = internal_storage_path + "/save";
+  if (!directoryExists(save_directory.c_str()) && !mkdir(save_directory.c_str()))
+    return false;
 
-	std::string game_directory = internal_storage_path + "/game";
-	if (!directoryExists (game_directory.c_str()) && !mkdir(game_directory.c_str()))
-		return false;
+  std::string game_directory = internal_storage_path + "/game";
+  if (!directoryExists(game_directory.c_str()) && !mkdir(game_directory.c_str()))
+    return false;
 
-	return true;
+  return true;
 }
 
 bool hasBackgroundMusic()
 {
-	JNIEnv *env = (JNIEnv*) SDL_AndroidGetJNIEnv();
-	jobject activity = (jobject) SDL_AndroidGetActivity();
+  JNIEnv *env = (JNIEnv *) SDL_AndroidGetJNIEnv();
+  jobject activity = (jobject) SDL_AndroidGetActivity();
 
-	jclass clazz(env->GetObjectClass(activity));
-	jmethodID method_id = env->GetMethodID(clazz, "hasBackgroundMusic", "()Z");
+  jclass clazz(env->GetObjectClass(activity));
+  jmethodID method_id = env->GetMethodID(clazz, "hasBackgroundMusic", "()Z");
 
-	jboolean result = env->CallBooleanMethod(activity, method_id);
+  jboolean result = env->CallBooleanMethod(activity, method_id);
 
-	env->DeleteLocalRef(activity);
-	env->DeleteLocalRef(clazz);
+  env->DeleteLocalRef(activity);
+  env->DeleteLocalRef(clazz);
 
-	return result;
+  return result;
 }
 
 bool hasRecordingPermission()
 {
-	JNIEnv *env = (JNIEnv*) SDL_AndroidGetJNIEnv();
-	jobject activity = (jobject) SDL_AndroidGetActivity();
+  JNIEnv *env = (JNIEnv *) SDL_AndroidGetJNIEnv();
+  jobject activity = (jobject) SDL_AndroidGetActivity();
 
-	jclass clazz(env->GetObjectClass(activity));
-	jmethodID methodID = env->GetMethodID(clazz, "hasRecordAudioPermission", "()Z");
-	jboolean result = false;
+  jclass clazz(env->GetObjectClass(activity));
+  jmethodID methodID = env->GetMethodID(clazz, "hasRecordAudioPermission", "()Z");
+  jboolean result = false;
 
-	if (methodID == nullptr)
-		env->ExceptionClear();
-	else
-		result = env->CallBooleanMethod(activity, methodID);
+  if (methodID == nullptr)
+    env->ExceptionClear();
+  else
+    result = env->CallBooleanMethod(activity, methodID);
 
-	env->DeleteLocalRef(activity);
-	env->DeleteLocalRef(clazz);
+  env->DeleteLocalRef(activity);
+  env->DeleteLocalRef(clazz);
 
-	return result;
+  return result;
 }
-
 
 void requestRecordingPermission()
 {
-	JNIEnv *env = (JNIEnv*) SDL_AndroidGetJNIEnv();
-	jobject activity = (jobject) SDL_AndroidGetActivity();
-	jclass clazz(env->GetObjectClass(activity));
-	jmethodID methodID = env->GetMethodID(clazz, "requestRecordAudioPermission", "()V");
+  JNIEnv *env = (JNIEnv *) SDL_AndroidGetJNIEnv();
+  jobject activity = (jobject) SDL_AndroidGetActivity();
+  jclass clazz(env->GetObjectClass(activity));
+  jmethodID methodID = env->GetMethodID(clazz, "requestRecordAudioPermission", "()V");
 
-	if (methodID == nullptr)
-		env->ExceptionClear();
-	else
-		env->CallVoidMethod(activity, methodID);
+  if (methodID == nullptr)
+    env->ExceptionClear();
+  else
+    env->CallVoidMethod(activity, methodID);
 
-	env->DeleteLocalRef(clazz);
-	env->DeleteLocalRef(activity);
+  env->DeleteLocalRef(clazz);
+  env->DeleteLocalRef(activity);
 }
 
 void showRecordingPermissionMissingDialog()
 {
-	JNIEnv *env = (JNIEnv*) SDL_AndroidGetJNIEnv();
-	jobject activity = (jobject) SDL_AndroidGetActivity();
-	jclass clazz(env->GetObjectClass(activity));
-	jmethodID methodID = env->GetMethodID(clazz, "showRecordingAudioPermissionMissingDialog", "()V");
+  JNIEnv *env = (JNIEnv *) SDL_AndroidGetJNIEnv();
+  jobject activity = (jobject) SDL_AndroidGetActivity();
+  jclass clazz(env->GetObjectClass(activity));
+  jmethodID methodID = env->GetMethodID(clazz, "showRecordingAudioPermissionMissingDialog", "()V");
 
-	if (methodID == nullptr)
-		env->ExceptionClear();
-	else
-		env->CallVoidMethod(activity, methodID);
+  if (methodID == nullptr)
+    env->ExceptionClear();
+  else
+    env->CallVoidMethod(activity, methodID);
 
-	env->DeleteLocalRef(clazz);
-	env->DeleteLocalRef(activity);
+  env->DeleteLocalRef(clazz);
+  env->DeleteLocalRef(activity);
 }
 
 /* A container for AssetManager Java object */
 class AssetManagerObject
 {
-public:
-	AssetManagerObject()
-	{
-		JNIEnv *env = (JNIEnv *) SDL_AndroidGetJNIEnv();
-		jobject am = getLocalAssetManager(env);
+ public:
+  AssetManagerObject()
+  {
+    JNIEnv *env = (JNIEnv *) SDL_AndroidGetJNIEnv();
+    jobject am = getLocalAssetManager(env);
 
-		assetManager = env->NewGlobalRef(am);
-		env->DeleteLocalRef(am);
-	}
+    assetManager = env->NewGlobalRef(am);
+    env->DeleteLocalRef(am);
+  }
 
-	~AssetManagerObject()
-	{
-		JNIEnv *env = (JNIEnv *) SDL_AndroidGetJNIEnv();
-		env->DeleteGlobalRef(assetManager);
-	}
+  ~AssetManagerObject()
+  {
+    JNIEnv *env = (JNIEnv *) SDL_AndroidGetJNIEnv();
+    env->DeleteGlobalRef(assetManager);
+  }
 
-	static jobject getLocalAssetManager(JNIEnv *env) {
-		jobject self = (jobject) SDL_AndroidGetActivity();
-		jclass activity = env->GetObjectClass(self);
-		jmethodID method = env->GetMethodID(activity, "getAssets", "()Landroid/content/res/AssetManager;");
-		jobject am = env->CallObjectMethod(self, method);
+  static jobject getLocalAssetManager(JNIEnv *env)
+  {
+    jobject self = (jobject) SDL_AndroidGetActivity();
+    jclass activity = env->GetObjectClass(self);
+    jmethodID method =
+        env->GetMethodID(activity, "getAssets", "()Landroid/content/res/AssetManager;");
+    jobject am = env->CallObjectMethod(self, method);
 
-		env->DeleteLocalRef(self);
-		env->DeleteLocalRef(activity);
-		return am;
-	}
+    env->DeleteLocalRef(self);
+    env->DeleteLocalRef(activity);
+    return am;
+  }
 
-	explicit operator jobject()
-	{
-		return assetManager;
-	};
-private:
-	jobject assetManager;
+  explicit operator jobject() { return assetManager; };
+
+ private:
+  jobject assetManager;
 };
 
 /*
@@ -378,442 +382,423 @@ private:
 // This returns *global* reference, no need to free it.
 static jobject getJavaAssetManager()
 {
-	static AssetManagerObject assetManager;
-	return (jobject) assetManager;
+  static AssetManagerObject assetManager;
+  return (jobject) assetManager;
 }
 
 static AAssetManager *getAssetManager()
 {
-	JNIEnv *env = (JNIEnv*) SDL_AndroidGetJNIEnv();
-	return AAssetManager_fromJava(env, (jobject) getJavaAssetManager());
+  JNIEnv *env = (JNIEnv *) SDL_AndroidGetJNIEnv();
+  return AAssetManager_fromJava(env, (jobject) getJavaAssetManager());
 }
 
 namespace aasset
 {
 
-struct AssetInfo: public love::filesystem::physfs::PhysfsIo<AssetInfo>
+struct AssetInfo : public love::filesystem::physfs::PhysfsIo<AssetInfo>
 {
-	static const uint32_t version = 0;
+  static const uint32_t version = 0;
 
-	AAssetManager *assetManager;
-	AAsset *asset;
-	char *filename;
-	size_t size;
+  AAssetManager *assetManager;
+  AAsset *asset;
+  char *filename;
+  size_t size;
 
-	static AssetInfo *fromAAsset(AAssetManager *assetManager, const char *filename, AAsset *asset)
-	{
-		return new AssetInfo(assetManager, filename, asset);
-	}
+  static AssetInfo *fromAAsset(AAssetManager *assetManager, const char *filename, AAsset *asset)
+  {
+    return new AssetInfo(assetManager, filename, asset);
+  }
 
-	int64_t read(void* buf, uint64_t len) const
-	{
-		int readed = AAsset_read(asset, buf, (size_t) len);
+  int64_t read(void *buf, uint64_t len) const
+  {
+    int readed = AAsset_read(asset, buf, (size_t) len);
 
-		PHYSFS_setErrorCode(readed < 0 ? PHYSFS_ERR_OS_ERROR : PHYSFS_ERR_OK);
-		return (PHYSFS_sint64) readed;
-	}
+    PHYSFS_setErrorCode(readed < 0 ? PHYSFS_ERR_OS_ERROR : PHYSFS_ERR_OK);
+    return (PHYSFS_sint64) readed;
+  }
 
-	int64_t write(const void* buf, uint64_t len) const
-	{
-		LOVE_UNUSED(buf);
-		LOVE_UNUSED(len);
+  int64_t write(const void *buf, uint64_t len) const
+  {
+    LOVE_UNUSED(buf);
+    LOVE_UNUSED(len);
 
-		PHYSFS_setErrorCode(PHYSFS_ERR_READ_ONLY);
-		return -1;
-	}
+    PHYSFS_setErrorCode(PHYSFS_ERR_READ_ONLY);
+    return -1;
+  }
 
-	int64_t seek(uint64_t offset) const
-	{
-		int64_t success = AAsset_seek64(asset, (off64_t) offset, SEEK_SET) != -1;
+  int64_t seek(uint64_t offset) const
+  {
+    int64_t success = AAsset_seek64(asset, (off64_t) offset, SEEK_SET) != -1;
 
-		PHYSFS_setErrorCode(success ? PHYSFS_ERR_OK : PHYSFS_ERR_OS_ERROR);
-		return success;
-	}
+    PHYSFS_setErrorCode(success ? PHYSFS_ERR_OK : PHYSFS_ERR_OS_ERROR);
+    return success;
+  }
 
-	int64_t tell() const
-	{
-		off64_t len = AAsset_getLength64(asset);
-		off64_t remain = AAsset_getRemainingLength64(asset);
+  int64_t tell() const
+  {
+    off64_t len = AAsset_getLength64(asset);
+    off64_t remain = AAsset_getRemainingLength64(asset);
 
-		return len - remain;
-	}
+    return len - remain;
+  }
 
-	int64_t length() const
-	{
-		return AAsset_getLength64(asset);
-	}
+  int64_t length() const { return AAsset_getLength64(asset); }
 
-	int64_t flush() const
-	{
-		// Do nothing
-		PHYSFS_setErrorCode(PHYSFS_ERR_OK);
-		return 1;
-	}
+  int64_t flush() const
+  {
+    // Do nothing
+    PHYSFS_setErrorCode(PHYSFS_ERR_OK);
+    return 1;
+  }
 
-	AssetInfo *duplicate() const
-	{
-		AAsset *newAsset = AAssetManager_open(assetManager, filename, AASSET_MODE_RANDOM);
+  AssetInfo *duplicate() const
+  {
+    AAsset *newAsset = AAssetManager_open(assetManager, filename, AASSET_MODE_RANDOM);
 
-		if (newAsset == nullptr)
-		{
-			PHYSFS_setErrorCode(PHYSFS_ERR_OS_ERROR);
-			return nullptr;
-		}
+    if (newAsset == nullptr)
+    {
+      PHYSFS_setErrorCode(PHYSFS_ERR_OS_ERROR);
+      return nullptr;
+    }
 
-		AAsset_seek64(asset, tell(), SEEK_SET);
-		return fromAAsset(assetManager, filename, asset);
-	}
+    AAsset_seek64(asset, tell(), SEEK_SET);
+    return fromAAsset(assetManager, filename, asset);
+  }
 
-	~AssetInfo() override
-	{
-		AAsset_close(asset);
-		delete[] filename;
-	}
+  ~AssetInfo() override
+  {
+    AAsset_close(asset);
+    delete[] filename;
+  }
 
-private:
-	AssetInfo(AAssetManager *assetManager, const char *filename, AAsset *asset)
-	: assetManager(assetManager)
-	, asset(asset)
-	, size(strlen(filename) + 1)
-	{
-		this->filename = new (std::nothrow) char[size];
-		memcpy(this->filename, filename, size);
-	}
+ private:
+  AssetInfo(AAssetManager *assetManager, const char *filename, AAsset *asset)
+      : assetManager(assetManager),
+        asset(asset),
+        size(strlen(filename) + 1)
+  {
+    this->filename = new (std::nothrow) char[size];
+    memcpy(this->filename, filename, size);
+  }
 };
 
 static std::unordered_map<std::string, PHYSFS_FileType> fileTree;
 
 void *openArchive(PHYSFS_Io *io, const char *name, int forWrite, int *claimed)
 {
-	if (forWrite || io->opaque == nullptr || memcmp(io->opaque, "ASET", 4) != 0)
-		return nullptr;
+  if (forWrite || io->opaque == nullptr || memcmp(io->opaque, "ASET", 4) != 0)
+    return nullptr;
 
-	// It's our archive
-	*claimed = 1;
-	AAssetManager *assetManager = getAssetManager();
+  // It's our archive
+  *claimed = 1;
+  AAssetManager *assetManager = getAssetManager();
 
-	if (fileTree.empty())
-	{
-		// AAssetDir_getNextFileName intentionally excludes directories, so
-		// we have to use JNI that calls AssetManager.list() recursively.
-		JNIEnv *env = (JNIEnv *) SDL_AndroidGetJNIEnv();
-		jobject activity = (jobject) SDL_AndroidGetActivity();
-		jclass clazz = env->GetObjectClass(activity);
+  if (fileTree.empty())
+  {
+    // AAssetDir_getNextFileName intentionally excludes directories, so
+    // we have to use JNI that calls AssetManager.list() recursively.
+    JNIEnv *env = (JNIEnv *) SDL_AndroidGetJNIEnv();
+    jobject activity = (jobject) SDL_AndroidGetActivity();
+    jclass clazz = env->GetObjectClass(activity);
 
-		jmethodID method = env->GetMethodID(clazz, "buildFileTree", "()[Ljava/lang/String;");
-		jobjectArray list = (jobjectArray) env->CallObjectMethod(activity, method);
+    jmethodID method = env->GetMethodID(clazz, "buildFileTree", "()[Ljava/lang/String;");
+    jobjectArray list = (jobjectArray) env->CallObjectMethod(activity, method);
 
-		for (jsize i = 0; i < env->GetArrayLength(list); i++)
-		{
-			jstring jstr = (jstring) env->GetObjectArrayElement(list, i);
-			const char *str = env->GetStringUTFChars(jstr, nullptr);
+    for (jsize i = 0; i < env->GetArrayLength(list); i++)
+    {
+      jstring jstr = (jstring) env->GetObjectArrayElement(list, i);
+      const char *str = env->GetStringUTFChars(jstr, nullptr);
 
-			fileTree[str + 1] = str[0] == 'd' ? PHYSFS_FILETYPE_DIRECTORY : PHYSFS_FILETYPE_REGULAR;
+      fileTree[str + 1] = str[0] == 'd' ? PHYSFS_FILETYPE_DIRECTORY : PHYSFS_FILETYPE_REGULAR;
 
-			env->ReleaseStringUTFChars(jstr, str);
-			env->DeleteLocalRef(jstr);
-		}
+      env->ReleaseStringUTFChars(jstr, str);
+      env->DeleteLocalRef(jstr);
+    }
 
-		env->DeleteLocalRef(list);
-		env->DeleteLocalRef(clazz);
-		env->DeleteLocalRef(activity);
-	}
+    env->DeleteLocalRef(list);
+    env->DeleteLocalRef(clazz);
+    env->DeleteLocalRef(activity);
+  }
 
-	return assetManager;
+  return assetManager;
 }
 
-PHYSFS_EnumerateCallbackResult enumerate(
-	void *opaque,
-	const char *dirname,
-	PHYSFS_EnumerateCallback cb,
-	const char *origdir,
-	void *callbackdata
-)
+PHYSFS_EnumerateCallbackResult enumerate(void *opaque, const char *dirname,
+                                         PHYSFS_EnumerateCallback cb, const char *origdir,
+                                         void *callbackdata)
 {
-	using FileTreeIterator = std::unordered_map<std::string, PHYSFS_FileType>::iterator;
-	LOVE_UNUSED(opaque);
+  using FileTreeIterator = std::unordered_map<std::string, PHYSFS_FileType>::iterator;
+  LOVE_UNUSED(opaque);
 
-	const char *path = dirname;
-	if (path == nullptr || (path[0] == '/' && path[1] == 0))
-		path = "";
+  const char *path = dirname;
+  if (path == nullptr || (path[0] == '/' && path[1] == 0))
+    path = "";
 
-	if (path[0] != 0)
-	{
-		FileTreeIterator result = fileTree.find(path);
+  if (path[0] != 0)
+  {
+    FileTreeIterator result = fileTree.find(path);
 
-		if (result == fileTree.end() || result->second != PHYSFS_FILETYPE_DIRECTORY)
-		{
-			PHYSFS_setErrorCode(PHYSFS_ERR_NOT_FOUND);
-			return PHYSFS_ENUM_ERROR;
-		}
-	}
+    if (result == fileTree.end() || result->second != PHYSFS_FILETYPE_DIRECTORY)
+    {
+      PHYSFS_setErrorCode(PHYSFS_ERR_NOT_FOUND);
+      return PHYSFS_ENUM_ERROR;
+    }
+  }
 
-	JNIEnv *env = (JNIEnv *) SDL_AndroidGetJNIEnv();
-	jobject assetManager = getJavaAssetManager();
-	jclass clazz = env->GetObjectClass(assetManager);
-	jmethodID method = env->GetMethodID(clazz, "list", "(Ljava/lang/String;)[Ljava/lang/String;");
+  JNIEnv *env = (JNIEnv *) SDL_AndroidGetJNIEnv();
+  jobject assetManager = getJavaAssetManager();
+  jclass clazz = env->GetObjectClass(assetManager);
+  jmethodID method = env->GetMethodID(clazz, "list", "(Ljava/lang/String;)[Ljava/lang/String;");
 
-	jstring jstringDir = env->NewStringUTF(path);
-	jobjectArray dir = (jobjectArray) env->CallObjectMethod(assetManager, method, jstringDir);
+  jstring jstringDir = env->NewStringUTF(path);
+  jobjectArray dir = (jobjectArray) env->CallObjectMethod(assetManager, method, jstringDir);
 
-	PHYSFS_EnumerateCallbackResult ret = PHYSFS_ENUM_OK;
+  PHYSFS_EnumerateCallbackResult ret = PHYSFS_ENUM_OK;
 
-	if (env->ExceptionCheck())
-	{
-		// IOException occured
-		ret = PHYSFS_ENUM_ERROR;
-		env->ExceptionClear();
-	}
-	else
-	{
-		jsize i = 0;
-		jsize len = env->GetArrayLength(dir);
+  if (env->ExceptionCheck())
+  {
+    // IOException occured
+    ret = PHYSFS_ENUM_ERROR;
+    env->ExceptionClear();
+  }
+  else
+  {
+    jsize i = 0;
+    jsize len = env->GetArrayLength(dir);
 
-		while (ret == PHYSFS_ENUM_OK && i < len) {
-			jstring jstr = (jstring) env->GetObjectArrayElement(dir, i++);
-			const char *name = env->GetStringUTFChars(jstr, nullptr);
+    while (ret == PHYSFS_ENUM_OK && i < len)
+    {
+      jstring jstr = (jstring) env->GetObjectArrayElement(dir, i++);
+      const char *name = env->GetStringUTFChars(jstr, nullptr);
 
-			ret = cb(callbackdata, origdir, name);
+      ret = cb(callbackdata, origdir, name);
 
-			env->ReleaseStringUTFChars(jstr, name);
-			env->DeleteLocalRef(jstr);
-		}
+      env->ReleaseStringUTFChars(jstr, name);
+      env->DeleteLocalRef(jstr);
+    }
 
-		env->DeleteLocalRef(dir);
-	}
+    env->DeleteLocalRef(dir);
+  }
 
-	env->DeleteLocalRef(jstringDir);
-	env->DeleteLocalRef(clazz);
-	return ret;
+  env->DeleteLocalRef(jstringDir);
+  env->DeleteLocalRef(clazz);
+  return ret;
 }
 
 PHYSFS_Io *openRead(void *opaque, const char *name)
 {
-	AAssetManager *assetManager = (AAssetManager *) opaque;
-	AAsset *file = AAssetManager_open(assetManager, name, AASSET_MODE_UNKNOWN);
+  AAssetManager *assetManager = (AAssetManager *) opaque;
+  AAsset *file = AAssetManager_open(assetManager, name, AASSET_MODE_UNKNOWN);
 
-	if (file == nullptr)
-	{
-		PHYSFS_setErrorCode(PHYSFS_ERR_NOT_FOUND);
-		return nullptr;
-	}
+  if (file == nullptr)
+  {
+    PHYSFS_setErrorCode(PHYSFS_ERR_NOT_FOUND);
+    return nullptr;
+  }
 
-	PHYSFS_setErrorCode(PHYSFS_ERR_OK);
-	return AssetInfo::fromAAsset(assetManager, name, file);
+  PHYSFS_setErrorCode(PHYSFS_ERR_OK);
+  return AssetInfo::fromAAsset(assetManager, name, file);
 }
 
 PHYSFS_Io *openWriteAppend(void *opaque, const char *name)
 {
-	LOVE_UNUSED(opaque);
-	LOVE_UNUSED(name);
+  LOVE_UNUSED(opaque);
+  LOVE_UNUSED(name);
 
-	// AAsset doesn't support modification
-	PHYSFS_setErrorCode(PHYSFS_ERR_READ_ONLY);
-	return nullptr;
+  // AAsset doesn't support modification
+  PHYSFS_setErrorCode(PHYSFS_ERR_READ_ONLY);
+  return nullptr;
 }
 
 int removeMkdir(void *opaque, const char *name)
 {
-	LOVE_UNUSED(opaque);
-	LOVE_UNUSED(name);
+  LOVE_UNUSED(opaque);
+  LOVE_UNUSED(name);
 
-	// AAsset doesn't support modification
-	PHYSFS_setErrorCode(PHYSFS_ERR_READ_ONLY);
-	return 0;
+  // AAsset doesn't support modification
+  PHYSFS_setErrorCode(PHYSFS_ERR_READ_ONLY);
+  return 0;
 }
 
 int stat(void *opaque, const char *name, PHYSFS_Stat *out)
 {
-	using FileTreeIterator = std::unordered_map<std::string, PHYSFS_FileType>::iterator;
-	LOVE_UNUSED(opaque);
+  using FileTreeIterator = std::unordered_map<std::string, PHYSFS_FileType>::iterator;
+  LOVE_UNUSED(opaque);
 
-	FileTreeIterator result = fileTree.find(name);
+  FileTreeIterator result = fileTree.find(name);
 
-	if (result != fileTree.end())
-	{
-		out->filetype = result->second;
-		out->modtime = -1;
-		out->createtime = -1;
-		out->accesstime = -1;
-		out->readonly = 1;
+  if (result != fileTree.end())
+  {
+    out->filetype = result->second;
+    out->modtime = -1;
+    out->createtime = -1;
+    out->accesstime = -1;
+    out->readonly = 1;
 
-		PHYSFS_setErrorCode(PHYSFS_ERR_OK);
-		return 1;
-	}
+    PHYSFS_setErrorCode(PHYSFS_ERR_OK);
+    return 1;
+  }
 
-	PHYSFS_setErrorCode(PHYSFS_ERR_NOT_FOUND);
-	return 0;
+  PHYSFS_setErrorCode(PHYSFS_ERR_NOT_FOUND);
+  return 0;
 }
 
 void closeArchive(void *opaque)
 {
-	// Do nothing
-	LOVE_UNUSED(opaque);
-	PHYSFS_setErrorCode(PHYSFS_ERR_OK);
+  // Do nothing
+  LOVE_UNUSED(opaque);
+  PHYSFS_setErrorCode(PHYSFS_ERR_OK);
 }
 
 static PHYSFS_Archiver g_AAssetArchiver = {
-	0,
-	{
-		"AASSET",
-		"Android AAsset Wrapper",
-		"LOVE Development Team",
-		"https://developer.android.com/ndk/reference/group/asset",
-		0
-	},
-	openArchive,
-	enumerate,
-	openRead,
-	openWriteAppend,
-	openWriteAppend,
-	removeMkdir,
-	removeMkdir,
-	stat,
-	closeArchive
-};
+    0,
+    {"AASSET", "Android AAsset Wrapper", "LOVE Development Team",
+     "https://developer.android.com/ndk/reference/group/asset", 0},
+    openArchive,
+    enumerate,
+    openRead,
+    openWriteAppend,
+    openWriteAppend,
+    removeMkdir,
+    removeMkdir,
+    stat,
+    closeArchive};
 
 static PHYSFS_sint64 dummyReturn0(PHYSFS_Io *io)
 {
-	LOVE_UNUSED(io);
-	PHYSFS_setErrorCode(PHYSFS_ERR_OK);
-	return 0;
+  LOVE_UNUSED(io);
+  PHYSFS_setErrorCode(PHYSFS_ERR_OK);
+  return 0;
 }
 
 static PHYSFS_Io *getDummyIO(PHYSFS_Io *io);
 
 static char dummyOpaque[] = "ASET";
 static PHYSFS_Io dummyIo = {
-	0,
-	dummyOpaque,
-	nullptr,
-	nullptr,
-	[](PHYSFS_Io *io, PHYSFS_uint64 offset) -> int
-	{
-		PHYSFS_setErrorCode(offset == 0 ? PHYSFS_ERR_OK : PHYSFS_ERR_PAST_EOF);
-		return offset == 0;
-	},
-	dummyReturn0,
-	dummyReturn0,
-	getDummyIO,
-	nullptr,
-	[](PHYSFS_Io *io) { LOVE_UNUSED(io); }
-};
+    0,
+    dummyOpaque,
+    nullptr,
+    nullptr,
+    [](PHYSFS_Io *io, PHYSFS_uint64 offset) -> int
+    {
+      PHYSFS_setErrorCode(offset == 0 ? PHYSFS_ERR_OK : PHYSFS_ERR_PAST_EOF);
+      return offset == 0;
+    },
+    dummyReturn0,
+    dummyReturn0,
+    getDummyIO,
+    nullptr,
+    [](PHYSFS_Io *io) { LOVE_UNUSED(io); }};
 
-static PHYSFS_Io *getDummyIO(PHYSFS_Io *io)
-{
-	return &dummyIo;
-}
+static PHYSFS_Io *getDummyIO(PHYSFS_Io *io) { return &dummyIo; }
 
-}
+}  // namespace aasset
 
 static bool isVirtualArchiveInitialized = false;
 
 bool initializeVirtualArchive()
 {
-	if (isVirtualArchiveInitialized)
-		return true;
+  if (isVirtualArchiveInitialized)
+    return true;
 
-	if (!PHYSFS_registerArchiver(&aasset::g_AAssetArchiver))
-		return false;
-	if (!PHYSFS_mountIo(&aasset::dummyIo, "ASET.AASSET", nullptr, 0))
-	{
-		PHYSFS_deregisterArchiver(aasset::g_AAssetArchiver.info.extension);
-		return false;
-	}
+  if (!PHYSFS_registerArchiver(&aasset::g_AAssetArchiver))
+    return false;
+  if (!PHYSFS_mountIo(&aasset::dummyIo, "ASET.AASSET", nullptr, 0))
+  {
+    PHYSFS_deregisterArchiver(aasset::g_AAssetArchiver.info.extension);
+    return false;
+  }
 
-	isVirtualArchiveInitialized = true;
-	return true;
+  isVirtualArchiveInitialized = true;
+  return true;
 }
 
 void deinitializeVirtualArchive()
 {
-	if (isVirtualArchiveInitialized)
-	{
-		PHYSFS_deregisterArchiver(aasset::g_AAssetArchiver.info.extension);
-		isVirtualArchiveInitialized = false;
-	}
+  if (isVirtualArchiveInitialized)
+  {
+    PHYSFS_deregisterArchiver(aasset::g_AAssetArchiver.info.extension);
+    isVirtualArchiveInitialized = false;
+  }
 }
 
 bool checkFusedGame(void **physfsIO_Out)
 {
-	// TODO: Reorder the loading in 12.0
-	PHYSFS_Io *&io = *(PHYSFS_Io **) physfsIO_Out;
-	AAssetManager *assetManager = getAssetManager();
+  // TODO: Reorder the loading in 12.0
+  PHYSFS_Io *&io = *(PHYSFS_Io **) physfsIO_Out;
+  AAssetManager *assetManager = getAssetManager();
 
-	// Prefer game.love inside assets/ folder
-	AAsset *asset = AAssetManager_open(assetManager, "game.love", AASSET_MODE_RANDOM);
-	if (asset)
-	{
-		io = aasset::AssetInfo::fromAAsset(assetManager, "game.love", asset);
-		return true;
-	}
+  // Prefer game.love inside assets/ folder
+  AAsset *asset = AAssetManager_open(assetManager, "game.love", AASSET_MODE_RANDOM);
+  if (asset)
+  {
+    io = aasset::AssetInfo::fromAAsset(assetManager, "game.love", asset);
+    return true;
+  }
 
-	// If there's no game.love inside assets/ try main.lua
-	asset = AAssetManager_open(assetManager, "main.lua", AASSET_MODE_STREAMING);
+  // If there's no game.love inside assets/ try main.lua
+  asset = AAssetManager_open(assetManager, "main.lua", AASSET_MODE_STREAMING);
 
-	if (asset)
-	{
-		AAsset_close(asset);
-		io = nullptr;
-		return true;
-	}
+  if (asset)
+  {
+    AAsset_close(asset);
+    io = nullptr;
+    return true;
+  }
 
-	// Not found
-	return false;
+  // Not found
+  return false;
 }
 
 const char *getCRequirePath()
 {
-	static bool initialized = false;
-	static const char *path = nullptr;
+  static bool initialized = false;
+  static const char *path = nullptr;
 
-	if (!initialized)
-	{
-		JNIEnv *env = (JNIEnv*) SDL_AndroidGetJNIEnv();
-		jobject activity = (jobject) SDL_AndroidGetActivity();
+  if (!initialized)
+  {
+    JNIEnv *env = (JNIEnv *) SDL_AndroidGetJNIEnv();
+    jobject activity = (jobject) SDL_AndroidGetActivity();
 
-		jclass clazz(env->GetObjectClass(activity));
-		jmethodID method_id = env->GetMethodID(clazz, "getCRequirePath", "()Ljava/lang/String;");
+    jclass clazz(env->GetObjectClass(activity));
+    jmethodID method_id = env->GetMethodID(clazz, "getCRequirePath", "()Ljava/lang/String;");
 
-		path = "";
-		initialized = true;
+    path = "";
+    initialized = true;
 
-		if (method_id)
-		{
-			jstring cpath = (jstring) env->CallObjectMethod(activity, method_id);
-			const char *utf = env->GetStringUTFChars(cpath, nullptr);
-			if (utf)
-			{
-				path = SDL_strdup(utf);
-				env->ReleaseStringUTFChars(cpath, utf);
-			}
+    if (method_id)
+    {
+      jstring cpath = (jstring) env->CallObjectMethod(activity, method_id);
+      const char *utf = env->GetStringUTFChars(cpath, nullptr);
+      if (utf)
+      {
+	path = SDL_strdup(utf);
+	env->ReleaseStringUTFChars(cpath, utf);
+      }
 
-			env->DeleteLocalRef(cpath);
-		}
-		else
-		{
-			// NoSuchMethodException is thrown in case methodID is null
-			env->ExceptionClear();
-			return "";
-		}
+      env->DeleteLocalRef(cpath);
+    }
+    else
+    {
+      // NoSuchMethodException is thrown in case methodID is null
+      env->ExceptionClear();
+      return "";
+    }
 
-		env->DeleteLocalRef(activity);
-		env->DeleteLocalRef(clazz);
-	}
+    env->DeleteLocalRef(activity);
+    env->DeleteLocalRef(clazz);
+  }
 
-	return path;
+  return path;
 }
 
 const char *getArg0()
 {
-	static PHYSFS_AndroidInit androidInit = {
-		SDL_AndroidGetJNIEnv(),
-		SDL_AndroidGetActivity()
-	};
-	return (const char *) &androidInit;
+  static PHYSFS_AndroidInit androidInit = {SDL_AndroidGetJNIEnv(), SDL_AndroidGetActivity()};
+  return (const char *) &androidInit;
 }
 
-} // android
-} // love
+}  // namespace android
+}  // namespace love
 
-#endif // LOVE_ANDROID
+#endif  // LOVE_ANDROID

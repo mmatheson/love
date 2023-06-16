@@ -22,8 +22,8 @@
 #define LOVE_PHYSICS_BOX2D_WRAP_BODY_H
 
 // LOVE
-#include "common/runtime.h"
 #include "Body.h"
+#include "common/runtime.h"
 
 namespace love
 {
@@ -35,8 +35,8 @@ namespace box2d
 Body *luax_checkbody(lua_State *L, int idx);
 extern "C" int luaopen_body(lua_State *L);
 
-} // box2d
-} // physics
-} // love
+}  // namespace box2d
+}  // namespace physics
+}  // namespace love
 
-#endif // LOVE_PHYSICS_BOX2D_WRAP_BODY_H
+#endif  // LOVE_PHYSICS_BOX2D_WRAP_BODY_H

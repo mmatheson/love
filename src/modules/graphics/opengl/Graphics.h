@@ -23,23 +23,20 @@
 
 // STD
 #include <stack>
-#include <vector>
 #include <unordered_map>
+#include <vector>
 
 // OpenGL
 #include "OpenGL.h"
 
 // LOVE
-#include "graphics/Graphics.h"
+#include "Canvas.h"
+#include "Image.h"
+#include "Shader.h"
 #include "common/Color.h"
-
+#include "graphics/Graphics.h"
 #include "image/Image.h"
 #include "image/ImageData.h"
-
-#include "Image.h"
-#include "Canvas.h"
-#include "Shader.h"
-
 #include "libraries/xxHash/xxhash.h"
 
 namespace love
@@ -52,111 +49,120 @@ namespace opengl
 
 class Graphics final : public love::graphics::Graphics
 {
-public:
+ public:
+  Graphics();
+  virtual ~Graphics();
 
-	Graphics();
-	virtual ~Graphics();
+  // Implements Module.
+  const char *getName() const override;
 
-	// Implements Module.
-	const char *getName() const override;
+  love::graphics::Image *newImage(const Image::Slices &data,
+                                  const Image::Settings &settings) override;
+  love::graphics::Image *newImage(TextureType textype, PixelFormat format, int width, int height,
+                                  int slices, const Image::Settings &settings) override;
+  love::graphics::Canvas *newCanvas(const Canvas::Settings &settings) override;
+  love::graphics::Buffer *newBuffer(size_t size, const void *data, BufferType type,
+                                    vertex::Usage usage, uint32 mapflags) override;
 
-	love::graphics::Image *newImage(const Image::Slices &data, const Image::Settings &settings) override;
-	love::graphics::Image *newImage(TextureType textype, PixelFormat format, int width, int height, int slices, const Image::Settings &settings) override;
-	love::graphics::Canvas *newCanvas(const Canvas::Settings &settings) override;
-	love::graphics::Buffer *newBuffer(size_t size, const void *data, BufferType type, vertex::Usage usage, uint32 mapflags) override;
+  void setViewportSize(int width, int height, int pixelwidth, int pixelheight) override;
+  bool setMode(int width, int height, int pixelwidth, int pixelheight,
+               bool windowhasstencil) override;
+  void unSetMode() override;
 
-	void setViewportSize(int width, int height, int pixelwidth, int pixelheight) override;
-	bool setMode(int width, int height, int pixelwidth, int pixelheight, bool windowhasstencil) override;
-	void unSetMode() override;
+  void setActive(bool active) override;
 
-	void setActive(bool active) override;
+  void draw(const DrawCommand &cmd) override;
+  void draw(const DrawIndexedCommand &cmd) override;
+  void drawQuads(int start, int count, const vertex::Attributes &attributes,
+                 const vertex::BufferBindings &buffers, Texture *texture) override;
 
-	void draw(const DrawCommand &cmd) override;
-	void draw(const DrawIndexedCommand &cmd) override;
-	void drawQuads(int start, int count, const vertex::Attributes &attributes, const vertex::BufferBindings &buffers, Texture *texture) override;
+  void clear(OptionalColorf color, OptionalInt stencil, OptionalDouble depth) override;
+  void clear(const std::vector<OptionalColorf> &colors, OptionalInt stencil,
+             OptionalDouble depth) override;
 
-	void clear(OptionalColorf color, OptionalInt stencil, OptionalDouble depth) override;
-	void clear(const std::vector<OptionalColorf> &colors, OptionalInt stencil, OptionalDouble depth) override;
+  void discard(const std::vector<bool> &colorbuffers, bool depthstencil) override;
 
-	void discard(const std::vector<bool> &colorbuffers, bool depthstencil) override;
+  void present(void *screenshotCallbackData) override;
 
-	void present(void *screenshotCallbackData) override;
+  void setColor(Colorf c) override;
 
-	void setColor(Colorf c) override;
+  void setScissor(const Rect &rect) override;
+  void setScissor() override;
 
-	void setScissor(const Rect &rect) override;
-	void setScissor() override;
+  void drawToStencilBuffer(StencilAction action, int value) override;
+  void stopDrawToStencilBuffer() override;
 
-	void drawToStencilBuffer(StencilAction action, int value) override;
-	void stopDrawToStencilBuffer() override;
+  void setStencilTest(CompareMode compare, int value) override;
 
-	void setStencilTest(CompareMode compare, int value) override;
+  void setDepthMode(CompareMode compare, bool write) override;
 
-	void setDepthMode(CompareMode compare, bool write) override;
+  void setFrontFaceWinding(vertex::Winding winding) override;
 
-	void setFrontFaceWinding(vertex::Winding winding) override;
+  void setColorMask(ColorMask mask) override;
 
-	void setColorMask(ColorMask mask) override;
+  void setBlendMode(BlendMode mode, BlendAlpha alphamode) override;
 
-	void setBlendMode(BlendMode mode, BlendAlpha alphamode) override;
+  void setPointSize(float size) override;
 
-	void setPointSize(float size) override;
+  void setWireframe(bool enable) override;
 
-	void setWireframe(bool enable) override;
+  bool isCanvasFormatSupported(PixelFormat format) const override;
+  bool isCanvasFormatSupported(PixelFormat format, bool readable) const override;
+  bool isImageFormatSupported(PixelFormat format, bool sRGB) const override;
+  Renderer getRenderer() const override;
+  RendererInfo getRendererInfo() const override;
 
-	bool isCanvasFormatSupported(PixelFormat format) const override;
-	bool isCanvasFormatSupported(PixelFormat format, bool readable) const override;
-	bool isImageFormatSupported(PixelFormat format, bool sRGB) const override;
-	Renderer getRenderer() const override;
-	RendererInfo getRendererInfo() const override;
+  Shader::Language getShaderLanguageTarget() const override;
 
-	Shader::Language getShaderLanguageTarget() const override;
+  // Internal use.
+  void cleanupCanvas(Canvas *canvas);
 
-	// Internal use.
-	void cleanupCanvas(Canvas *canvas);
+ private:
+  struct CachedFBOHasher
+  {
+    size_t operator()(const RenderTargets &rts) const
+    {
+      RenderTarget hashtargets[MAX_COLOR_RENDER_TARGETS + 1];
+      int hashcount = 0;
 
-private:
+      for (size_t i = 0; i < rts.colors.size(); i++) hashtargets[hashcount++] = rts.colors[i];
 
-	struct CachedFBOHasher
-	{
-		size_t operator() (const RenderTargets &rts) const
-		{
-			RenderTarget hashtargets[MAX_COLOR_RENDER_TARGETS + 1];
-			int hashcount = 0;
+      if (rts.depthStencil.canvas != nullptr)
+	hashtargets[hashcount++] = rts.depthStencil;
+      else if (rts.temporaryRTFlags != 0)
+	hashtargets[hashcount++] = RenderTarget(nullptr, -1, rts.temporaryRTFlags);
 
-			for (size_t i = 0; i < rts.colors.size(); i++)
-				hashtargets[hashcount++] = rts.colors[i];
+      return XXH32(hashtargets, sizeof(RenderTarget) * hashcount, 0);
+    }
+  };
 
-			if (rts.depthStencil.canvas != nullptr)
-				hashtargets[hashcount++] = rts.depthStencil;
-			else if (rts.temporaryRTFlags != 0)
-				hashtargets[hashcount++] = RenderTarget(nullptr, -1, rts.temporaryRTFlags);
+  love::graphics::ShaderStage *newShaderStageInternal(ShaderStage::StageType stage,
+                                                      const std::string &cachekey,
+                                                      const std::string &source,
+                                                      bool gles) override;
+  love::graphics::Shader *newShaderInternal(love::graphics::ShaderStage *vertex,
+                                            love::graphics::ShaderStage *pixel) override;
+  love::graphics::StreamBuffer *newStreamBuffer(BufferType type, size_t size) override;
+  void setCanvasInternal(const RenderTargets &rts, int w, int h, int pixelw, int pixelh,
+                         bool hasSRGBcanvas) override;
+  void initCapabilities() override;
+  void getAPIStats(int &shaderswitches) const override;
 
-			return XXH32(hashtargets, sizeof(RenderTarget) * hashcount, 0);
-		}
-	};
+  void endPass();
+  void bindCachedFBO(const RenderTargets &targets);
+  void discard(OpenGL::FramebufferTarget target, const std::vector<bool> &colorbuffers,
+               bool depthstencil);
 
-	love::graphics::ShaderStage *newShaderStageInternal(ShaderStage::StageType stage, const std::string &cachekey, const std::string &source, bool gles) override;
-	love::graphics::Shader *newShaderInternal(love::graphics::ShaderStage *vertex, love::graphics::ShaderStage *pixel) override;
-	love::graphics::StreamBuffer *newStreamBuffer(BufferType type, size_t size) override;
-	void setCanvasInternal(const RenderTargets &rts, int w, int h, int pixelw, int pixelh, bool hasSRGBcanvas) override;
-	void initCapabilities() override;
-	void getAPIStats(int &shaderswitches) const override;
+  void setDebug(bool enable);
 
-	void endPass();
-	void bindCachedFBO(const RenderTargets &targets);
-	void discard(OpenGL::FramebufferTarget target, const std::vector<bool> &colorbuffers, bool depthstencil);
+  std::unordered_map<RenderTargets, GLuint, CachedFBOHasher> framebufferObjects;
+  bool windowHasStencil;
+  GLuint mainVAO;
 
-	void setDebug(bool enable);
+};  // Graphics
 
-	std::unordered_map<RenderTargets, GLuint, CachedFBOHasher> framebufferObjects;
-	bool windowHasStencil;
-	GLuint mainVAO;
+}  // namespace opengl
+}  // namespace graphics
+}  // namespace love
 
-}; // Graphics
-
-} // opengl
-} // graphics
-} // love
-
-#endif // LOVE_GRAPHICS_OPENGL_GRAPHICS_H
+#endif  // LOVE_GRAPHICS_OPENGL_GRAPHICS_H

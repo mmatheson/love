@@ -34,7 +34,7 @@ extern "C" int luaopen_texture(lua_State *L);
 
 extern const luaL_Reg w_Texture_functions[];
 
-} // graphics
-} // love
+}  // namespace graphics
+}  // namespace love
 
-#endif // LOVE_GRAPHICS_WRAP_TEXTURE_H
+#endif  // LOVE_GRAPHICS_WRAP_TEXTURE_H

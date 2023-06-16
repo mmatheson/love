@@ -36,32 +36,30 @@ namespace sdl
 
 class Touch : public love::touch::Touch
 {
-public:
+ public:
+  virtual ~Touch() {}
 
-	virtual ~Touch() {}
+  const std::vector<TouchInfo> &getTouches() const override;
+  const TouchInfo &getTouch(int64 id) const override;
 
-	const std::vector<TouchInfo> &getTouches() const override;
-	const TouchInfo &getTouch(int64 id) const override;
+  // Implements Module.
+  const char *getName() const override;
 
-	// Implements Module.
-	const char *getName() const override;
+  // SDL has functions to query the state of touch presses, but unfortunately
+  // they are updated on a different thread in some backends, which causes
+  // issues especially if the user is iterating through the current touches
+  // when they're updated. So we only update our touch press state in
+  // love::event::sdl::Event::convert.
+  void onEvent(Uint32 eventtype, const TouchInfo &info);
 
-	// SDL has functions to query the state of touch presses, but unfortunately
-	// they are updated on a different thread in some backends, which causes
-	// issues especially if the user is iterating through the current touches
-	// when they're updated. So we only update our touch press state in
-	// love::event::sdl::Event::convert.
-	void onEvent(Uint32 eventtype, const TouchInfo &info);
+ private:
+  // All current touches.
+  std::vector<TouchInfo> touches;
 
-private:
+};  // Touch
 
-	// All current touches.
-	std::vector<TouchInfo> touches;
+}  // namespace sdl
+}  // namespace touch
+}  // namespace love
 
-}; // Touch
-
-} // sdl
-} // touch
-} // love
-
-#endif // LOVE_TOUCH_SDL_TOUCH_H
+#endif  // LOVE_TOUCH_SDL_TOUCH_H

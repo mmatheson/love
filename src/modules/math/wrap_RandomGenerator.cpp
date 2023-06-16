@@ -20,13 +20,13 @@
 
 #include "wrap_RandomGenerator.h"
 
-#include <cmath>
 #include <algorithm>
+#include <cmath>
 
 // Put the Lua code directly into a raw string literal.
 static const char randomgenerator_lua[] =
 #include "wrap_RandomGenerator.lua"
-;
+    ;
 
 namespace love
 {
@@ -36,126 +36,120 @@ namespace math
 template <typename T>
 static T checkrandomseed_part(lua_State *L, int idx)
 {
-	double num = luaL_checknumber(L, idx);
-	double inf = std::numeric_limits<double>::infinity();
+  double num = luaL_checknumber(L, idx);
+  double inf = std::numeric_limits<double>::infinity();
 
-	// Disallow conversions from infinity and NaN.
-	if (num == inf || num == -inf || num != num)
-		luaL_argerror(L, idx, "invalid random seed");
+  // Disallow conversions from infinity and NaN.
+  if (num == inf || num == -inf || num != num)
+    luaL_argerror(L, idx, "invalid random seed");
 
-	return (T) num;
+  return (T) num;
 }
 
 RandomGenerator::Seed luax_checkrandomseed(lua_State *L, int idx)
 {
-	RandomGenerator::Seed s;
+  RandomGenerator::Seed s;
 
-	if (!lua_isnoneornil(L, idx + 1))
-	{
-		s.b32.low = checkrandomseed_part<uint32>(L, idx);
-		s.b32.high = checkrandomseed_part<uint32>(L, idx + 1);
-	}
-	else
-		s.b64 = checkrandomseed_part<uint64>(L, idx);
+  if (!lua_isnoneornil(L, idx + 1))
+  {
+    s.b32.low = checkrandomseed_part<uint32>(L, idx);
+    s.b32.high = checkrandomseed_part<uint32>(L, idx + 1);
+  }
+  else
+    s.b64 = checkrandomseed_part<uint64>(L, idx);
 
-	return s;
+  return s;
 }
 
 RandomGenerator *luax_checkrandomgenerator(lua_State *L, int idx)
 {
-	return luax_checktype<RandomGenerator>(L, idx);
+  return luax_checktype<RandomGenerator>(L, idx);
 }
 
 int w_RandomGenerator__random(lua_State *L)
 {
-	RandomGenerator *rng = luax_checkrandomgenerator(L, 1);
-	lua_pushnumber(L, rng->random());
-	return 1;
+  RandomGenerator *rng = luax_checkrandomgenerator(L, 1);
+  lua_pushnumber(L, rng->random());
+  return 1;
 }
 
 int w_RandomGenerator_randomNormal(lua_State *L)
 {
-	RandomGenerator *rng = luax_checkrandomgenerator(L, 1);
+  RandomGenerator *rng = luax_checkrandomgenerator(L, 1);
 
-	double stddev = luaL_optnumber(L, 2, 1.0);
-	double mean = luaL_optnumber(L, 3, 0.0);
-	double r = rng->randomNormal(stddev);
+  double stddev = luaL_optnumber(L, 2, 1.0);
+  double mean = luaL_optnumber(L, 3, 0.0);
+  double r = rng->randomNormal(stddev);
 
-	lua_pushnumber(L, r + mean);
-	return 1;
+  lua_pushnumber(L, r + mean);
+  return 1;
 }
 
 int w_RandomGenerator_setSeed(lua_State *L)
 {
-	RandomGenerator *rng = luax_checkrandomgenerator(L, 1);
-	luax_catchexcept(L, [&](){ rng->setSeed(luax_checkrandomseed(L, 2)); });
-	return 0;
+  RandomGenerator *rng = luax_checkrandomgenerator(L, 1);
+  luax_catchexcept(L, [&]() { rng->setSeed(luax_checkrandomseed(L, 2)); });
+  return 0;
 }
 
 int w_RandomGenerator_getSeed(lua_State *L)
 {
-	RandomGenerator *rng = luax_checkrandomgenerator(L, 1);
-	RandomGenerator::Seed s = rng->getSeed();
-	lua_pushnumber(L, (lua_Number) s.b32.low);
-	lua_pushnumber(L, (lua_Number) s.b32.high);
-	return 2;
+  RandomGenerator *rng = luax_checkrandomgenerator(L, 1);
+  RandomGenerator::Seed s = rng->getSeed();
+  lua_pushnumber(L, (lua_Number) s.b32.low);
+  lua_pushnumber(L, (lua_Number) s.b32.high);
+  return 2;
 }
 
 int w_RandomGenerator_setState(lua_State *L)
 {
-	RandomGenerator *rng = luax_checkrandomgenerator(L, 1);
-	luax_catchexcept(L, [&](){ rng->setState(luax_checkstring(L, 2)); });
-	return 0;
+  RandomGenerator *rng = luax_checkrandomgenerator(L, 1);
+  luax_catchexcept(L, [&]() { rng->setState(luax_checkstring(L, 2)); });
+  return 0;
 }
 
 int w_RandomGenerator_getState(lua_State *L)
 {
-	RandomGenerator *rng = luax_checkrandomgenerator(L, 1);
-	luax_pushstring(L, rng->getState());
-	return 1;
+  RandomGenerator *rng = luax_checkrandomgenerator(L, 1);
+  luax_pushstring(L, rng->getState());
+  return 1;
 }
 
 // C functions in a struct, necessary for the FFI versions of RandomGenerator functions.
 struct FFI_RandomGenerator
 {
-	double (*random)(Proxy *p);
-	double (*randomNormal)(Proxy *p, double stddev, double mean);
+  double (*random)(Proxy *p);
+  double (*randomNormal)(Proxy *p, double stddev, double mean);
 };
 
-static FFI_RandomGenerator ffifuncs =
-{
-	[](Proxy *p) -> double // random()
-	{
-		auto rng = luax_ffi_checktype<RandomGenerator>(p);
-		return rng != nullptr ? rng->random() : 0.0;
-	},
+static FFI_RandomGenerator ffifuncs = {
+    [](Proxy *p) -> double  // random()
+    {
+      auto rng = luax_ffi_checktype<RandomGenerator>(p);
+      return rng != nullptr ? rng->random() : 0.0;
+    },
 
-	[](Proxy *p, double stdddev, double mean) -> double // randomNormal
-	{
-		auto rng = luax_ffi_checktype<RandomGenerator>(p);
-		return rng != nullptr ? (rng->randomNormal(stdddev) + mean) : 0.0;
-	}
-};
+    [](Proxy *p, double stdddev, double mean) -> double  // randomNormal
+    {
+      auto rng = luax_ffi_checktype<RandomGenerator>(p);
+      return rng != nullptr ? (rng->randomNormal(stdddev) + mean) : 0.0;
+    }};
 
-static const luaL_Reg w_RandomGenerator_functions[] =
-{
-	{ "_random", w_RandomGenerator__random }, // random() is defined in wrap_RandomGenerator.lua.
-	{ "randomNormal", w_RandomGenerator_randomNormal },
-	{ "setSeed", w_RandomGenerator_setSeed },
-	{ "getSeed", w_RandomGenerator_getSeed },
-	{ "setState", w_RandomGenerator_setState },
-	{ "getState", w_RandomGenerator_getState },
-	{ 0, 0 }
-};
+static const luaL_Reg w_RandomGenerator_functions[] = {
+    {"_random", w_RandomGenerator__random},  // random() is defined in wrap_RandomGenerator.lua.
+    {"randomNormal", w_RandomGenerator_randomNormal}, {"setSeed", w_RandomGenerator_setSeed},
+    {"getSeed", w_RandomGenerator_getSeed},           {"setState", w_RandomGenerator_setState},
+    {"getState", w_RandomGenerator_getState},         {0, 0}};
 
 extern "C" int luaopen_randomgenerator(lua_State *L)
 {
-	int n = luax_register_type(L, &RandomGenerator::type, w_RandomGenerator_functions, nullptr);
+  int n = luax_register_type(L, &RandomGenerator::type, w_RandomGenerator_functions, nullptr);
 
-	luax_runwrapper(L, randomgenerator_lua, sizeof(randomgenerator_lua), "RandomGenerator.lua", RandomGenerator::type, &ffifuncs);
+  luax_runwrapper(L, randomgenerator_lua, sizeof(randomgenerator_lua), "RandomGenerator.lua",
+                  RandomGenerator::type, &ffifuncs);
 
-	return n;
+  return n;
 }
 
-} // math
-} // love
+}  // namespace math
+}  // namespace love

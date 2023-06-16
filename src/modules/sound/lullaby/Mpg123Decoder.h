@@ -43,53 +43,52 @@ namespace lullaby
 
 struct DecoderFile
 {
-	unsigned char *data;
-	size_t size;
-	size_t offset;
+  unsigned char *data;
+  size_t size;
+  size_t offset;
 
-	DecoderFile(Data *d)
-		: data((unsigned char *) d->getData())
-		, size(d->getSize())
-		, offset(0)
-	{}
+  DecoderFile(Data *d)
+      : data((unsigned char *) d->getData()),
+        size(d->getSize()),
+        offset(0)
+  {
+  }
 };
 
 class Mpg123Decoder : public Decoder
 {
-public:
+ public:
+  Mpg123Decoder(Data *data, int bufferSize);
+  virtual ~Mpg123Decoder();
 
-	Mpg123Decoder(Data *data, int bufferSize);
-	virtual ~Mpg123Decoder();
+  static bool accepts(const std::string &ext);
+  static void quit();
 
-	static bool accepts(const std::string &ext);
-	static void quit();
+  love::sound::Decoder *clone();
+  int decode();
+  bool seek(double s);
+  bool rewind();
+  bool isSeekable();
+  int getChannelCount() const;
+  int getBitDepth() const;
+  double getDuration();
 
-	love::sound::Decoder *clone();
-	int decode();
-	bool seek(double s);
-	bool rewind();
-	bool isSeekable();
-	int getChannelCount() const;
-	int getBitDepth() const;
-	double getDuration();
+ private:
+  DecoderFile decoder_file;
 
-private:
+  mpg123_handle *handle;
+  static bool inited;
 
-	DecoderFile decoder_file;
+  int channels;
 
-	mpg123_handle *handle;
-	static bool inited;
+  double duration;
 
-	int channels;
+};  // Decoder
 
-	double duration;
+}  // namespace lullaby
+}  // namespace sound
+}  // namespace love
 
-}; // Decoder
+#endif  // LOVE_NOMPG123
 
-} // lullaby
-} // sound
-} // love
-
-#endif // LOVE_NOMPG123
-
-#endif // LOVE_SOUND_LULLABY_LIBMPG123_DECODER_H
+#endif  // LOVE_SOUND_LULLABY_LIBMPG123_DECODER_H

@@ -45,35 +45,33 @@ namespace lullaby
 
 class ModPlugDecoder : public Decoder
 {
-public:
+ public:
+  ModPlugDecoder(Data *data, int bufferSize);
+  virtual ~ModPlugDecoder();
 
-	ModPlugDecoder(Data *data, int bufferSize);
-	virtual ~ModPlugDecoder();
+  static bool accepts(const std::string &ext);
 
-	static bool accepts(const std::string &ext);
+  love::sound::Decoder *clone();
+  int decode();
+  bool seek(double s);
+  bool rewind();
+  bool isSeekable();
+  int getChannelCount() const;
+  int getBitDepth() const;
+  double getDuration();
 
-	love::sound::Decoder *clone();
-	int decode();
-	bool seek(double s);
-	bool rewind();
-	bool isSeekable();
-	int getChannelCount() const;
-	int getBitDepth() const;
-	double getDuration();
+ private:
+  ModPlugFile *plug;
+  ModPlug_Settings settings;
 
-private:
+  double duration;
 
-	ModPlugFile *plug;
-	ModPlug_Settings settings;
+};  // Decoder
 
-	double duration;
+}  // namespace lullaby
+}  // namespace sound
+}  // namespace love
 
-}; // Decoder
+#endif  // LOVE_NO_MODPLUG
 
-} // lullaby
-} // sound
-} // love
-
-#endif // LOVE_NO_MODPLUG
-
-#endif // LOVE_SOUND_LULLABY_MODPLUG_DECODER_H
+#endif  // LOVE_SOUND_LULLABY_MODPLUG_DECODER_H

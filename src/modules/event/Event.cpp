@@ -20,8 +20,8 @@
 
 #include "Event.h"
 
-using love::thread::Mutex;
 using love::thread::Lock;
+using love::thread::Mutex;
 
 namespace love
 {
@@ -29,86 +29,81 @@ namespace event
 {
 
 Message::Message(const std::string &name, const std::vector<Variant> &vargs)
-	: name(name)
-	, args(vargs)
+    : name(name),
+      args(vargs)
 {
 }
 
-Message::~Message()
-{
-}
+Message::~Message() {}
 
 int Message::toLua(lua_State *L)
 {
-	luax_pushstring(L, name);
+  luax_pushstring(L, name);
 
-	for (const Variant &v : args)
-		v.toLua(L);
+  for (const Variant &v : args) v.toLua(L);
 
-	return (int) args.size() + 1;
+  return (int) args.size() + 1;
 }
 
 Message *Message::fromLua(lua_State *L, int n)
 {
-	std::string name = luax_checkstring(L, n);
-	std::vector<Variant> vargs;
+  std::string name = luax_checkstring(L, n);
+  std::vector<Variant> vargs;
 
-	int count = lua_gettop(L) - n;
-	n++;
+  int count = lua_gettop(L) - n;
+  n++;
 
-	Variant varg;
+  Variant varg;
 
-	for (int i = 0; i < count; i++)
-	{
-		if (lua_isnoneornil(L, n+i))
-			break;
+  for (int i = 0; i < count; i++)
+  {
+    if (lua_isnoneornil(L, n + i))
+      break;
 
-		luax_catchexcept(L, [&]() {
-			vargs.push_back(Variant::fromLua(L, n+i));
-		});
+    luax_catchexcept(L, [&]() { vargs.push_back(Variant::fromLua(L, n + i)); });
 
-		if (vargs.back().getType() == Variant::UNKNOWN)
-		{
-			vargs.clear();
-			luaL_error(L, "Argument %d can't be stored safely\nExpected boolean, number, string or userdata.", n+i);
-			return nullptr;
-		}
-	}
+    if (vargs.back().getType() == Variant::UNKNOWN)
+    {
+      vargs.clear();
+      luaL_error(
+          L, "Argument %d can't be stored safely\nExpected boolean, number, string or userdata.",
+          n + i);
+      return nullptr;
+    }
+  }
 
-	return new Message(name, vargs);
+  return new Message(name, vargs);
 }
 
-Event::~Event()
-{
-}
+Event::~Event() {}
 
 void Event::push(Message *msg)
 {
-	Lock lock(mutex);
-	msg->retain();
-	queue.push(msg);
+  Lock lock(mutex);
+  msg->retain();
+  queue.push(msg);
 }
 
 bool Event::poll(Message *&msg)
 {
-	Lock lock(mutex);
-	if (queue.empty())
-		return false;
-	msg = queue.front();
-	queue.pop();
-	return true;
+  Lock lock(mutex);
+  if (queue.empty())
+    return false;
+  msg = queue.front();
+  queue.pop();
+  return true;
 }
 
 void Event::clear()
 {
-	Lock lock(mutex);
-	while (!queue.empty())
-	{
-		// std::queue::pop will remove the first (front) element.
-		queue.front()->release();
-		queue.pop();
-	}
+  Lock lock(mutex);
+  while (!queue.empty())
+  {
+    // std::queue::pop will remove the first (front) element.
+    queue.front()->release();
+    queue.pop();
+  }
 }
 
-} // event
-} // love
+}  // namespace event
+}  // namespace love

@@ -22,8 +22,8 @@
 #define LOVE_AUDIO_WRAP_RECORDING_DEVICE_H
 
 // LOVE
-#include "common/runtime.h"
 #include "RecordingDevice.h"
+#include "common/runtime.h"
 
 namespace love
 {
@@ -33,8 +33,7 @@ namespace audio
 RecordingDevice *luax_checkrecordingdevice(lua_State *L, int idx);
 extern "C" int luaopen_recordingdevice(lua_State *L);
 
-} // audio
-} // love
+}  // namespace audio
+}  // namespace love
 
-#endif //LOVE_AUDIO_WRAP_RECORDING_DEVICE_H
-
+#endif  // LOVE_AUDIO_WRAP_RECORDING_DEVICE_H

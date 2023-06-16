@@ -18,13 +18,12 @@
  * 3. This notice may not be removed or altered from any source distribution.
  **/
 
-
-
 #ifndef LOVE_SOUND_LULLABY_SOUND_H
 #define LOVE_SOUND_LULLABY_SOUND_H
 
 // LOVE
 #include <sound/Sound.h>
+
 #include "sound/Decoder.h"
 
 namespace love
@@ -43,28 +42,27 @@ namespace lullaby
  **/
 class Sound : public love::sound::Sound
 {
-public:
+ public:
+  /**
+   * Constructor. Initializes relevant libraries.
+   **/
+  Sound();
 
-	/**
-	 * Constructor. Initializes relevant libraries.
-	 **/
-	Sound();
+  /**
+   * Destructor. Deinitializes relevant libraries.
+   **/
+  virtual ~Sound();
 
-	/**
-	 * Destructor. Deinitializes relevant libraries.
-	 **/
-	virtual ~Sound();
+  /// @copydoc love::Module::getName
+  const char *getName() const;
 
-	/// @copydoc love::Module::getName
-	const char *getName() const;
+  /// @copydoc love::sound::Sound::newDecoder
+  sound::Decoder *newDecoder(love::filesystem::FileData *file, int bufferSize);
 
-	/// @copydoc love::sound::Sound::newDecoder
-	sound::Decoder *newDecoder(love::filesystem::FileData *file, int bufferSize);
+};  // Sound
 
-}; // Sound
+}  // namespace lullaby
+}  // namespace sound
+}  // namespace love
 
-} // lullaby
-} // sound
-} // love
-
-#endif // LOVE_SOUND_LULLABY_SOUND_H
+#endif  // LOVE_SOUND_LULLABY_SOUND_H

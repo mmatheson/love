@@ -21,8 +21,8 @@
 #pragma once
 
 // LOVE
-#include "common/runtime.h"
 #include "Canvas.h"
+#include "common/runtime.h"
 #include "wrap_Texture.h"
 
 namespace love
@@ -30,9 +30,9 @@ namespace love
 namespace graphics
 {
 
-//see Canvas.h
+// see Canvas.h
 Canvas *luax_checkcanvas(lua_State *L, int idx);
 extern "C" int luaopen_canvas(lua_State *L);
 
-} // graphics
-} // love
+}  // namespace graphics
+}  // namespace love

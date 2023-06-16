@@ -20,6 +20,7 @@
 
 // LOVE
 #include "System.h"
+
 #include "window/Window.h"
 
 // SDL
@@ -33,74 +34,69 @@ namespace system
 namespace sdl
 {
 
-System::System()
-{
-}
+System::System() {}
 
-const char *System::getName() const
-{
-	return "love.system.sdl";
-}
+const char *System::getName() const { return "love.system.sdl"; }
 
-int System::getProcessorCount() const
-{
-	return SDL_GetCPUCount();
-}
+int System::getProcessorCount() const { return SDL_GetCPUCount(); }
 
 bool System::isWindowOpen() const
 {
-	auto window = Module::getInstance<window::Window>(M_WINDOW);
-	return window != nullptr && window->isOpen();
+  auto window = Module::getInstance<window::Window>(M_WINDOW);
+  return window != nullptr && window->isOpen();
 }
 
 void System::setClipboardText(const std::string &text) const
 {
-	// SDL requires the video subsystem to be initialized and a window to be
-	// opened in order for clipboard text to work, on at least some platforms.
-	if (!isWindowOpen())
-		throw love::Exception("A window must be created in order for setClipboardText to function properly.");
+  // SDL requires the video subsystem to be initialized and a window to be
+  // opened in order for clipboard text to work, on at least some platforms.
+  if (!isWindowOpen())
+    throw love::Exception(
+        "A window must be created in order for setClipboardText to function properly.");
 
-	SDL_SetClipboardText(text.c_str());
+  SDL_SetClipboardText(text.c_str());
 }
 
 std::string System::getClipboardText() const
 {
-	if (!isWindowOpen())
-		throw love::Exception("A window must be created in order for getClipboardText to function properly.");
+  if (!isWindowOpen())
+    throw love::Exception(
+        "A window must be created in order for getClipboardText to function properly.");
 
-	std::string text("");
+  std::string text("");
 
-	char *ctext = SDL_GetClipboardText();
-	if (ctext)
-	{
-		text = std::string(ctext);
-		SDL_free(ctext);
-	}
+  char *ctext = SDL_GetClipboardText();
+  if (ctext)
+  {
+    text = std::string(ctext);
+    SDL_free(ctext);
+  }
 
-	return text;
+  return text;
 }
 
 love::system::System::PowerState System::getPowerInfo(int &seconds, int &percent) const
 {
-	SDL_PowerState sdlstate = SDL_GetPowerInfo(&seconds, &percent);
+  SDL_PowerState sdlstate = SDL_GetPowerInfo(&seconds, &percent);
 
-	PowerState state = POWER_UNKNOWN;
-	powerStates.find(sdlstate, state);
+  PowerState state = POWER_UNKNOWN;
+  powerStates.find(sdlstate, state);
 
-	return state;
+  return state;
 }
 
 EnumMap<System::PowerState, SDL_PowerState, System::POWER_MAX_ENUM>::Entry System::powerEntries[] =
-{
-	{System::POWER_UNKNOWN, SDL_POWERSTATE_UNKNOWN},
-	{System::POWER_BATTERY, SDL_POWERSTATE_ON_BATTERY},
-	{System::POWER_NO_BATTERY, SDL_POWERSTATE_NO_BATTERY},
-	{System::POWER_CHARGING, SDL_POWERSTATE_CHARGING},
-	{System::POWER_CHARGED, SDL_POWERSTATE_CHARGED},
+    {
+        {System::POWER_UNKNOWN, SDL_POWERSTATE_UNKNOWN},
+        {System::POWER_BATTERY, SDL_POWERSTATE_ON_BATTERY},
+        {System::POWER_NO_BATTERY, SDL_POWERSTATE_NO_BATTERY},
+        {System::POWER_CHARGING, SDL_POWERSTATE_CHARGING},
+        {System::POWER_CHARGED, SDL_POWERSTATE_CHARGED},
 };
 
-EnumMap<System::PowerState, SDL_PowerState, System::POWER_MAX_ENUM> System::powerStates(System::powerEntries, sizeof(System::powerEntries));
+EnumMap<System::PowerState, SDL_PowerState, System::POWER_MAX_ENUM> System::powerStates(
+    System::powerEntries, sizeof(System::powerEntries));
 
-} // sdl
-} // system
-} // love
+}  // namespace sdl
+}  // namespace system
+}  // namespace love

@@ -21,12 +21,12 @@
 #pragma once
 
 // LOVE
-#include "common/math.h"
 #include "Drawable.h"
 #include "Image.h"
+#include "audio/Source.h"
+#include "common/math.h"
 #include "vertex.h"
 #include "video/VideoStream.h"
-#include "audio/Source.h"
 
 namespace love
 {
@@ -37,47 +37,45 @@ class Graphics;
 
 class Video : public Drawable
 {
-public:
+ public:
+  static love::Type type;
 
-	static love::Type type;
+  Video(Graphics *gfx, love::video::VideoStream *stream, float dpiscale = 1.0f);
+  virtual ~Video();
 
-	Video(Graphics *gfx, love::video::VideoStream *stream, float dpiscale = 1.0f);
-	virtual ~Video();
+  // Drawable
+  void draw(Graphics *gfx, const Matrix4 &m) override;
 
-	// Drawable
-	void draw(Graphics *gfx, const Matrix4 &m) override;
+  love::video::VideoStream *getStream();
 
-	love::video::VideoStream *getStream();
+  love::audio::Source *getSource();
+  void setSource(love::audio::Source *source);
 
-	love::audio::Source *getSource();
-	void setSource(love::audio::Source *source);
+  int getWidth() const;
+  int getHeight() const;
 
-	int getWidth() const;
-	int getHeight() const;
+  int getPixelWidth() const;
+  int getPixelHeight() const;
 
-	int getPixelWidth() const;
-	int getPixelHeight() const;
+  void setFilter(const Texture::Filter &f);
+  const Texture::Filter &getFilter() const;
 
-	void setFilter(const Texture::Filter &f);
-	const Texture::Filter &getFilter() const;
+ private:
+  void update();
 
-private:
+  StrongRef<love::video::VideoStream> stream;
 
-	void update();
+  int width;
+  int height;
 
-	StrongRef<love::video::VideoStream> stream;
+  Texture::Filter filter;
 
-	int width;
-	int height;
+  Vertex vertices[4];
 
-	Texture::Filter filter;
+  StrongRef<Image> images[3];
+  StrongRef<love::audio::Source> source;
 
-	Vertex vertices[4];
+};  // Video
 
-	StrongRef<Image> images[3];
-	StrongRef<love::audio::Source> source;
-	
-}; // Video
-
-} // graphics
-} // love
+}  // namespace graphics
+}  // namespace love

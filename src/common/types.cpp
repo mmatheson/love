@@ -19,62 +19,60 @@
  **/
 
 // STL
-#include <unordered_map>
-
 #include "types.h"
+
+#include <unordered_map>
 
 namespace love
 {
 
-static std::unordered_map<std::string, Type*> types;
+static std::unordered_map<std::string, Type *> types;
 
 Type::Type(const char *name, Type *parent)
-	: name(name)
-	, parent(parent)
-	, id(0)
-	, inited(false)
+    : name(name),
+      parent(parent),
+      id(0),
+      inited(false)
 {
 }
 
 void Type::init()
 {
-	static uint32 nextId = 1;
+  static uint32 nextId = 1;
 
-	// Make sure we don't init twice, that would be bad
-	if (inited)
-		return;
+  // Make sure we don't init twice, that would be bad
+  if (inited)
+    return;
 
-	// Note: we add it here, not in the constructor, because some Types can get initialized before the map!
-	types[name] = this;
-	id = nextId++;
-	bits[id] = true;
-	inited = true;
+  // Note: we add it here, not in the constructor, because some Types can get initialized before the
+  // map!
+  types[name] = this;
+  id = nextId++;
+  bits[id] = true;
+  inited = true;
 
-	if (!parent)
-		return;
-	if (!parent->inited)
-		parent->init();
-	bits |= parent->bits;
+  if (!parent)
+    return;
+  if (!parent->inited)
+    parent->init();
+  bits |= parent->bits;
 }
 
 uint32 Type::getId()
 {
-	if (!inited)
-		init();
-	return id;
+  if (!inited)
+    init();
+  return id;
 }
 
-const char *Type::getName() const
-{
-	return name;
-}
+const char *Type::getName() const { return name; }
 
 Type *Type::byName(const char *name)
 {
-	auto pos = types.find(name);
-	if (pos == types.end())
-		return nullptr;
-	return pos->second;
+  auto pos = types.find(name);
+  if (pos == types.end())
+    return nullptr;
+  return pos->second;
 }
 
-} // love
+}  // namespace love

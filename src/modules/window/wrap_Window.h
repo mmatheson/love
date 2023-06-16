@@ -31,7 +31,7 @@ namespace window
 
 extern "C" LOVE_EXPORT int luaopen_love_window(lua_State *L);
 
-} // window
-} // love
+}  // namespace window
+}  // namespace love
 
-#endif // LOVE_WINDOW_WRAP_WINDOW_H
+#endif  // LOVE_WINDOW_WRAP_WINDOW_H

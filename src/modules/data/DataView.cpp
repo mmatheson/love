@@ -19,6 +19,7 @@
  **/
 
 #include "DataView.h"
+
 #include "common/Exception.h"
 #include "common/int.h"
 
@@ -30,42 +31,31 @@ namespace data
 love::Type DataView::type("DataView", &Data::type);
 
 DataView::DataView(Data *data, size_t offset, size_t size)
-	: data(data)
-	, offset(offset)
-	, size(size)
+    : data(data),
+      offset(offset),
+      size(size)
 {
-	if (offset >= data->getSize() || size > data->getSize() || offset > data->getSize() - size)
-		throw love::Exception("Offset and size of Data View must fit within the original Data's size.");
+  if (offset >= data->getSize() || size > data->getSize() || offset > data->getSize() - size)
+    throw love::Exception("Offset and size of Data View must fit within the original Data's size.");
 
-	if (size == 0)
-		throw love::Exception("DataView size must be greater than 0.");
+  if (size == 0)
+    throw love::Exception("DataView size must be greater than 0.");
 }
 
 DataView::DataView(const DataView &d)
-	: data(d.data)
-	, offset(d.offset)
-	, size(d.size)
+    : data(d.data),
+      offset(d.offset),
+      size(d.size)
 {
 }
 
-DataView::~DataView()
-{
-}
+DataView::~DataView() {}
 
-DataView *DataView::clone() const
-{
-	return new DataView(*this);
-}
+DataView *DataView::clone() const { return new DataView(*this); }
 
-void *DataView::getData() const
-{
-	return (uint8 *) data->getData() + offset;
-}
+void *DataView::getData() const { return (uint8 *) data->getData() + offset; }
 
-size_t DataView::getSize() const
-{
-	return size;
-}
+size_t DataView::getSize() const { return size; }
 
-} // data
-} // love
+}  // namespace data
+}  // namespace love

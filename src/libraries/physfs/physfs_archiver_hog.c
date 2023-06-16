@@ -49,109 +49,103 @@
 
 static int readui32(PHYSFS_Io *io, PHYSFS_uint32 *val)
 {
-    PHYSFS_uint32 v;
-    BAIL_IF_ERRPASS(!__PHYSFS_readAll(io, &v, sizeof (v)), 0);
-    *val = PHYSFS_swapULE32(v);
-    return 1;
+  PHYSFS_uint32 v;
+  BAIL_IF_ERRPASS(!__PHYSFS_readAll(io, &v, sizeof(v)), 0);
+  *val = PHYSFS_swapULE32(v);
+  return 1;
 } /* readui32 */
 
 static int hog1LoadEntries(PHYSFS_Io *io, void *arc)
 {
-    const PHYSFS_uint64 iolen = io->length(io);
-    PHYSFS_uint32 pos = 3;
+  const PHYSFS_uint64 iolen = io->length(io);
+  PHYSFS_uint32 pos = 3;
 
-    while (pos < iolen)
-    {
-        PHYSFS_uint32 size;
-        char name[13];
+  while (pos < iolen)
+  {
+    PHYSFS_uint32 size;
+    char name[13];
 
-        BAIL_IF_ERRPASS(!__PHYSFS_readAll(io, name, 13), 0);
-        BAIL_IF_ERRPASS(!readui32(io, &size), 0);
-        name[12] = '\0';  /* just in case. */
-        pos += 13 + 4;
+    BAIL_IF_ERRPASS(!__PHYSFS_readAll(io, name, 13), 0);
+    BAIL_IF_ERRPASS(!readui32(io, &size), 0);
+    name[12] = '\0'; /* just in case. */
+    pos += 13 + 4;
 
-        BAIL_IF_ERRPASS(!UNPK_addEntry(arc, name, 0, -1, -1, pos, size), 0);
-        pos += size;
+    BAIL_IF_ERRPASS(!UNPK_addEntry(arc, name, 0, -1, -1, pos, size), 0);
+    pos += size;
 
-        /* skip over entry */
-        BAIL_IF_ERRPASS(!io->seek(io, pos), 0);
-    } /* while */
+    /* skip over entry */
+    BAIL_IF_ERRPASS(!io->seek(io, pos), 0);
+  } /* while */
 
-    return 1;
+  return 1;
 } /* hogLoadEntries */
 
 static int hog2LoadEntries(PHYSFS_Io *io, void *arc)
 {
-    PHYSFS_uint32 numfiles;
-    PHYSFS_uint32 pos;
-    PHYSFS_uint32 i;
+  PHYSFS_uint32 numfiles;
+  PHYSFS_uint32 pos;
+  PHYSFS_uint32 i;
 
-    BAIL_IF_ERRPASS(!readui32(io, &numfiles), 0);
-    BAIL_IF_ERRPASS(!readui32(io, &pos), 0);
-    BAIL_IF_ERRPASS(!io->seek(io, 68), 0);  /* skip to end of header. */
+  BAIL_IF_ERRPASS(!readui32(io, &numfiles), 0);
+  BAIL_IF_ERRPASS(!readui32(io, &pos), 0);
+  BAIL_IF_ERRPASS(!io->seek(io, 68), 0); /* skip to end of header. */
 
-    for (i = 0; i < numfiles; i++) {
-        char name[37];
-        PHYSFS_uint32 reserved;
-        PHYSFS_uint32 size;
-        PHYSFS_uint32 mtime;
-        BAIL_IF_ERRPASS(!__PHYSFS_readAll(io, name, 36), 0);
-        BAIL_IF_ERRPASS(!readui32(io, &reserved), 0);
-        BAIL_IF_ERRPASS(!readui32(io, &size), 0);
-        BAIL_IF_ERRPASS(!readui32(io, &mtime), 0);
-        name[36] = '\0';  /* just in case */
-        BAIL_IF_ERRPASS(!UNPK_addEntry(arc, name, 0, mtime, mtime, pos, size), 0);
-        pos += size;
-    }
+  for (i = 0; i < numfiles; i++)
+  {
+    char name[37];
+    PHYSFS_uint32 reserved;
+    PHYSFS_uint32 size;
+    PHYSFS_uint32 mtime;
+    BAIL_IF_ERRPASS(!__PHYSFS_readAll(io, name, 36), 0);
+    BAIL_IF_ERRPASS(!readui32(io, &reserved), 0);
+    BAIL_IF_ERRPASS(!readui32(io, &size), 0);
+    BAIL_IF_ERRPASS(!readui32(io, &mtime), 0);
+    name[36] = '\0'; /* just in case */
+    BAIL_IF_ERRPASS(!UNPK_addEntry(arc, name, 0, mtime, mtime, pos, size), 0);
+    pos += size;
+  }
 
-    return 1;
+  return 1;
 } /* hog2LoadEntries */
 
-
-static void *HOG_openArchive(PHYSFS_Io *io, const char *name,
-                             int forWriting, int *claimed)
+static void *HOG_openArchive(PHYSFS_Io *io, const char *name, int forWriting, int *claimed)
 {
-    PHYSFS_uint8 buf[3];
-    void *unpkarc = NULL;
-    int hog1 = 0;
+  PHYSFS_uint8 buf[3];
+  void *unpkarc = NULL;
+  int hog1 = 0;
 
-    assert(io != NULL);  /* shouldn't ever happen. */
-    BAIL_IF(forWriting, PHYSFS_ERR_READ_ONLY, NULL);
-    BAIL_IF_ERRPASS(!__PHYSFS_readAll(io, buf, 3), NULL);
+  assert(io != NULL); /* shouldn't ever happen. */
+  BAIL_IF(forWriting, PHYSFS_ERR_READ_ONLY, NULL);
+  BAIL_IF_ERRPASS(!__PHYSFS_readAll(io, buf, 3), NULL);
 
-    if (memcmp(buf, "DHF", 3) == 0)
-        hog1 = 1;  /* original HOG (Descent 1 and 2) archive */
-    else
-    {
-        BAIL_IF(memcmp(buf, "HOG", 3) != 0, PHYSFS_ERR_UNSUPPORTED, NULL); /* Not HOG2 */
-        BAIL_IF_ERRPASS(!__PHYSFS_readAll(io, buf, 1), NULL);
-        BAIL_IF(buf[0] != '2', PHYSFS_ERR_UNSUPPORTED, NULL); /* Not HOG2 */
-    } /* else */
+  if (memcmp(buf, "DHF", 3) == 0)
+    hog1 = 1; /* original HOG (Descent 1 and 2) archive */
+  else
+  {
+    BAIL_IF(memcmp(buf, "HOG", 3) != 0, PHYSFS_ERR_UNSUPPORTED, NULL); /* Not HOG2 */
+    BAIL_IF_ERRPASS(!__PHYSFS_readAll(io, buf, 1), NULL);
+    BAIL_IF(buf[0] != '2', PHYSFS_ERR_UNSUPPORTED, NULL); /* Not HOG2 */
+  }                                                       /* else */
 
-    *claimed = 1;
+  *claimed = 1;
 
-    unpkarc = UNPK_openArchive(io, 0, 1);
-    BAIL_IF_ERRPASS(!unpkarc, NULL);
+  unpkarc = UNPK_openArchive(io, 0, 1);
+  BAIL_IF_ERRPASS(!unpkarc, NULL);
 
-    if (!(hog1 ? hog1LoadEntries(io, unpkarc) : hog2LoadEntries(io, unpkarc)))
-    {
-        UNPK_abandonArchive(unpkarc);
-        return NULL;
-    } /* if */
+  if (!(hog1 ? hog1LoadEntries(io, unpkarc) : hog2LoadEntries(io, unpkarc)))
+  {
+    UNPK_abandonArchive(unpkarc);
+    return NULL;
+  } /* if */
 
-    return unpkarc;
+  return unpkarc;
 } /* HOG_openArchive */
 
-
-const PHYSFS_Archiver __PHYSFS_Archiver_HOG =
-{
+const PHYSFS_Archiver __PHYSFS_Archiver_HOG = {
     CURRENT_PHYSFS_ARCHIVER_API_VERSION,
     {
-        "HOG",
-        "Descent I/II/III HOG file format",
-        "Bradley Bell <btb@icculus.org>",
-        "https://icculus.org/physfs/",
-        0,  /* supportsSymlinks */
+        "HOG", "Descent I/II/III HOG file format", "Bradley Bell <btb@icculus.org>",
+        "https://icculus.org/physfs/", 0, /* supportsSymlinks */
     },
     HOG_openArchive,
     UNPK_enumerate,
@@ -161,10 +155,8 @@ const PHYSFS_Archiver __PHYSFS_Archiver_HOG =
     UNPK_remove,
     UNPK_mkdir,
     UNPK_stat,
-    UNPK_closeArchive
-};
+    UNPK_closeArchive};
 
-#endif  /* defined PHYSFS_SUPPORTS_HOG */
+#endif /* defined PHYSFS_SUPPORTS_HOG */
 
 /* end of physfs_archiver_hog.c ... */
-

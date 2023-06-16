@@ -22,8 +22,8 @@
 #define LOVE_PHYSICS_BOX2D_WRAP_FIXTURE_H
 
 // LOVE
-#include "common/runtime.h"
 #include "Fixture.h"
+#include "common/runtime.h"
 #include "wrap_Physics.h"
 
 namespace love
@@ -36,8 +36,8 @@ namespace box2d
 Fixture *luax_checkfixture(lua_State *L, int idx);
 extern "C" int luaopen_fixture(lua_State *L);
 
-} // box2d
-} // physics
-} // love
+}  // namespace box2d
+}  // namespace physics
+}  // namespace love
 
-#endif // LOVE_PHYSICS_BOX2D_WRAP_FIXTURE_H
+#endif  // LOVE_PHYSICS_BOX2D_WRAP_FIXTURE_H

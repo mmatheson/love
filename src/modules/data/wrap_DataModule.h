@@ -21,9 +21,9 @@
 #pragma once
 
 // LOVE
+#include "DataModule.h"
 #include "common/config.h"
 #include "common/runtime.h"
-#include "DataModule.h"
 
 namespace love
 {
@@ -35,5 +35,5 @@ int w_compress(lua_State *L);
 int w_decompress(lua_State *L);
 extern "C" LOVE_EXPORT int luaopen_love_data(lua_State *L);
 
-} // data
-} // love
+}  // namespace data
+}  // namespace love

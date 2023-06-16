@@ -22,8 +22,8 @@
 #define LOVE_FILESYSTEM_WRAP_DROPPED_FILE_H
 
 // LOVE
-#include "common/runtime.h"
 #include "DroppedFile.h"
+#include "common/runtime.h"
 
 namespace love
 {
@@ -33,7 +33,7 @@ namespace filesystem
 DroppedFile *luax_checkdroppedfile(lua_State *L, int idx);
 extern "C" int luaopen_droppedfile(lua_State *L);
 
-} // filesystem
-} // love
+}  // namespace filesystem
+}  // namespace love
 
-#endif // LOVE_FILESYSTEM_WRAP_DROPPED_FILE_H
+#endif  // LOVE_FILESYSTEM_WRAP_DROPPED_FILE_H

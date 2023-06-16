@@ -20,13 +20,14 @@
 
 // LOVE
 #include "BMFontRasterizer.h"
+
 #include "filesystem/Filesystem.h"
 #include "image/Image.h"
 
 // C++
+#include <algorithm>
 #include <sstream>
 #include <vector>
-#include <algorithm>
 
 // C
 #include <cstdlib>
@@ -47,319 +48,306 @@ namespace
  **/
 class BMFontLine
 {
-public:
+ public:
+  BMFontLine(const std::string &line);
 
-	BMFontLine(const std::string &line);
+  const std::string &getTag() const { return tag; }
 
-	const std::string &getTag() const { return tag; }
+  int getAttributeInt(const char *name) const;
+  std::string getAttributeString(const char *name) const;
 
-	int getAttributeInt(const char *name) const;
-	std::string getAttributeString(const char *name) const;
-
-private:
-
-	std::string tag;
-	std::unordered_map<std::string, std::string> attributes;
-
+ private:
+  std::string tag;
+  std::unordered_map<std::string, std::string> attributes;
 };
 
 // This is not entirely robust...
 BMFontLine::BMFontLine(const std::string &line)
 {
-	// The tag name should always be at the start of the line.
-	tag = line.substr(0, line.find(' '));
+  // The tag name should always be at the start of the line.
+  tag = line.substr(0, line.find(' '));
 
-	size_t startpos = 0;
+  size_t startpos = 0;
 
-	while (startpos < line.length())
-	{
-		// Find the next '=', which indicates a key-value pair.
-		size_t fpos = line.find('=', startpos);
-		if (fpos == std::string::npos || fpos + 1 >= line.length())
-			break;
+  while (startpos < line.length())
+  {
+    // Find the next '=', which indicates a key-value pair.
+    size_t fpos = line.find('=', startpos);
+    if (fpos == std::string::npos || fpos + 1 >= line.length())
+      break;
 
-		// The key should be between a space character and the '='.
-		size_t keystart = line.rfind(' ', fpos);
-		if (keystart == std::string::npos)
-			break;
+    // The key should be between a space character and the '='.
+    size_t keystart = line.rfind(' ', fpos);
+    if (keystart == std::string::npos)
+      break;
 
-		keystart++;
+    keystart++;
 
-		std::string key = line.substr(keystart, fpos - keystart);
+    std::string key = line.substr(keystart, fpos - keystart);
 
-		size_t valstart = fpos + 1;
-		size_t valend = valstart + 1;
+    size_t valstart = fpos + 1;
+    size_t valend = valstart + 1;
 
-		if (line[valstart] == '"')
-		{
-			// Values can be surrounded by quotes (a literal string.)
-			valstart++;
-			valend = line.find('"', valstart) - 1;
-		}
-		else
-		{
-			// Otherwise look for the next space character after the '='.
-			valend = line.find(' ', valstart + 1) - 1;
-		}
+    if (line[valstart] == '"')
+    {
+      // Values can be surrounded by quotes (a literal string.)
+      valstart++;
+      valend = line.find('"', valstart) - 1;
+    }
+    else
+    {
+      // Otherwise look for the next space character after the '='.
+      valend = line.find(' ', valstart + 1) - 1;
+    }
 
-		valend = std::min(valend, line.length() - 1);
+    valend = std::min(valend, line.length() - 1);
 
-		attributes[key] = line.substr(valstart, valend - valstart + 1);
+    attributes[key] = line.substr(valstart, valend - valstart + 1);
 
-		startpos = valend + 1;
-	}
+    startpos = valend + 1;
+  }
 }
 
 int BMFontLine::getAttributeInt(const char *name) const
 {
-	auto it = attributes.find(name);
-	if (it == attributes.end())
-		return 0;
+  auto it = attributes.find(name);
+  if (it == attributes.end())
+    return 0;
 
-	return (int) strtol(it->second.c_str(), nullptr, 10);
+  return (int) strtol(it->second.c_str(), nullptr, 10);
 }
 
 std::string BMFontLine::getAttributeString(const char *name) const
 {
-	auto it = attributes.find(name);
-	if (it == attributes.end())
-		return "";
+  auto it = attributes.find(name);
+  if (it == attributes.end())
+    return "";
 
-	return it->second;
+  return it->second;
 }
 
-} // anonymous namespace
+}  // anonymous namespace
 
-
-BMFontRasterizer::BMFontRasterizer(love::filesystem::FileData *fontdef, const std::vector<image::ImageData *> &imagelist, float dpiscale)
-	: fontSize(0)
-	, unicode(false)
-	, lineHeight(0)
+BMFontRasterizer::BMFontRasterizer(love::filesystem::FileData *fontdef,
+                                   const std::vector<image::ImageData *> &imagelist, float dpiscale)
+    : fontSize(0),
+      unicode(false),
+      lineHeight(0)
 {
-	this->dpiScale = dpiscale;
+  this->dpiScale = dpiscale;
 
-	const std::string &filename = fontdef->getFilename();
+  const std::string &filename = fontdef->getFilename();
 
-	size_t separatorpos = filename.rfind('/');
-	if (separatorpos != std::string::npos)
-		fontFolder = filename.substr(0, separatorpos);
+  size_t separatorpos = filename.rfind('/');
+  if (separatorpos != std::string::npos)
+    fontFolder = filename.substr(0, separatorpos);
 
-	// The parseConfig function will try to load any missing page images.
-	for (int i = 0; i < (int) imagelist.size(); i++)
-	{
-		if (imagelist[i]->getFormat() != PIXELFORMAT_RGBA8)
-			throw love::Exception("Only 32-bit RGBA images are supported in BMFonts.");
+  // The parseConfig function will try to load any missing page images.
+  for (int i = 0; i < (int) imagelist.size(); i++)
+  {
+    if (imagelist[i]->getFormat() != PIXELFORMAT_RGBA8)
+      throw love::Exception("Only 32-bit RGBA images are supported in BMFonts.");
 
-		images[i] = imagelist[i];
-	}
+    images[i] = imagelist[i];
+  }
 
-	std::string configtext((const char *) fontdef->getData(), fontdef->getSize());
+  std::string configtext((const char *) fontdef->getData(), fontdef->getSize());
 
-	parseConfig(configtext);
+  parseConfig(configtext);
 }
 
-BMFontRasterizer::~BMFontRasterizer()
-{
-}
+BMFontRasterizer::~BMFontRasterizer() {}
 
 void BMFontRasterizer::parseConfig(const std::string &configtext)
 {
-	std::stringstream ss(configtext);
-	std::string line;
+  std::stringstream ss(configtext);
+  std::string line;
 
-	while (std::getline(ss, line))
+  while (std::getline(ss, line))
+  {
+    BMFontLine cline(line);
+
+    const std::string &tag = cline.getTag();
+
+    if (tag == "info")
+    {
+      fontSize = cline.getAttributeInt("size");
+      unicode = cline.getAttributeInt("unicode") > 0;
+    }
+    else if (tag == "common")
+    {
+      lineHeight = cline.getAttributeInt("lineHeight");
+      metrics.ascent = cline.getAttributeInt("base");
+    }
+    else if (tag == "page")
+    {
+      int pageindex = cline.getAttributeInt("id");
+      std::string filename = cline.getAttributeString("file");
+
+      // The file name is relative to the font file's folder.
+      if (!fontFolder.empty())
+	filename = fontFolder + "/" + filename;
+
+      // Load the page file from disk into an ImageData, if necessary.
+      if (images[pageindex].get() == nullptr)
+      {
+	using namespace love::filesystem;
+	using namespace love::image;
+
+	auto filesystem = Module::getInstance<Filesystem>(Module::M_FILESYSTEM);
+	auto imagemodule = Module::getInstance<image::Image>(Module::M_IMAGE);
+
+	if (!filesystem)
+	  throw love::Exception("Filesystem module not loaded!");
+	if (!imagemodule)
+	  throw love::Exception("Image module not loaded!");
+
+	// read() returns a retained ref already.
+	StrongRef<FileData> data(filesystem->read(filename.c_str()), Acquire::NORETAIN);
+
+	ImageData *imagedata = imagemodule->newImageData(data.get());
+
+	if (imagedata->getFormat() != PIXELFORMAT_RGBA8)
 	{
-		BMFontLine cline(line);
-
-		const std::string &tag = cline.getTag();
-
-		if (tag == "info")
-		{
-			fontSize = cline.getAttributeInt("size");
-			unicode  = cline.getAttributeInt("unicode") > 0;
-		}
-		else if (tag == "common")
-		{
-			lineHeight = cline.getAttributeInt("lineHeight");
-			metrics.ascent = cline.getAttributeInt("base");
-		}
-		else if (tag == "page")
-		{
-			int pageindex = cline.getAttributeInt("id");
-			std::string filename = cline.getAttributeString("file");
-
-			// The file name is relative to the font file's folder.
-			if (!fontFolder.empty())
-				filename = fontFolder + "/" + filename;
-
-			// Load the page file from disk into an ImageData, if necessary.
-			if (images[pageindex].get() == nullptr)
-			{
-				using namespace love::filesystem;
-				using namespace love::image;
-
-				auto filesystem  = Module::getInstance<Filesystem>(Module::M_FILESYSTEM);
-				auto imagemodule = Module::getInstance<image::Image>(Module::M_IMAGE);
-
-				if (!filesystem)
-					throw love::Exception("Filesystem module not loaded!");
-				if (!imagemodule)
-					throw love::Exception("Image module not loaded!");
-
-				// read() returns a retained ref already.
-				StrongRef<FileData> data(filesystem->read(filename.c_str()), Acquire::NORETAIN);
-
-				ImageData *imagedata = imagemodule->newImageData(data.get());
-
-				if (imagedata->getFormat() != PIXELFORMAT_RGBA8)
-				{
-					imagedata->release();
-					throw love::Exception("Only 32-bit RGBA images are supported in BMFonts.");
-				}
-
-				// Same with newImageData.
-				images[pageindex].set(imagedata, Acquire::NORETAIN);
-			}
-		}
-		else if (tag == "char")
-		{
-			BMFontCharacter c = {};
-
-			uint32 id = (uint32) cline.getAttributeInt("id");
-
-			c.x    = cline.getAttributeInt("x");
-			c.y    = cline.getAttributeInt("y");
-			c.page = cline.getAttributeInt("page");
-
-			c.metrics.width    =  cline.getAttributeInt("width");
-			c.metrics.height   =  cline.getAttributeInt("height");
-			c.metrics.bearingX =  cline.getAttributeInt("xoffset");
-			c.metrics.bearingY = -cline.getAttributeInt("yoffset");
-			c.metrics.advance  =  cline.getAttributeInt("xadvance");
-
-			characters[id] = c;
-		}
-		else if (tag == "kerning")
-		{
-			uint32 firstid  = (uint32) cline.getAttributeInt("first");
-			uint32 secondid = (uint32) cline.getAttributeInt("second");
-
-			uint64 packedids = ((uint64) firstid << 32) | (uint64) secondid;
-
-			kerning[packedids] = cline.getAttributeInt("amount");
-		}
+	  imagedata->release();
+	  throw love::Exception("Only 32-bit RGBA images are supported in BMFonts.");
 	}
 
-	if (characters.size() == 0)
-		throw love::Exception("Invalid BMFont file (no character definitions?)");
+	// Same with newImageData.
+	images[pageindex].set(imagedata, Acquire::NORETAIN);
+      }
+    }
+    else if (tag == "char")
+    {
+      BMFontCharacter c = {};
 
-	// Try to guess the line height if the lineheight attribute isn't found.
-	bool guessheight = lineHeight == 0;
+      uint32 id = (uint32) cline.getAttributeInt("id");
 
-	// Verify the glyph character attributes.
-	for (const auto &cpair : characters)
-	{
-		const BMFontCharacter &c = cpair.second;
-		int width = c.metrics.width;
-		int height = c.metrics.height;
+      c.x = cline.getAttributeInt("x");
+      c.y = cline.getAttributeInt("y");
+      c.page = cline.getAttributeInt("page");
 
-		if (!unicode && cpair.first > 127)
-			throw love::Exception("Invalid BMFont character id (only unicode and ASCII are supported)");
+      c.metrics.width = cline.getAttributeInt("width");
+      c.metrics.height = cline.getAttributeInt("height");
+      c.metrics.bearingX = cline.getAttributeInt("xoffset");
+      c.metrics.bearingY = -cline.getAttributeInt("yoffset");
+      c.metrics.advance = cline.getAttributeInt("xadvance");
 
-		if (c.page < 0 || images[c.page].get() == nullptr)
-			throw love::Exception("Invalid BMFont character page id: %d", c.page);
+      characters[id] = c;
+    }
+    else if (tag == "kerning")
+    {
+      uint32 firstid = (uint32) cline.getAttributeInt("first");
+      uint32 secondid = (uint32) cline.getAttributeInt("second");
 
-		const image::ImageData *id = images[c.page].get();
+      uint64 packedids = ((uint64) firstid << 32) | (uint64) secondid;
 
-		if (!id->inside(c.x, c.y))
-			throw love::Exception("Invalid coordinates for BMFont character %u.", cpair.first);
+      kerning[packedids] = cline.getAttributeInt("amount");
+    }
+  }
 
-		if (width > 0 && !id->inside(c.x + width - 1, c.y))
-			throw love::Exception("Invalid width %d for BMFont character %u.", width, cpair.first);
+  if (characters.size() == 0)
+    throw love::Exception("Invalid BMFont file (no character definitions?)");
 
-		if (height > 0 && !id->inside(c.x, c.y + height - 1))
-			throw love::Exception("Invalid height %d for BMFont character %u.", height, cpair.first);
+  // Try to guess the line height if the lineheight attribute isn't found.
+  bool guessheight = lineHeight == 0;
 
-		if (guessheight)
-			lineHeight = std::max(lineHeight, c.metrics.height);
-	}
+  // Verify the glyph character attributes.
+  for (const auto &cpair : characters)
+  {
+    const BMFontCharacter &c = cpair.second;
+    int width = c.metrics.width;
+    int height = c.metrics.height;
 
-	metrics.height = lineHeight;
+    if (!unicode && cpair.first > 127)
+      throw love::Exception("Invalid BMFont character id (only unicode and ASCII are supported)");
+
+    if (c.page < 0 || images[c.page].get() == nullptr)
+      throw love::Exception("Invalid BMFont character page id: %d", c.page);
+
+    const image::ImageData *id = images[c.page].get();
+
+    if (!id->inside(c.x, c.y))
+      throw love::Exception("Invalid coordinates for BMFont character %u.", cpair.first);
+
+    if (width > 0 && !id->inside(c.x + width - 1, c.y))
+      throw love::Exception("Invalid width %d for BMFont character %u.", width, cpair.first);
+
+    if (height > 0 && !id->inside(c.x, c.y + height - 1))
+      throw love::Exception("Invalid height %d for BMFont character %u.", height, cpair.first);
+
+    if (guessheight)
+      lineHeight = std::max(lineHeight, c.metrics.height);
+  }
+
+  metrics.height = lineHeight;
 }
 
-int BMFontRasterizer::getLineHeight() const
-{
-	return lineHeight;
-}
+int BMFontRasterizer::getLineHeight() const { return lineHeight; }
 
 GlyphData *BMFontRasterizer::getGlyphData(uint32 glyph) const
 {
-	auto it = characters.find(glyph);
+  auto it = characters.find(glyph);
 
-	// Return an empty GlyphData if we don't have the glyph character.
-	if (it == characters.end())
-		return new GlyphData(glyph, GlyphMetrics(), PIXELFORMAT_RGBA8);
+  // Return an empty GlyphData if we don't have the glyph character.
+  if (it == characters.end())
+    return new GlyphData(glyph, GlyphMetrics(), PIXELFORMAT_RGBA8);
 
-	const BMFontCharacter &c = it->second;
-	const auto &imagepair = images.find(c.page);
+  const BMFontCharacter &c = it->second;
+  const auto &imagepair = images.find(c.page);
 
-	if (imagepair == images.end())
-		return new GlyphData(glyph, GlyphMetrics(), PIXELFORMAT_RGBA8);
+  if (imagepair == images.end())
+    return new GlyphData(glyph, GlyphMetrics(), PIXELFORMAT_RGBA8);
 
-	image::ImageData *imagedata = imagepair->second.get();
-	GlyphData *g = new GlyphData(glyph, c.metrics, PIXELFORMAT_RGBA8);
+  image::ImageData *imagedata = imagepair->second.get();
+  GlyphData *g = new GlyphData(glyph, c.metrics, PIXELFORMAT_RGBA8);
 
-	size_t pixelsize = imagedata->getPixelSize();
+  size_t pixelsize = imagedata->getPixelSize();
 
-	uint8 *pixels = (uint8 *) g->getData();
-	const uint8 *ipixels = (const uint8 *) imagedata->getData();
+  uint8 *pixels = (uint8 *) g->getData();
+  const uint8 *ipixels = (const uint8 *) imagedata->getData();
 
-	love::thread::Lock lock(imagedata->getMutex());
+  love::thread::Lock lock(imagedata->getMutex());
 
-	// Copy the subsection of the texture from the ImageData to the GlyphData.
-	for (int y = 0; y < c.metrics.height; y++)
-	{
-		size_t idindex = ((c.y + y) * imagedata->getWidth() + c.x) * pixelsize;
-		memcpy(&pixels[y * c.metrics.width * pixelsize], &ipixels[idindex], pixelsize * c.metrics.width);
-	}
+  // Copy the subsection of the texture from the ImageData to the GlyphData.
+  for (int y = 0; y < c.metrics.height; y++)
+  {
+    size_t idindex = ((c.y + y) * imagedata->getWidth() + c.x) * pixelsize;
+    memcpy(&pixels[y * c.metrics.width * pixelsize], &ipixels[idindex],
+           pixelsize * c.metrics.width);
+  }
 
-	return g;
+  return g;
 }
 
-int BMFontRasterizer::getGlyphCount() const
-{
-	return (int) characters.size();
-}
+int BMFontRasterizer::getGlyphCount() const { return (int) characters.size(); }
 
 bool BMFontRasterizer::hasGlyph(uint32 glyph) const
 {
-	return characters.find(glyph) != characters.end();
+  return characters.find(glyph) != characters.end();
 }
 
 float BMFontRasterizer::getKerning(uint32 leftglyph, uint32 rightglyph) const
 {
-	uint64 packedglyphs = ((uint64) leftglyph << 32) | (uint64) rightglyph;
+  uint64 packedglyphs = ((uint64) leftglyph << 32) | (uint64) rightglyph;
 
-	auto it = kerning.find(packedglyphs);
-	if (it != kerning.end())
-		return it->second;
+  auto it = kerning.find(packedglyphs);
+  if (it != kerning.end())
+    return it->second;
 
-	return 0.0f;
+  return 0.0f;
 }
 
-Rasterizer::DataType BMFontRasterizer::getDataType() const
-{
-	return DATA_IMAGE;
-}
+Rasterizer::DataType BMFontRasterizer::getDataType() const { return DATA_IMAGE; }
 
 bool BMFontRasterizer::accepts(love::filesystem::FileData *fontdef)
 {
-	const char *data = (const char *) fontdef->getData();
+  const char *data = (const char *) fontdef->getData();
 
-	// Check if the "info" tag is at the start of the file. This is a truly
-	// crappy test. Is the tag even guaranteed to be at the start?
-	return fontdef->getSize() > 4 && memcmp(data, "info", 4) == 0;
+  // Check if the "info" tag is at the start of the file. This is a truly
+  // crappy test. Is the tag even guaranteed to be at the start?
+  return fontdef->getSize() > 4 && memcmp(data, "info", 4) == 0;
 }
 
-} // font
-} // love
+}  // namespace font
+}  // namespace love

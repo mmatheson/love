@@ -38,32 +38,30 @@ namespace thread
 
 class LuaThread : public Threadable
 {
-public:
+ public:
+  static love::Type type;
 
-	static love::Type type;
+  LuaThread(const std::string &name, love::Data *code);
+  virtual ~LuaThread();
+  void threadFunction();
+  const std::string &getError() const;
+  bool hasError() const { return haserror; }
 
-	LuaThread(const std::string &name, love::Data *code);
-	virtual ~LuaThread();
-	void threadFunction();
-	const std::string &getError() const;
-	bool hasError() const { return haserror; }
+  bool start(const std::vector<Variant> &args);
 
-	bool start(const std::vector<Variant> &args);
+ private:
+  void onError();
 
-private:
+  StrongRef<love::Data> code;
+  std::string name;
+  std::string error;
+  bool haserror;
 
-	void onError();
+  std::vector<Variant> args;
 
-	StrongRef<love::Data> code;
-	std::string name;
-	std::string error;
-	bool haserror;
+};  // LuaThread
 
-	std::vector<Variant> args;
+}  // namespace thread
+}  // namespace love
 
-}; // LuaThread
-
-} // thread
-} // love
-
-#endif // LOVE_THREAD_LUATHREAD_H
+#endif  // LOVE_THREAD_LUATHREAD_H

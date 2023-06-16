@@ -19,6 +19,7 @@
  **/
 
 #include "wrap_DroppedFile.h"
+
 #include "wrap_File.h"
 
 namespace love
@@ -28,13 +29,13 @@ namespace filesystem
 
 DroppedFile *luax_checkdroppedfile(lua_State *L, int idx)
 {
-	return luax_checktype<DroppedFile>(L, idx);
+  return luax_checktype<DroppedFile>(L, idx);
 }
 
 extern "C" int luaopen_droppedfile(lua_State *L)
 {
-	return luax_register_type(L, &DroppedFile::type, w_File_functions, nullptr);
+  return luax_register_type(L, &DroppedFile::type, w_File_functions, nullptr);
 }
 
-} // filesystem
-} // love
+}  // namespace filesystem
+}  // namespace love

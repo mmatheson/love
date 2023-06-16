@@ -21,8 +21,8 @@
 #pragma once
 
 // LOVE
-#include "common/runtime.h"
 #include "DataView.h"
+#include "common/runtime.h"
 
 namespace love
 {
@@ -32,5 +32,5 @@ namespace data
 DataView *luax_checkdataview(lua_State *L, int idx);
 int luaopen_dataview(lua_State *L);
 
-} // data
-} // love
+}  // namespace data
+}  // namespace love

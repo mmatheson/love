@@ -22,8 +22,8 @@
 #define LOVE_DATA_H
 
 // LOVE
-#include "config.h"
 #include "Object.h"
+#include "config.h"
 
 // C
 #include <stddef.h>
@@ -36,32 +36,31 @@ namespace love
  **/
 class Data : public Object
 {
-public:
+ public:
+  static love::Type type;
 
-	static love::Type type;
+  /**
+   * Destructor.
+   **/
+  virtual ~Data() {}
 
-	/**
-	 * Destructor.
-	 **/
-	virtual ~Data() {}
+  /**
+   * Creates a duplicate of Data derived class instance.
+   **/
+  virtual Data *clone() const = 0;
+  /**
+   * Gets a pointer to the data. This pointer will obviously not
+   * be valid if the Data object is destroyed.
+   **/
+  virtual void *getData() const = 0;
 
-	/**
-	 * Creates a duplicate of Data derived class instance.
-	 **/
-	virtual Data *clone() const = 0;
-	/**
-	 * Gets a pointer to the data. This pointer will obviously not
-	 * be valid if the Data object is destroyed.
-	 **/
-	virtual void *getData() const = 0;
+  /**
+   * Gets the size of the Data in bytes.
+   **/
+  virtual size_t getSize() const = 0;
 
-	/**
-	 * Gets the size of the Data in bytes.
-	 **/
-	virtual size_t getSize() const = 0;
+};  // Data
 
-}; // Data
+}  // namespace love
 
-} // love
-
-#endif // LOVE_DATA_H
+#endif  // LOVE_DATA_H

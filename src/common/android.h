@@ -109,8 +109,8 @@ const char *getCRequirePath();
  */
 const char *getArg0();
 
-} // android
-} // love
+}  // namespace android
+}  // namespace love
 
-#endif // LOVE_ANDROID
-#endif // LOVE_ANDROID_H
+#endif  // LOVE_ANDROID
+#endif  // LOVE_ANDROID_H

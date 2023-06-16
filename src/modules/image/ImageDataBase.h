@@ -31,26 +31,24 @@ namespace image
 
 class ImageDataBase : public Data
 {
-public:
+ public:
+  virtual ~ImageDataBase() {}
 
-	virtual ~ImageDataBase() {}
+  PixelFormat getFormat() const;
 
-	PixelFormat getFormat() const;
+  int getWidth() const;
+  int getHeight() const;
 
-	int getWidth() const;
-	int getHeight() const;
+  virtual bool isSRGB() const = 0;
 
-	virtual bool isSRGB() const = 0;
+ protected:
+  ImageDataBase(PixelFormat format, int width, int height);
 
-protected:
+  PixelFormat format;
+  int width;
+  int height;
 
-	ImageDataBase(PixelFormat format, int width, int height);
+};  // ImageDataBase
 
-	PixelFormat format;
-	int width;
-	int height;
-
-}; // ImageDataBase
-
-} // image
-} // love
+}  // namespace image
+}  // namespace love

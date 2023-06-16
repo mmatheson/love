@@ -22,8 +22,8 @@
 #define LOVE_GRAPHICS_DRAWABLE_H
 
 // LOVE
-#include "common/Object.h"
 #include "common/Matrix.h"
+#include "common/Object.h"
 
 namespace love
 {
@@ -38,22 +38,21 @@ class Graphics;
  **/
 class Drawable : public Object
 {
-public:
+ public:
+  static love::Type type;
 
-	static love::Type type;
+  /**
+   * Destructor.
+   **/
+  virtual ~Drawable() {}
 
-	/**
-	 * Destructor.
-	 **/
-	virtual ~Drawable() {}
-
-	/**
-	 * Draws the object with the specified transformation matrix.
-	 **/
-	virtual void draw(Graphics *gfx, const Matrix4 &m) = 0;
+  /**
+   * Draws the object with the specified transformation matrix.
+   **/
+  virtual void draw(Graphics *gfx, const Matrix4 &m) = 0;
 };
 
-} // graphics
-} // love
+}  // namespace graphics
+}  // namespace love
 
-#endif // LOVE_GRAPHICS_DRAWABLE_H
+#endif  // LOVE_GRAPHICS_DRAWABLE_H

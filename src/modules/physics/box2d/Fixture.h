@@ -22,11 +22,11 @@
 #define LOVE_PHYSICS_BOX2D_FIXTURE_H
 
 // LOVE
+#include "common/Object.h"
+#include "common/Reference.h"
 #include "physics/Shape.h"
 #include "physics/box2d/Body.h"
 #include "physics/box2d/Shape.h"
-#include "common/Object.h"
-#include "common/Reference.h"
 
 // Box2D
 #include <Box2D/Box2D.h>
@@ -48,8 +48,8 @@ class World;
  **/
 struct fixtureudata
 {
-	// Reference to arbitrary data.
-	Reference *ref = nullptr;
+  // Reference to arbitrary data.
+  Reference *ref = nullptr;
 };
 
 /**
@@ -60,167 +60,165 @@ struct fixtureudata
  **/
 class Fixture : public Object
 {
-public:
-	friend class Physics;
+ public:
+  friend class Physics;
 
-	static love::Type type;
+  static love::Type type;
 
-	/**
-	 * Creates a Fixture.
-	 **/
-	Fixture(Body *body, Shape *shape, float density);
+  /**
+   * Creates a Fixture.
+   **/
+  Fixture(Body *body, Shape *shape, float density);
 
-	virtual ~Fixture();
+  virtual ~Fixture();
 
-	/**
-	 * Gets the type of the Fixture's Shape. Useful for
-	 * debug drawing.
-	 **/
-	Shape::Type getType();
+  /**
+   * Gets the type of the Fixture's Shape. Useful for
+   * debug drawing.
+   **/
+  Shape::Type getType();
 
-	/**
-	 * Gets the Shape attached to this Fixture.
-	 **/
-	Shape *getShape();
+  /**
+   * Gets the Shape attached to this Fixture.
+   **/
+  Shape *getShape();
 
-	/**
-	 * Returns true if the fixture is active in a Box2D world.
-	 **/
-	bool isValid() const;
+  /**
+   * Returns true if the fixture is active in a Box2D world.
+   **/
+  bool isValid() const;
 
-	/**
-	 * Checks whether this Fixture acts as a sensor.
-	 * @return True if sensor, false otherwise.
-	 **/
-	bool isSensor() const;
+  /**
+   * Checks whether this Fixture acts as a sensor.
+   * @return True if sensor, false otherwise.
+   **/
+  bool isSensor() const;
 
-	/**
-	 * Set whether this Fixture should be a sensor or not.
-	 * @param sensor True if sensor, false if not.
-	 **/
-	void setSensor(bool sensor);
+  /**
+   * Set whether this Fixture should be a sensor or not.
+   * @param sensor True if sensor, false if not.
+   **/
+  void setSensor(bool sensor);
 
-	/**
-	 * Gets the Body this Fixture is attached to.
-	 **/
-	Body *getBody() const;
+  /**
+   * Gets the Body this Fixture is attached to.
+   **/
+  Body *getBody() const;
 
-	/**
-	 * Sets the filter data. An integer array is used even though the
-	 * first two elements are unsigned shorts. The elements are:
-	 * category (16-bits), mask (16-bits) and group (32-bits/int).
-	 **/
-	void setFilterData(int *v);
+  /**
+   * Sets the filter data. An integer array is used even though the
+   * first two elements are unsigned shorts. The elements are:
+   * category (16-bits), mask (16-bits) and group (32-bits/int).
+   **/
+  void setFilterData(int *v);
 
-	/**
-	 * Gets the filter data. An integer array is used even though the
-	 * first two elements are unsigned shorts. The elements are:
-	 * category (16-bits), mask (16-bits) and group (32-bits/int).
-	 **/
-	void getFilterData(int *v);
+  /**
+   * Gets the filter data. An integer array is used even though the
+   * first two elements are unsigned shorts. The elements are:
+   * category (16-bits), mask (16-bits) and group (32-bits/int).
+   **/
+  void getFilterData(int *v);
 
-	/**
-	 * This function stores an in-C reference to
-	 * arbitrary Lua data in the Box2D Fixture object.
-	 **/
-	int setUserData(lua_State *L);
+  /**
+   * This function stores an in-C reference to
+   * arbitrary Lua data in the Box2D Fixture object.
+   **/
+  int setUserData(lua_State *L);
 
-	/**
-	 * Gets the data set with setData. If no
-	 * data is set, nil is returned.
-	 **/
-	int getUserData(lua_State *L);
+  /**
+   * Gets the data set with setData. If no
+   * data is set, nil is returned.
+   **/
+  int getUserData(lua_State *L);
 
-	/**
-	 * Sets the friction of the Fixture.
-	 * @param friction The new friction.
-	 **/
-	void setFriction(float friction);
+  /**
+   * Sets the friction of the Fixture.
+   * @param friction The new friction.
+   **/
+  void setFriction(float friction);
 
-	/**
-	 * Sets the restitution for the Fixture.
-	 * @param restitution The restitution.
-	 **/
-	void setRestitution(float restitution);
+  /**
+   * Sets the restitution for the Fixture.
+   * @param restitution The restitution.
+   **/
+  void setRestitution(float restitution);
 
-	/**
-	 * Sets the density of the Fixture.
-	 * @param density The density of the Fixture.
-	 **/
-	void setDensity(float density);
+  /**
+   * Sets the density of the Fixture.
+   * @param density The density of the Fixture.
+   **/
+  void setDensity(float density);
 
-	/**
-	 * Gets the friction of the Fixture.
-	 * @returns The friction.
-	 **/
-	float getFriction() const;
+  /**
+   * Gets the friction of the Fixture.
+   * @returns The friction.
+   **/
+  float getFriction() const;
 
-	/**
-	 * Gets the restitution of the Fixture.
-	 * @return The restitution of the Fixture.
-	 **/
-	float getRestitution() const;
+  /**
+   * Gets the restitution of the Fixture.
+   * @return The restitution of the Fixture.
+   **/
+  float getRestitution() const;
 
-	/**
-	 * Gets the density of the Fixture.
-	 * @return The density.
-	 **/
-	float getDensity() const;
+  /**
+   * Gets the density of the Fixture.
+   * @return The density.
+   **/
+  float getDensity() const;
 
-	/**
-	 * Checks if a point is inside the Fixture.
-	 * @param x The x-component of the point.
-	 * @param y The y-component of the point.
-	 **/
-	bool testPoint(float x, float y) const;
+  /**
+   * Checks if a point is inside the Fixture.
+   * @param x The x-component of the point.
+   * @param y The y-component of the point.
+   **/
+  bool testPoint(float x, float y) const;
 
-	/**
-	 * Cast a ray against this Fixture.
-	 **/
-	int rayCast(lua_State *L) const;
+  /**
+   * Cast a ray against this Fixture.
+   **/
+  int rayCast(lua_State *L) const;
 
-	void setGroupIndex(int index);
-	int getGroupIndex() const;
+  void setGroupIndex(int index);
+  int getGroupIndex() const;
 
-	int setCategory(lua_State *L);
-	int setMask(lua_State *L);
-	int getCategory(lua_State *L);
-	int getMask(lua_State *L);
-	uint16 getBits(lua_State *L);
-	int pushBits(lua_State *L, uint16 bits);
+  int setCategory(lua_State *L);
+  int setMask(lua_State *L);
+  int getCategory(lua_State *L);
+  int getMask(lua_State *L);
+  uint16 getBits(lua_State *L);
+  int pushBits(lua_State *L, uint16 bits);
 
-	/**
-	 * Gets the bounding box for this Fixture.
-	 * The function returns eight values which can be
-	 * passed directly to love.graphics.polygon.
-	 **/
-	int getBoundingBox(lua_State *L) const;
+  /**
+   * Gets the bounding box for this Fixture.
+   * The function returns eight values which can be
+   * passed directly to love.graphics.polygon.
+   **/
+  int getBoundingBox(lua_State *L) const;
 
-	/**
-	 * Gets the mass data for this Fixture.
-	 * This operation may be expensive.
-	 **/
-	int getMassData(lua_State *L) const;
+  /**
+   * Gets the mass data for this Fixture.
+   * This operation may be expensive.
+   **/
+  int getMassData(lua_State *L) const;
 
-	/**
-	 * Destroys this fixture.
-	 **/
-	void destroy(bool implicit = false);
+  /**
+   * Destroys this fixture.
+   **/
+  void destroy(bool implicit = false);
 
-protected:
+ protected:
+  void checkCreateShape();
 
-	void checkCreateShape();
+  Body *body;
+  fixtureudata *udata;
+  b2Fixture *fixture;
 
-	Body *body;
-	fixtureudata *udata;
-	b2Fixture *fixture;
-
-	StrongRef<Shape> shape;
-
+  StrongRef<Shape> shape;
 };
 
-} // box2d
-} // physics
-} // love
+}  // namespace box2d
+}  // namespace physics
+}  // namespace love
 
-#endif // LOVE_PHYSICS_BOX2D_FIXTURE_H
+#endif  // LOVE_PHYSICS_BOX2D_FIXTURE_H

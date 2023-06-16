@@ -21,8 +21,8 @@
 #pragma once
 
 // LOVE
-#include "common/runtime.h"
 #include "Image.h"
+#include "common/runtime.h"
 #include "wrap_Texture.h"
 
 namespace love
@@ -33,5 +33,5 @@ namespace graphics
 Image *luax_checkimage(lua_State *L, int idx);
 extern "C" int luaopen_image(lua_State *L);
 
-} // graphics
-} // love
+}  // namespace graphics
+}  // namespace love

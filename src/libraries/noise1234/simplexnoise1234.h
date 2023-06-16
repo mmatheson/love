@@ -17,8 +17,8 @@
 // to patent issues.
 
 /** \file
-		\brief Declares the SimplexNoise1234 class for producing Perlin simplex noise.
-		\author Stefan Gustavson (stegu@itn.liu.se)
+                \brief Declares the SimplexNoise1234 class for producing Perlin simplex noise.
+                \author Stefan Gustavson (stegu@itn.liu.se)
 */
 
 /*
@@ -32,20 +32,19 @@
  * on some platforms. A templatized version of SimplexNoise1234 could be useful.
  */
 
-class SimplexNoise1234 {
+class SimplexNoise1234
+{
+ public:
+  SimplexNoise1234() {}
+  ~SimplexNoise1234() {}
 
-  public:
-    SimplexNoise1234() {}
-    ~SimplexNoise1234() {}
+  /** 1D and 2D float Perlin noise
+   */
+  static float noise(float x);
+  static float noise(float x, float y);
 
-/** 1D and 2D float Perlin noise
- */
-    static float noise( float x );
-    static float noise( float x, float y );
-
-  private:
-    static unsigned char perm[];
-    static float  grad( int hash, float x );
-    static float  grad( int hash, float x, float y );
-
+ private:
+  static unsigned char perm[];
+  static float grad(int hash, float x);
+  static float grad(int hash, float x, float y);
 };

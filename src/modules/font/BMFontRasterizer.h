@@ -22,8 +22,8 @@
 #define LOVE_FONT_BMFONT_RASTERIZER_H
 
 // LOVE
-#include "common/config.h"
 #include "Rasterizer.h"
+#include "common/config.h"
 #include "image/ImageData.h"
 
 // C++
@@ -40,52 +40,51 @@ namespace font
  **/
 class BMFontRasterizer : public Rasterizer
 {
-public:
+ public:
+  BMFontRasterizer(love::filesystem::FileData *fontdef,
+                   const std::vector<image::ImageData *> &imagelist, float dpiscale);
+  virtual ~BMFontRasterizer();
 
-	BMFontRasterizer(love::filesystem::FileData *fontdef, const std::vector<image::ImageData *> &imagelist, float dpiscale);
-	virtual ~BMFontRasterizer();
+  // Implements Rasterizer.
+  int getLineHeight() const override;
+  GlyphData *getGlyphData(uint32 glyph) const override;
+  int getGlyphCount() const override;
+  bool hasGlyph(uint32 glyph) const override;
+  float getKerning(uint32 leftglyph, uint32 rightglyph) const override;
+  DataType getDataType() const override;
 
-	// Implements Rasterizer.
-	int getLineHeight() const override;
-	GlyphData *getGlyphData(uint32 glyph) const override;
-	int getGlyphCount() const override;
-	bool hasGlyph(uint32 glyph) const override;
-	float getKerning(uint32 leftglyph, uint32 rightglyph) const override;
-	DataType getDataType() const override;
+  static bool accepts(love::filesystem::FileData *fontdef);
 
-	static bool accepts(love::filesystem::FileData *fontdef);
+ private:
+  struct BMFontCharacter
+  {
+    int x;
+    int y;
+    int page;
+    GlyphMetrics metrics;
+  };
 
-private:
+  void parseConfig(const std::string &config);
 
-	struct BMFontCharacter
-	{
-		int x;
-		int y;
-		int page;
-		GlyphMetrics metrics;
-	};
+  std::string fontFolder;
 
-	void parseConfig(const std::string &config);
+  // Image pages, indexed by their page id.
+  std::unordered_map<int, StrongRef<image::ImageData>> images;
 
-	std::string fontFolder;
+  // Glyph characters, indexed by their glyph id.
+  std::unordered_map<uint32, BMFontCharacter> characters;
 
-	// Image pages, indexed by their page id.
-	std::unordered_map<int, StrongRef<image::ImageData>> images;
+  // Kerning information, indexed by two (packed) characters.
+  std::unordered_map<uint64, int> kerning;
 
-	// Glyph characters, indexed by their glyph id.
-	std::unordered_map<uint32, BMFontCharacter> characters;
+  int fontSize;
+  bool unicode;
 
-	// Kerning information, indexed by two (packed) characters.
-	std::unordered_map<uint64, int> kerning;
+  int lineHeight;
 
-	int fontSize;
-	bool unicode;
+};  // BMFontRasterizer
 
-	int lineHeight;
+}  // namespace font
+}  // namespace love
 
-}; // BMFontRasterizer
-
-} // font
-} // love
-
-#endif // LOVE_FONT_BMFONT_RASTERIZER_H
+#endif  // LOVE_FONT_BMFONT_RASTERIZER_H

@@ -22,9 +22,9 @@
 #define LOVE_PHYSICS_BOX2D_WRAP_WORLD_H
 
 // LOVE
-#include "common/runtime.h"
-#include "common/Exception.h"
 #include "World.h"
+#include "common/Exception.h"
+#include "common/runtime.h"
 #include "wrap_Physics.h"
 
 namespace love
@@ -37,8 +37,8 @@ namespace box2d
 World *luax_checkworld(lua_State *L, int idx);
 extern "C" int luaopen_world(lua_State *L);
 
-} // box2d
-} // physics
-} // love
+}  // namespace box2d
+}  // namespace physics
+}  // namespace love
 
-#endif // LOVE_PHYSICS_BOX2D_WRAP_WORLD_H
+#endif  // LOVE_PHYSICS_BOX2D_WRAP_WORLD_H

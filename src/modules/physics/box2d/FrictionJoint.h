@@ -36,45 +36,44 @@ namespace box2d
  **/
 class FrictionJoint : public Joint
 {
-public:
+ public:
+  static love::Type type;
 
-	static love::Type type;
+  /**
+   * Creates a new FrictionJoint connecting body1 and body2.
+   **/
+  FrictionJoint(Body *body1, Body *body2, float xA, float yA, float xB, float yB,
+                bool collideConnected);
 
-	/**
-	 * Creates a new FrictionJoint connecting body1 and body2.
-	 **/
-	FrictionJoint(Body *body1, Body *body2, float xA, float yA, float xB, float yB, bool collideConnected);
+  virtual ~FrictionJoint();
 
-	virtual ~FrictionJoint();
+  /**
+   * Sets the maximum friction force in Newtons.
+   **/
+  void setMaxForce(float force);
 
-	/**
-	 * Sets the maximum friction force in Newtons.
-	 **/
-	void setMaxForce(float force);
+  /**
+   * Gets the maximum friction force in Newtons.
+   **/
+  float getMaxForce() const;
 
-	/**
-	 * Gets the maximum friction force in Newtons.
-	 **/
-	float getMaxForce() const;
+  /**
+   * Sets the maximum friction torque in Newton-meters.
+   **/
+  void setMaxTorque(float torque);
 
-	/**
-	 * Sets the maximum friction torque in Newton-meters.
-	 **/
-	void setMaxTorque(float torque);
+  /**
+   * Gets the maximum friction torque in Newton-meters.
+   **/
+  float getMaxTorque() const;
 
-	/**
-	 * Gets the maximum friction torque in Newton-meters.
-	 **/
-	float getMaxTorque() const;
-
-private:
-
-	// The Box2D friction joint object.
-	b2FrictionJoint *joint;
+ private:
+  // The Box2D friction joint object.
+  b2FrictionJoint *joint;
 };
 
-} // box2d
-} // physics
-} // love
+}  // namespace box2d
+}  // namespace physics
+}  // namespace love
 
-#endif // LOVE_PHYSICS_BOX2D_FRICTION_JOINT_H
+#endif  // LOVE_PHYSICS_BOX2D_FRICTION_JOINT_H

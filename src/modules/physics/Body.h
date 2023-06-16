@@ -32,32 +32,30 @@ namespace physics
 
 class Body : public Object
 {
-public:
+ public:
+  static love::Type type;
 
-	static love::Type type;
+  enum Type
+  {
+    BODY_INVALID,
+    BODY_STATIC,
+    BODY_DYNAMIC,
+    BODY_KINEMATIC,
+    BODY_MAX_ENUM
+  };
 
-	enum Type
-	{
-		BODY_INVALID,
-		BODY_STATIC,
-		BODY_DYNAMIC,
-		BODY_KINEMATIC,
-		BODY_MAX_ENUM
-	};
+  virtual ~Body();
 
-	virtual ~Body();
+  static bool getConstant(const char *in, Type &out);
+  static bool getConstant(Type in, const char *&out);
+  static std::vector<std::string> getConstants(Type);
 
-	static bool getConstant(const char *in, Type &out);
-	static bool getConstant(Type in, const char  *&out);
-	static std::vector<std::string> getConstants(Type);
-
-private:
-
-	static StringMap<Type, BODY_MAX_ENUM>::Entry typeEntries[];
-	static StringMap<Type, BODY_MAX_ENUM> types;
+ private:
+  static StringMap<Type, BODY_MAX_ENUM>::Entry typeEntries[];
+  static StringMap<Type, BODY_MAX_ENUM> types;
 };
 
-} // physics
-} // love
+}  // namespace physics
+}  // namespace love
 
-#endif // LOVE_PHYSICS_BODY_H
+#endif  // LOVE_PHYSICS_BODY_H

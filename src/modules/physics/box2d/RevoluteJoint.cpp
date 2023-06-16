@@ -24,8 +24,8 @@
 
 // Module
 #include "Body.h"
-#include "World.h"
 #include "Physics.h"
+#include "World.h"
 
 namespace love
 {
@@ -36,128 +36,87 @@ namespace box2d
 
 love::Type RevoluteJoint::type("RevoluteJoint", &Joint::type);
 
-RevoluteJoint::RevoluteJoint(Body *body1, Body *body2, float xA, float yA, float xB, float yB, bool collideConnected)
-	: Joint(body1, body2)
-	, joint(NULL)
+RevoluteJoint::RevoluteJoint(Body *body1, Body *body2, float xA, float yA, float xB, float yB,
+                             bool collideConnected)
+    : Joint(body1, body2),
+      joint(NULL)
 {
-	b2RevoluteJointDef def;
-	init(def, body1, body2, xA, yA, xB, yB, collideConnected);
-	joint = (b2RevoluteJoint *)createJoint(&def);
+  b2RevoluteJointDef def;
+  init(def, body1, body2, xA, yA, xB, yB, collideConnected);
+  joint = (b2RevoluteJoint *) createJoint(&def);
 }
 
-RevoluteJoint::RevoluteJoint(Body *body1, Body *body2, float xA, float yA, float xB, float yB, bool collideConnected, float referenceAngle)
-	: Joint(body1, body2)
-	, joint(NULL)
+RevoluteJoint::RevoluteJoint(Body *body1, Body *body2, float xA, float yA, float xB, float yB,
+                             bool collideConnected, float referenceAngle)
+    : Joint(body1, body2),
+      joint(NULL)
 {
-	b2RevoluteJointDef def;
-	init(def, body1, body2, xA, yA, xB, yB, collideConnected);
-	def.referenceAngle = referenceAngle;
-	joint = (b2RevoluteJoint *)createJoint(&def);
+  b2RevoluteJointDef def;
+  init(def, body1, body2, xA, yA, xB, yB, collideConnected);
+  def.referenceAngle = referenceAngle;
+  joint = (b2RevoluteJoint *) createJoint(&def);
 }
 
-RevoluteJoint::~RevoluteJoint()
+RevoluteJoint::~RevoluteJoint() {}
+
+void RevoluteJoint::init(b2RevoluteJointDef &def, Body *body1, Body *body2, float xA, float yA,
+                         float xB, float yB, bool collideConnected)
 {
+  def.Initialize(body1->body, body2->body, Physics::scaleDown(b2Vec2(xA, yA)));
+  def.localAnchorB = body2->body->GetLocalPoint(Physics::scaleDown(b2Vec2(xB, yB)));
+  def.collideConnected = collideConnected;
 }
 
-void RevoluteJoint::init(b2RevoluteJointDef &def, Body *body1, Body *body2, float xA, float yA, float xB, float yB, bool collideConnected)
-{
-	def.Initialize(body1->body, body2->body, Physics::scaleDown(b2Vec2(xA,yA)));
-	def.localAnchorB = body2->body->GetLocalPoint(Physics::scaleDown(b2Vec2(xB, yB)));
-	def.collideConnected = collideConnected;
-}
+float RevoluteJoint::getJointAngle() const { return joint->GetJointAngle(); }
 
-float RevoluteJoint::getJointAngle() const
-{
-	return joint->GetJointAngle();
-}
+float RevoluteJoint::getJointSpeed() const { return joint->GetJointSpeed(); }
 
-float RevoluteJoint::getJointSpeed() const
-{
-	return joint->GetJointSpeed();
-}
+void RevoluteJoint::setMotorEnabled(bool enable) { return joint->EnableMotor(enable); }
 
-void RevoluteJoint::setMotorEnabled(bool enable)
-{
-	return joint->EnableMotor(enable);
-}
-
-bool RevoluteJoint::isMotorEnabled() const
-{
-	return joint->IsMotorEnabled();
-}
+bool RevoluteJoint::isMotorEnabled() const { return joint->IsMotorEnabled(); }
 
 void RevoluteJoint::setMaxMotorTorque(float torque)
 {
-	joint->SetMaxMotorTorque(Physics::scaleDown(Physics::scaleDown(torque)));
+  joint->SetMaxMotorTorque(Physics::scaleDown(Physics::scaleDown(torque)));
 }
 
-void RevoluteJoint::setMotorSpeed(float speed)
-{
-	joint->SetMotorSpeed(speed);
-}
+void RevoluteJoint::setMotorSpeed(float speed) { joint->SetMotorSpeed(speed); }
 
-float RevoluteJoint::getMotorSpeed() const
-{
-	return joint->GetMotorSpeed();
-}
+float RevoluteJoint::getMotorSpeed() const { return joint->GetMotorSpeed(); }
 
 float RevoluteJoint::getMotorTorque(float inv_dt) const
 {
-	return Physics::scaleUp(Physics::scaleUp(joint->GetMotorTorque(inv_dt)));
+  return Physics::scaleUp(Physics::scaleUp(joint->GetMotorTorque(inv_dt)));
 }
 
 float RevoluteJoint::getMaxMotorTorque() const
 {
-	return Physics::scaleUp(Physics::scaleUp(joint->GetMaxMotorTorque()));
+  return Physics::scaleUp(Physics::scaleUp(joint->GetMaxMotorTorque()));
 }
 
-void RevoluteJoint::setLimitsEnabled(bool enable)
-{
-	joint->EnableLimit(enable);
-}
+void RevoluteJoint::setLimitsEnabled(bool enable) { joint->EnableLimit(enable); }
 
-bool RevoluteJoint::areLimitsEnabled() const
-{
-	return joint->IsLimitEnabled();
-}
+bool RevoluteJoint::areLimitsEnabled() const { return joint->IsLimitEnabled(); }
 
-void RevoluteJoint::setUpperLimit(float limit)
-{
-	joint->SetLimits(joint->GetLowerLimit(), limit);
-}
+void RevoluteJoint::setUpperLimit(float limit) { joint->SetLimits(joint->GetLowerLimit(), limit); }
 
-void RevoluteJoint::setLowerLimit(float limit)
-{
-	joint->SetLimits(limit, joint->GetUpperLimit());
-}
+void RevoluteJoint::setLowerLimit(float limit) { joint->SetLimits(limit, joint->GetUpperLimit()); }
 
-void RevoluteJoint::setLimits(float lower, float upper)
-{
-	joint->SetLimits(lower, upper);
-}
+void RevoluteJoint::setLimits(float lower, float upper) { joint->SetLimits(lower, upper); }
 
-float RevoluteJoint::getLowerLimit() const
-{
-	return joint->GetLowerLimit();
-}
+float RevoluteJoint::getLowerLimit() const { return joint->GetLowerLimit(); }
 
-float RevoluteJoint::getUpperLimit() const
-{
-	return joint->GetUpperLimit();
-}
+float RevoluteJoint::getUpperLimit() const { return joint->GetUpperLimit(); }
 
 int RevoluteJoint::getLimits(lua_State *L)
 {
-	lua_pushnumber(L, joint->GetLowerLimit());
-	lua_pushnumber(L, joint->GetUpperLimit());
-	return 2;
+  lua_pushnumber(L, joint->GetLowerLimit());
+  lua_pushnumber(L, joint->GetUpperLimit());
+  return 2;
 }
 
-float RevoluteJoint::getReferenceAngle() const
-{
-	return joint->GetReferenceAngle();
-}
+float RevoluteJoint::getReferenceAngle() const { return joint->GetReferenceAngle(); }
 
-} // box2d
-} // physics
-} // love
+}  // namespace box2d
+}  // namespace physics
+}  // namespace love

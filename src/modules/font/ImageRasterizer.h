@@ -22,11 +22,11 @@
 #define LOVE_FONT_IMAGE_RASTERIZER_H
 
 // LOVE
+#include <map>
+
+#include "common/Color.h"
 #include "font/Rasterizer.h"
 #include "image/ImageData.h"
-#include "common/Color.h"
-
-#include <map>
 
 namespace love
 {
@@ -38,49 +38,48 @@ namespace font
  **/
 class ImageRasterizer : public Rasterizer
 {
-public:
-	ImageRasterizer(love::image::ImageData *imageData, uint32 *glyphs, int numglyphs, int extraspacing, float dpiscale);
-	virtual ~ImageRasterizer();
+ public:
+  ImageRasterizer(love::image::ImageData *imageData, uint32 *glyphs, int numglyphs,
+                  int extraspacing, float dpiscale);
+  virtual ~ImageRasterizer();
 
-	// Implement Rasterizer
-	int getLineHeight() const override;
-	GlyphData *getGlyphData(uint32 glyph) const override;
-	int getGlyphCount() const override;
-	bool hasGlyph(uint32 glyph) const override;
-	DataType getDataType() const override;
+  // Implement Rasterizer
+  int getLineHeight() const override;
+  GlyphData *getGlyphData(uint32 glyph) const override;
+  int getGlyphCount() const override;
+  bool hasGlyph(uint32 glyph) const override;
+  DataType getDataType() const override;
 
+ private:
+  // Information about a glyph in the ImageData
+  struct ImageGlyphData
+  {
+    int x;
+    int width;
+  };
 
-private:
+  // Load all the glyph positions into memory
+  void load();
 
-	// Information about a glyph in the ImageData
-	struct ImageGlyphData
-	{
-		int x;
-		int width;
-	};
+  // The image data
+  StrongRef<love::image::ImageData> imageData;
 
-	// Load all the glyph positions into memory
-	void load();
+  // The glyphs in the font
+  uint32 *glyphs;
 
-	// The image data
-	StrongRef<love::image::ImageData> imageData;
+  // Number of glyphs in the font
+  int numglyphs;
 
-	// The glyphs in the font
-	uint32 *glyphs;
+  int extraSpacing;
 
-	// Number of glyphs in the font
-	int numglyphs;
+  std::map<uint32, ImageGlyphData> imageGlyphs;
 
-	int extraSpacing;
+  // Color used to identify glyph separation in the source ImageData
+  Color32 spacer;
 
-	std::map<uint32, ImageGlyphData> imageGlyphs;
+};  // ImageRasterizer
 
-	// Color used to identify glyph separation in the source ImageData
-	Color32 spacer;
+}  // namespace font
+}  // namespace love
 
-}; // ImageRasterizer
-
-} // font
-} // love
-
-#endif // LOVE_FONT_IMAGE_RASTERIZER_H
+#endif  // LOVE_FONT_IMAGE_RASTERIZER_H

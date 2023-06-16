@@ -22,9 +22,9 @@
 #define LOVE_SOUND_SOUND_DATA_H
 
 // LOVE
-#include "filesystem/File.h"
-#include "common/int.h"
 #include "Decoder.h"
+#include "common/int.h"
+#include "filesystem/File.h"
 
 namespace love
 {
@@ -33,48 +33,46 @@ namespace sound
 
 class SoundData : public love::Data
 {
-public:
+ public:
+  static love::Type type;
 
-	static love::Type type;
+  SoundData(Decoder *decoder);
+  SoundData(int samples, int sampleRate, int bitDepth, int channels);
+  SoundData(void *d, int samples, int sampleRate, int bitDepth, int channels);
+  SoundData(const SoundData &c);
 
-	SoundData(Decoder *decoder);
-	SoundData(int samples, int sampleRate, int bitDepth, int channels);
-	SoundData(void *d, int samples, int sampleRate, int bitDepth, int channels);
-	SoundData(const SoundData &c);
+  virtual ~SoundData();
 
-	virtual ~SoundData();
+  // Implements Data.
+  SoundData *clone() const;
+  void *getData() const;
+  size_t getSize() const;
 
-	// Implements Data.
-	SoundData *clone() const;
-	void *getData() const;
-	size_t getSize() const;
+  virtual int getChannelCount() const;
+  virtual int getBitDepth() const;
+  virtual int getSampleRate() const;
+  virtual int getSampleCount() const;
 
-	virtual int getChannelCount() const;
-	virtual int getBitDepth() const;
-	virtual int getSampleRate() const;
-	virtual int getSampleCount() const;
+  virtual float getDuration() const;
 
-	virtual float getDuration() const;
+  void setSample(int i, float sample);
+  void setSample(int i, int channel, float sample);
+  float getSample(int i) const;
+  float getSample(int i, int channel) const;
 
-	void setSample(int i, float sample);
-	void setSample(int i, int channel, float sample);
-	float getSample(int i) const;
-	float getSample(int i, int channel) const;
+ private:
+  void load(int samples, int sampleRate, int bitDepth, int channels, void *newData = 0);
 
-private:
+  uint8 *data;
+  size_t size;
 
-	void load(int samples, int sampleRate, int bitDepth, int channels, void *newData = 0);
+  int sampleRate;
+  int bitDepth;
+  int channels;
 
-	uint8 *data;
-	size_t size;
+};  // SoundData
 
-	int sampleRate;
-	int bitDepth;
-	int channels;
+}  // namespace sound
+}  // namespace love
 
-}; // SoundData
-
-} // sound
-} // love
-
-#endif // LOVE_SOUND_SOUND_DATA_H
+#endif  // LOVE_SOUND_SOUND_DATA_H

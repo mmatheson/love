@@ -20,11 +20,11 @@
 
 #pragma once
 
+#include "ByteData.h"
 #include "CompressedData.h"
 #include "Compressor.h"
-#include "HashFunction.h"
 #include "DataView.h"
-#include "ByteData.h"
+#include "HashFunction.h"
 
 // LOVE
 #include "common/Module.h"
@@ -37,16 +37,16 @@ namespace data
 
 enum EncodeFormat
 {
-	ENCODE_BASE64,
-	ENCODE_HEX,
-	ENCODE_MAX_ENUM
+  ENCODE_BASE64,
+  ENCODE_HEX,
+  ENCODE_MAX_ENUM
 };
 
 enum ContainerType
 {
-	CONTAINER_DATA,
-	CONTAINER_STRING,
-	CONTAINER_MAX_ENUM
+  CONTAINER_DATA,
+  CONTAINER_STRING,
+  CONTAINER_MAX_ENUM
 };
 
 /**
@@ -60,7 +60,8 @@ enum ContainerType
  *              Specific formats may not use every level.
  * @return The newly compressed data.
  **/
-CompressedData *compress(Compressor::Format format, const char *rawbytes, size_t rawsize, int level = -1);
+CompressedData *compress(Compressor::Format format, const char *rawbytes, size_t rawsize,
+                         int level = -1);
 
 /**
  * Decompresses existing compressed data into raw bytes.
@@ -82,9 +83,11 @@ char *decompress(CompressedData *data, size_t &decompressedsize);
  *               bytes of the newly decompressed data.
  * @return The newly decompressed data (allocated with new[]).
  **/
-char *decompress(Compressor::Format format, const char *cbytes, size_t compressedsize, size_t &rawsize);
+char *decompress(Compressor::Format format, const char *cbytes, size_t compressedsize,
+                 size_t &rawsize);
 
-char *encode(EncodeFormat format, const char *src, size_t srclen, size_t &dstlen, size_t linelen = 0);
+char *encode(EncodeFormat format, const char *src, size_t srclen, size_t &dstlen,
+             size_t linelen = 0);
 char *decode(EncodeFormat format, const char *src, size_t srclen, size_t &dstlen);
 
 /**
@@ -98,8 +101,8 @@ char *decode(EncodeFormat format, const char *src, size_t srclen, size_t &dstlen
 std::string hash(HashFunction::Function function, Data *input);
 std::string hash(HashFunction::Function function, const char *input, uint64_t size);
 void hash(HashFunction::Function function, Data *input, HashFunction::Value &output);
-void hash(HashFunction::Function function, const char *input, uint64_t size, HashFunction::Value &output);
-
+void hash(HashFunction::Function function, const char *input, uint64_t size,
+          HashFunction::Value &output);
 
 bool getConstant(const char *in, EncodeFormat &out);
 bool getConstant(EncodeFormat in, const char *&out);
@@ -109,24 +112,22 @@ bool getConstant(const char *in, ContainerType &out);
 bool getConstant(ContainerType in, const char *&out);
 std::vector<std::string> getConstants(ContainerType);
 
-
 class DataModule : public Module
 {
-public:
+ public:
+  DataModule();
+  virtual ~DataModule();
 
-	DataModule();
-	virtual ~DataModule();
+  // Implements Module.
+  ModuleType getModuleType() const override { return M_DATA; }
+  const char *getName() const override { return "love.data"; }
 
-	// Implements Module.
-	ModuleType getModuleType() const override { return M_DATA; }
-	const char *getName() const override { return "love.data"; }
+  DataView *newDataView(Data *data, size_t offset, size_t size);
+  ByteData *newByteData(size_t size);
+  ByteData *newByteData(const void *d, size_t size);
+  ByteData *newByteData(void *d, size_t size, bool own);
 
-	DataView *newDataView(Data *data, size_t offset, size_t size);
-	ByteData *newByteData(size_t size);
-	ByteData *newByteData(const void *d, size_t size);
-	ByteData *newByteData(void *d, size_t size, bool own);
+};  // DataModule
 
-}; // DataModule
-
-} // data
-} // love
+}  // namespace data
+}  // namespace love

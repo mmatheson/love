@@ -29,142 +29,95 @@ namespace video
 
 love::Type VideoStream::type("VideoStream", &Stream::type);
 
-void VideoStream::setSync(VideoStream::FrameSync *frameSync)
-{
-	this->frameSync = frameSync;
-}
+void VideoStream::setSync(VideoStream::FrameSync *frameSync) { this->frameSync = frameSync; }
 
-VideoStream::FrameSync *VideoStream::getSync() const
-{
-	return frameSync;
-}
+VideoStream::FrameSync *VideoStream::getSync() const { return frameSync; }
 
-void VideoStream::play()
-{
-	frameSync->play();
-}
+void VideoStream::play() { frameSync->play(); }
 
-void VideoStream::pause()
-{
-	frameSync->pause();
-}
+void VideoStream::pause() { frameSync->pause(); }
 
-void VideoStream::seek(double offset)
-{
-	frameSync->seek(offset);
-}
+void VideoStream::seek(double offset) { frameSync->seek(offset); }
 
-double VideoStream::tell() const
-{
-	return frameSync->tell();
-}
+double VideoStream::tell() const { return frameSync->tell(); }
 
-bool VideoStream::isPlaying() const
-{
-	return frameSync->isPlaying();
-}
+bool VideoStream::isPlaying() const { return frameSync->isPlaying(); }
 
 VideoStream::Frame::Frame()
-	: yplane(nullptr)
-	, cbplane(nullptr)
-	, crplane(nullptr)
+    : yplane(nullptr),
+      cbplane(nullptr),
+      crplane(nullptr)
 {
 }
 
 VideoStream::Frame::~Frame()
 {
-	delete[] yplane;
-	delete[] cbplane;
-	delete[] crplane;
+  delete[] yplane;
+  delete[] cbplane;
+  delete[] crplane;
 }
 
 void VideoStream::FrameSync::copyState(const VideoStream::FrameSync *other)
 {
-	seek(other->tell());
-	if (other->isPlaying())
-		play();
-	else
-		pause();
+  seek(other->tell());
+  if (other->isPlaying())
+    play();
+  else
+    pause();
 }
 
-double VideoStream::FrameSync::tell() const
-{
-	return getPosition();
-}
+double VideoStream::FrameSync::tell() const { return getPosition(); }
 
 VideoStream::DeltaSync::DeltaSync()
-	: playing(false)
-	, position(0)
-	, speed(1)
+    : playing(false),
+      position(0),
+      speed(1)
 {
 }
 
-VideoStream::DeltaSync::~DeltaSync()
-{
-}
+VideoStream::DeltaSync::~DeltaSync() {}
 
-double VideoStream::DeltaSync::getPosition() const
-{
-	return position;
-}
+double VideoStream::DeltaSync::getPosition() const { return position; }
 
 void VideoStream::DeltaSync::update(double dt)
 {
-	Lock l(mutex);
-	if (playing)
-		position += dt*speed;
+  Lock l(mutex);
+  if (playing)
+    position += dt * speed;
 }
 
-void VideoStream::DeltaSync::play()
-{
-	playing = true;
-}
+void VideoStream::DeltaSync::play() { playing = true; }
 
-void VideoStream::DeltaSync::pause()
-{
-	playing = false;
-}
+void VideoStream::DeltaSync::pause() { playing = false; }
 
 void VideoStream::DeltaSync::seek(double time)
 {
-	Lock l(mutex);
-	position = time;
+  Lock l(mutex);
+  position = time;
 }
 
-bool VideoStream::DeltaSync::isPlaying() const
-{
-	return playing;
-}
+bool VideoStream::DeltaSync::isPlaying() const { return playing; }
 
 VideoStream::SourceSync::SourceSync(love::audio::Source *source)
-	: source(source)
+    : source(source)
 {
 }
 
 double VideoStream::SourceSync::getPosition() const
 {
-	return source->tell(love::audio::Source::UNIT_SECONDS);
+  return source->tell(love::audio::Source::UNIT_SECONDS);
 }
 
-void VideoStream::SourceSync::play()
-{
-	source->play();
-}
+void VideoStream::SourceSync::play() { source->play(); }
 
-void VideoStream::SourceSync::pause()
-{
-	source->pause();
-}
+void VideoStream::SourceSync::pause() { source->pause(); }
 
 void VideoStream::SourceSync::seek(double time)
 {
-	source->seek(time, love::audio::Source::UNIT_SECONDS);
+  source->seek(time, love::audio::Source::UNIT_SECONDS);
 }
 
-bool VideoStream::SourceSync::isPlaying() const
-{
-	return source->isPlaying();
-}
+bool VideoStream::SourceSync::isPlaying() const { return source->isPlaying(); }
 
-} // video
-} // love
+}  // namespace video
+}  // namespace love

@@ -31,79 +31,77 @@ namespace timer
 
 class Timer : public Module
 {
-public:
+ public:
+  Timer();
+  virtual ~Timer() {}
 
-	Timer();
-	virtual ~Timer() {}
+  // Implements Module.
+  ModuleType getModuleType() const override { return M_TIMER; }
+  const char *getName() const override { return "love.timer"; }
 
-	// Implements Module.
-	ModuleType getModuleType() const override { return M_TIMER; }
-	const char *getName() const override { return "love.timer"; }
+  /**
+   * Measures the time between this call and the previous call,
+   * and updates internal values accordingly.
+   **/
+  double step();
 
-	/**
-	 * Measures the time between this call and the previous call,
-	 * and updates internal values accordingly.
-	 **/
-	double step();
+  /**
+   * Tries to sleep for the specified amount of time. The precision is
+   * usually 1ms.
+   * @param seconds The number of seconds to sleep for.
+   **/
+  void sleep(double seconds) const;
 
-	/**
-	 * Tries to sleep for the specified amount of time. The precision is
-	 * usually 1ms.
-	 * @param seconds The number of seconds to sleep for.
-	 **/
-	void sleep(double seconds) const;
+  /**
+   * Gets the time between the last two frames, assuming step is called
+   * each frame.
+   **/
+  double getDelta() const;
 
-	/**
-	 * Gets the time between the last two frames, assuming step is called
-	 * each frame.
-	 **/
-	double getDelta() const;
+  /**
+   * Gets the average FPS over the last second. Beucase the value is only updated
+   * once per second, it does not look erratic when displayed on screen.
+   * @return The "current" FPS.
+   **/
+  int getFPS() const;
 
-	/**
-	 * Gets the average FPS over the last second. Beucase the value is only updated
-	 * once per second, it does not look erratic when displayed on screen.
-	 * @return The "current" FPS.
-	 **/
-	int getFPS() const;
+  /**
+   * Gets the average delta time (seconds per frame) over the last second.
+   **/
+  double getAverageDelta() const;
 
-	/**
-	 * Gets the average delta time (seconds per frame) over the last second.
-	 **/
-	double getAverageDelta() const;
+  /**
+   * Gets the amount of time in seconds passed since its first invocation
+   * (which happens as part of the Timer constructor,
+   * which is called when the module is first opened).
+   * Useful for profiling code or measuring intervals.
+   * The time is microsecond-precise, and increases monotonically.
+   * @return The time (in seconds)
+   **/
+  static double getTime();
 
-	/**
-	 * Gets the amount of time in seconds passed since its first invocation
-	 * (which happens as part of the Timer constructor,
-	 * which is called when the module is first opened).
-	 * Useful for profiling code or measuring intervals.
-	 * The time is microsecond-precise, and increases monotonically.
-	 * @return The time (in seconds)
-	 **/
-	static double getTime();
+ private:
+  // Frame delta vars.
+  double currTime;
+  double prevTime;
+  double prevFpsUpdate;
 
-private:
+  // Updated with a certain frequency.
+  int fps;
+  double averageDelta;
 
-	// Frame delta vars.
-	double currTime;
-	double prevTime;
-	double prevFpsUpdate;
+  // The frequency by which to update the FPS.
+  double fpsUpdateFrequency;
 
-	// Updated with a certain frequency.
-	int fps;
-	double averageDelta;
+  // Frames since last FPS update.
+  int frames;
 
-	// The frequency by which to update the FPS.
-	double fpsUpdateFrequency;
+  // The current timestep.
+  double dt;
 
-	// Frames since last FPS update.
-	int frames;
+};  // Timer
 
-	// The current timestep.
-	double dt;
+}  // namespace timer
+}  // namespace love
 
-}; // Timer
-
-} // timer
-} // love
-
-#endif // LOVE_TIMER_TIMER_H
+#endif  // LOVE_TIMER_TIMER_H

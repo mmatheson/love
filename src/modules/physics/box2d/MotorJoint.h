@@ -38,50 +38,47 @@ namespace box2d
  */
 class MotorJoint : public Joint
 {
-public:
+ public:
+  static love::Type type;
 
-	static love::Type type;
+  MotorJoint(Body *body1, Body *body2);
+  MotorJoint(Body *body1, Body *body2, float correctionFactor, bool collideConnected);
+  virtual ~MotorJoint();
 
-	MotorJoint(Body *body1, Body* body2);
-	MotorJoint(Body *body1, Body* body2, float correctionFactor, bool collideConnected);
-	virtual ~MotorJoint();
+  /// Set/get the target linear offset, in frame A, in meters.
+  void setLinearOffset(float x, float y);
+  int getLinearOffset(lua_State *L) const;
 
-	/// Set/get the target linear offset, in frame A, in meters.
-	void setLinearOffset(float x, float y);
-	int getLinearOffset(lua_State *L) const;
+  /// Set/get the target angular offset, in radians.
+  void setAngularOffset(float angularOffset);
+  float getAngularOffset() const;
 
-	/// Set/get the target angular offset, in radians.
-	void setAngularOffset(float angularOffset);
-	float getAngularOffset() const;
+  /// Set the maximum friction force.
+  void setMaxForce(float force);
 
-	/// Set the maximum friction force.
-	void setMaxForce(float force);
+  /// Get the maximum friction force.
+  float getMaxForce() const;
 
-	/// Get the maximum friction force.
-	float getMaxForce() const;
+  /// Set the maximum friction torque.
+  void setMaxTorque(float torque);
 
-	/// Set the maximum friction torque.
-	void setMaxTorque(float torque);
+  /// Get the maximum friction torque.
+  float getMaxTorque() const;
 
-	/// Get the maximum friction torque.
-	float getMaxTorque() const;
+  /// Set the position correction factor in the range [0,1].
+  void setCorrectionFactor(float factor);
 
-	/// Set the position correction factor in the range [0,1].
-	void setCorrectionFactor(float factor);
+  /// Get the position correction factor in the range [0,1].
+  float getCorrectionFactor() const;
 
-	/// Get the position correction factor in the range [0,1].
-	float getCorrectionFactor() const;
+ private:
+  // The Box2D MotorJoint object.
+  b2MotorJoint *joint;
 
-private:
+};  // MotorJoint
 
-	// The Box2D MotorJoint object.
-	b2MotorJoint *joint;
+}  // namespace box2d
+}  // namespace physics
+}  // namespace love
 
-}; // MotorJoint
-
-
-} // box2d
-} // physics
-} // love
-
-#endif // LOVE_PHYSICS_BOX2D_MOTOR_JOINT_H
+#endif  // LOVE_PHYSICS_BOX2D_MOTOR_JOINT_H

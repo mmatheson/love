@@ -19,6 +19,7 @@
  **/
 
 #include "threads.h"
+
 #include "Thread.h"
 
 namespace love
@@ -28,79 +29,45 @@ namespace thread
 namespace sdl
 {
 
-Mutex::Mutex()
-{
-	mutex = SDL_CreateMutex();
-}
+Mutex::Mutex() { mutex = SDL_CreateMutex(); }
 
-Mutex::~Mutex()
-{
-	SDL_DestroyMutex(mutex);
-}
+Mutex::~Mutex() { SDL_DestroyMutex(mutex); }
 
-void Mutex::lock()
-{
-	SDL_LockMutex(mutex);
-}
+void Mutex::lock() { SDL_LockMutex(mutex); }
 
-void Mutex::unlock()
-{
-	SDL_UnlockMutex(mutex);
-}
+void Mutex::unlock() { SDL_UnlockMutex(mutex); }
 
-Conditional::Conditional()
-{
-	cond = SDL_CreateCond();
-}
+Conditional::Conditional() { cond = SDL_CreateCond(); }
 
-Conditional::~Conditional()
-{
-	SDL_DestroyCond(cond);
-}
+Conditional::~Conditional() { SDL_DestroyCond(cond); }
 
-void Conditional::signal()
-{
-	SDL_CondSignal(cond);
-}
+void Conditional::signal() { SDL_CondSignal(cond); }
 
-void Conditional::broadcast()
-{
-	SDL_CondBroadcast(cond);
-}
+void Conditional::broadcast() { SDL_CondBroadcast(cond); }
 
 bool Conditional::wait(thread::Mutex *_mutex, int timeout)
 {
-	// Yes, I realise this can be dangerous,
-	// however, you're asking for it if you're
-	// mixing thread implementations.
-	Mutex *mutex = (Mutex *) _mutex;
-	if (timeout < 0)
-		return !SDL_CondWait(cond, mutex->mutex);
-	else
-		return (SDL_CondWaitTimeout(cond, mutex->mutex, timeout) == 0);
+  // Yes, I realise this can be dangerous,
+  // however, you're asking for it if you're
+  // mixing thread implementations.
+  Mutex *mutex = (Mutex *) _mutex;
+  if (timeout < 0)
+    return !SDL_CondWait(cond, mutex->mutex);
+  else
+    return (SDL_CondWaitTimeout(cond, mutex->mutex, timeout) == 0);
 }
 
-} // sdl
-
+}  // namespace sdl
 
 /**
  * Implementations of the functions declared in src/modules/threads.h.
  **/
 
-thread::Mutex *newMutex()
-{
-	return new sdl::Mutex();
-}
+thread::Mutex *newMutex() { return new sdl::Mutex(); }
 
-thread::Conditional *newConditional()
-{
-	return new sdl::Conditional();
-}
+thread::Conditional *newConditional() { return new sdl::Conditional(); }
 
-thread::Thread *newThread(Threadable *t)
-{
-	return new sdl::Thread(t);
-}
+thread::Thread *newThread(Threadable *t) { return new sdl::Thread(t); }
 
-} // thread
-} // love
+}  // namespace thread
+}  // namespace love

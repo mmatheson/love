@@ -37,37 +37,36 @@ namespace box2d
  **/
 class EdgeShape : public Shape
 {
-public:
+ public:
+  static love::Type type;
 
-	static love::Type type;
+  /**
+   * Create a new EdgeShape from a Box2D edge shape.
+   * @param e The edge shape.
+   **/
+  EdgeShape(b2EdgeShape *e, bool own = true);
 
-	/**
-	 * Create a new EdgeShape from a Box2D edge shape.
-	 * @param e The edge shape.
-	 **/
-	EdgeShape(b2EdgeShape *e, bool own = true);
+  virtual ~EdgeShape();
 
-	virtual ~EdgeShape();
+  void setNextVertex(float x, float y);
+  void setNextVertex();
+  bool getNextVertex(float &x, float &y) const;
 
-	void setNextVertex(float x, float y);
-	void setNextVertex();
-	bool getNextVertex(float &x, float &y) const;
+  void setPreviousVertex(float x, float y);
+  void setPreviousVertex();
+  bool getPreviousVertex(float &x, float &y) const;
 
-	void setPreviousVertex(float x, float y);
-	void setPreviousVertex();
-	bool getPreviousVertex(float &x, float &y) const;
-
-	/**
-	 * Returns the transformed points of the edge shape.
-	 * This function is useful for debug drawing and such.
-	 *
-	 * The result can be directly passed into love.graphics.line().
-	 **/
-	int getPoints(lua_State *L);
+  /**
+   * Returns the transformed points of the edge shape.
+   * This function is useful for debug drawing and such.
+   *
+   * The result can be directly passed into love.graphics.line().
+   **/
+  int getPoints(lua_State *L);
 };
 
-} // box2d
-} // physics
-} // love
+}  // namespace box2d
+}  // namespace physics
+}  // namespace love
 
-#endif // LOVE_PHYSICS_BOX2D_EDGE_SHAPE_H
+#endif  // LOVE_PHYSICS_BOX2D_EDGE_SHAPE_H

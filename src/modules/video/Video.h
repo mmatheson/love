@@ -22,11 +22,10 @@
 #define LOVE_VIDEO_VIDEO_H
 
 // LOVE
+#include "VideoStream.h"
 #include "common/Module.h"
 #include "common/Stream.h"
 #include "filesystem/File.h"
-
-#include "VideoStream.h"
 
 namespace love
 {
@@ -35,19 +34,19 @@ namespace video
 
 class Video : public Module
 {
-public:
-	virtual ~Video() {}
+ public:
+  virtual ~Video() {}
 
-	// Implements Module
-	virtual ModuleType getModuleType() const { return M_VIDEO; }
+  // Implements Module
+  virtual ModuleType getModuleType() const { return M_VIDEO; }
 
-	/**
-	 * Create a VideoStream representing video frames
-	 **/
-	virtual VideoStream *newVideoStream(love::filesystem::File *file) = 0;
-}; // Video
+  /**
+   * Create a VideoStream representing video frames
+   **/
+  virtual VideoStream *newVideoStream(love::filesystem::File *file) = 0;
+};  // Video
 
-} // video
-} // love
+}  // namespace video
+}  // namespace love
 
-#endif // LOVE_VIDEO_VIDEO_H
+#endif  // LOVE_VIDEO_VIDEO_H

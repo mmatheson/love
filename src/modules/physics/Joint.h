@@ -32,40 +32,37 @@ namespace physics
 
 class Joint : public Object
 {
-public:
+ public:
+  static love::Type type;
 
-	static love::Type type;
+  enum Type
+  {
+    JOINT_INVALID,
+    JOINT_DISTANCE,
+    JOINT_REVOLUTE,
+    JOINT_PRISMATIC,
+    JOINT_MOUSE,
+    JOINT_PULLEY,
+    JOINT_GEAR,
+    JOINT_FRICTION,
+    JOINT_WELD,
+    JOINT_WHEEL,
+    JOINT_ROPE,
+    JOINT_MOTOR,
+    JOINT_MAX_ENUM
+  };
 
-	enum Type
-	{
-		JOINT_INVALID,
-		JOINT_DISTANCE,
-		JOINT_REVOLUTE,
-		JOINT_PRISMATIC,
-		JOINT_MOUSE,
-		JOINT_PULLEY,
-		JOINT_GEAR,
-		JOINT_FRICTION,
-		JOINT_WELD,
-		JOINT_WHEEL,
-		JOINT_ROPE,
-		JOINT_MOTOR,
-		JOINT_MAX_ENUM
-	};
+  virtual ~Joint();
 
+  static bool getConstant(const char *in, Type &out);
+  static bool getConstant(Type in, const char *&out);
 
-	virtual ~Joint();
-
-	static bool getConstant(const char *in, Type &out);
-	static bool getConstant(Type in, const char  *&out);
-
-private:
-
-	static StringMap<Type, JOINT_MAX_ENUM>::Entry typeEntries[];
-	static StringMap<Type, JOINT_MAX_ENUM> types;
+ private:
+  static StringMap<Type, JOINT_MAX_ENUM>::Entry typeEntries[];
+  static StringMap<Type, JOINT_MAX_ENUM> types;
 };
 
-} // physics
-} // love
+}  // namespace physics
+}  // namespace love
 
-#endif // LOVE_PHYSICS_JOINT_H
+#endif  // LOVE_PHYSICS_JOINT_H

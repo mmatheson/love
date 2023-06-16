@@ -32,32 +32,30 @@ namespace physics
 
 class Shape : public Object
 {
-public:
+ public:
+  static love::Type type;
 
-	static love::Type type;
+  enum Type
+  {
+    SHAPE_INVALID,
+    SHAPE_CIRCLE,
+    SHAPE_POLYGON,
+    SHAPE_EDGE,
+    SHAPE_CHAIN,
+    SHAPE_MAX_ENUM
+  };
 
-	enum Type
-	{
-		SHAPE_INVALID,
-		SHAPE_CIRCLE,
-		SHAPE_POLYGON,
-		SHAPE_EDGE,
-		SHAPE_CHAIN,
-		SHAPE_MAX_ENUM
-	};
+  virtual ~Shape();
 
-	virtual ~Shape();
+  static bool getConstant(const char *in, Type &out);
+  static bool getConstant(Type in, const char *&out);
 
-	static bool getConstant(const char *in, Type &out);
-	static bool getConstant(Type in, const char  *&out);
-
-private:
-
-	static StringMap<Type, SHAPE_MAX_ENUM>::Entry typeEntries[];
-	static StringMap<Type, SHAPE_MAX_ENUM> types;
+ private:
+  static StringMap<Type, SHAPE_MAX_ENUM>::Entry typeEntries[];
+  static StringMap<Type, SHAPE_MAX_ENUM> types;
 };
 
-} // physics
-} // love
+}  // namespace physics
+}  // namespace love
 
-#endif // LOVE_PHYSICS_SHAPE_H
+#endif  // LOVE_PHYSICS_SHAPE_H

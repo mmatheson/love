@@ -37,27 +37,25 @@ namespace sdl
 
 class Thread : public thread::Thread
 {
-public:
+ public:
+  Thread(Threadable *t);
+  ~Thread();
+  bool start();
+  void wait();
+  bool isRunning();
 
-	Thread(Threadable *t);
-	~Thread();
-	bool start();
-	void wait();
-	bool isRunning();
+ private:
+  Threadable *t;
+  bool running;
+  SDL_Thread *thread;
+  Mutex mutex;
 
-private:
+  static int thread_runner(void *data);
 
-	Threadable *t;
-	bool running;
-	SDL_Thread *thread;
-	Mutex mutex;
+};  // Thread
 
-	static int thread_runner(void *data);
+}  // namespace sdl
+}  // namespace thread
+}  // namespace love
 
-}; // Thread
-
-} // sdl
-} // thread
-} // love
-
-#endif // LOVE_THREAD_SDL_THREAD_H
+#endif  // LOVE_THREAD_SDL_THREAD_H

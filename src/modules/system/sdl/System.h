@@ -22,8 +22,8 @@
 #define LOVE_SYSTEM_SDL_SYSTEM_H
 
 // LOVE
-#include "system/System.h"
 #include "common/EnumMap.h"
+#include "system/System.h"
 
 // SDL
 #include <SDL_power.h>
@@ -37,32 +37,30 @@ namespace sdl
 
 class System : public love::system::System
 {
-public:
+ public:
+  System();
+  virtual ~System() {}
 
-	System();
-	virtual ~System() {}
+  // Implements Module.
+  const char *getName() const;
 
-	// Implements Module.
-	const char *getName() const;
+  int getProcessorCount() const;
 
-	int getProcessorCount() const;
+  void setClipboardText(const std::string &text) const;
+  std::string getClipboardText() const;
 
-	void setClipboardText(const std::string &text) const;
-	std::string getClipboardText() const;
+  PowerState getPowerInfo(int &seconds, int &percent) const;
 
-	PowerState getPowerInfo(int &seconds, int &percent) const;
+ private:
+  bool isWindowOpen() const;
 
-private:
+  static EnumMap<PowerState, SDL_PowerState, POWER_MAX_ENUM>::Entry powerEntries[];
+  static EnumMap<PowerState, SDL_PowerState, POWER_MAX_ENUM> powerStates;
 
-	bool isWindowOpen() const;
+};  // System
 
-	static EnumMap<PowerState, SDL_PowerState, POWER_MAX_ENUM>::Entry powerEntries[];
-	static EnumMap<PowerState, SDL_PowerState, POWER_MAX_ENUM> powerStates;
+}  // namespace sdl
+}  // namespace system
+}  // namespace love
 
-}; // System
-
-} // sdl
-} // system
-} // love
-
-#endif // LOVE_SYSTEM_SDL_SYSTEM_H
+#endif  // LOVE_SYSTEM_SDL_SYSTEM_H

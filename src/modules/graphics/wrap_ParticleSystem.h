@@ -21,8 +21,8 @@
 #pragma once
 
 // LOVE
-#include "common/runtime.h"
 #include "ParticleSystem.h"
+#include "common/runtime.h"
 
 namespace love
 {
@@ -32,5 +32,5 @@ namespace graphics
 ParticleSystem *luax_checkparticlesystem(lua_State *L, int idx);
 extern "C" int luaopen_particlesystem(lua_State *L);
 
-} // graphics
-} // love
+}  // namespace graphics
+}  // namespace love

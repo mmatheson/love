@@ -63,9 +63,9 @@ void requestAttention(bool continuous);
  **/
 void setWindowSRGBColorSpace(SDL_Window *window);
 
-} // macosx
-} // love
+}  // namespace macosx
+}  // namespace love
 
-#endif // LOVE_MACOSX
+#endif  // LOVE_MACOSX
 
-#endif // LOVE_OSX_H
+#endif  // LOVE_OSX_H

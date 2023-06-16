@@ -41,73 +41,71 @@ namespace box2d
  **/
 class MouseJoint : public Joint
 {
-public:
+ public:
+  static love::Type type;
 
-	static love::Type type;
+  /**
+   * Creates a MouseJoint which connects body1 to the target point.
+   **/
+  MouseJoint(Body *body1, float x, float y);
 
-	/**
-	 * Creates a MouseJoint which connects body1 to the target point.
-	 **/
-	MouseJoint(Body *body1, float x, float y);
+  virtual ~MouseJoint();
 
-	virtual ~MouseJoint();
+  /**
+   * Sets the target of anchor2. (You usually want
+   * to set this to the current mouse.)
+   **/
+  void setTarget(float x, float y);
 
-	/**
-	 * Sets the target of anchor2. (You usually want
-	 * to set this to the current mouse.)
-	 **/
-	void setTarget(float x, float y);
+  /**
+   * Gets the current anchor2 target.
+   **/
+  int getTarget(lua_State *L);
 
-	/**
-	 * Gets the current anchor2 target.
-	 **/
-	int getTarget(lua_State *L);
+  /**
+   * Sets the maximum constraint force that can be exerted
+   * to move the candidate body.
+   **/
+  void setMaxForce(float force);
 
-	/**
-	 * Sets the maximum constraint force that can be exerted
-	 * to move the candidate body.
-	 **/
-	void setMaxForce(float force);
+  /**
+   * Gets the maximum constraint force that can be exerted
+   * to move the candidate body.
+   **/
+  float getMaxForce() const;
 
-	/**
-	 * Gets the maximum constraint force that can be exerted
-	 * to move the candidate body.
-	 **/
-	float getMaxForce() const;
+  /**
+   * Sets the response speed.
+   **/
+  void setFrequency(float hz);
 
-	/**
-	 * Sets the response speed.
-	 **/
-	void setFrequency(float hz);
+  /**
+   * Gets the response speed.
+   **/
+  float getFrequency() const;
 
-	/**
-	 * Gets the response speed.
-	 **/
-	float getFrequency() const;
+  /**
+   * Sets the damping ratio.
+   * 0 = no damping, 1 = critical damping.
+   **/
+  void setDampingRatio(float d);
 
-	/**
-	 * Sets the damping ratio.
-	 * 0 = no damping, 1 = critical damping.
-	 **/
-	void setDampingRatio(float d);
+  /**
+   * Gets the damping ratio.
+   * 0 = no damping, 1 = critical damping.
+   **/
+  float getDampingRatio() const;
 
-	/**
-	 * Gets the damping ratio.
-	 * 0 = no damping, 1 = critical damping.
-	 **/
-	float getDampingRatio() const;
+  virtual Body *getBodyA() const;
+  virtual Body *getBodyB() const;
 
-	virtual Body *getBodyA() const;
-	virtual Body *getBodyB() const;
-
-private:
-	// The Box2D MouseJoint object.
-	b2MouseJoint *joint;
+ private:
+  // The Box2D MouseJoint object.
+  b2MouseJoint *joint;
 };
 
-} // box2d
-} // physics
-} // love
+}  // namespace box2d
+}  // namespace physics
+}  // namespace love
 
-
-#endif // LOVE_PHYSICS_BOX2D_MOUSE_JOINT_H
+#endif  // LOVE_PHYSICS_BOX2D_MOUSE_JOINT_H

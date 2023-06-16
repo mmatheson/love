@@ -22,8 +22,8 @@
 
 // Module
 #include "Body.h"
-#include "World.h"
 #include "Physics.h"
+#include "World.h"
 
 namespace love
 {
@@ -34,38 +34,34 @@ namespace box2d
 
 love::Type RopeJoint::type("RopeJoint", &Joint::type);
 
-RopeJoint::RopeJoint(Body *body1, Body *body2, float x1, float y1, float x2, float y2, float maxLength, bool collideConnected)
-	: Joint(body1, body2)
-	, joint(NULL)
+RopeJoint::RopeJoint(Body *body1, Body *body2, float x1, float y1, float x2, float y2,
+                     float maxLength, bool collideConnected)
+    : Joint(body1, body2),
+      joint(NULL)
 {
-	b2RopeJointDef def;
-	def.bodyA = body1->body;
-	def.bodyB = body2->body;
-	body1->getLocalPoint(x1, y1, x1, y1);
-	body2->getLocalPoint(x2, y2, x2, y2);
-	def.localAnchorA.x = Physics::scaleDown(x1);
-	def.localAnchorA.y = Physics::scaleDown(y1);
-	def.localAnchorB.x = Physics::scaleDown(x2);
-	def.localAnchorB.y = Physics::scaleDown(y2);
-	def.maxLength = Physics::scaleDown(maxLength);
-	def.collideConnected = collideConnected;
-	joint = (b2RopeJoint *)createJoint(&def);
+  b2RopeJointDef def;
+  def.bodyA = body1->body;
+  def.bodyB = body2->body;
+  body1->getLocalPoint(x1, y1, x1, y1);
+  body2->getLocalPoint(x2, y2, x2, y2);
+  def.localAnchorA.x = Physics::scaleDown(x1);
+  def.localAnchorA.y = Physics::scaleDown(y1);
+  def.localAnchorB.x = Physics::scaleDown(x2);
+  def.localAnchorB.y = Physics::scaleDown(y2);
+  def.maxLength = Physics::scaleDown(maxLength);
+  def.collideConnected = collideConnected;
+  joint = (b2RopeJoint *) createJoint(&def);
 }
 
-RopeJoint::~RopeJoint()
-{
-}
+RopeJoint::~RopeJoint() {}
 
-float RopeJoint::getMaxLength() const
-{
-	return Physics::scaleUp(joint->GetMaxLength());
-}
+float RopeJoint::getMaxLength() const { return Physics::scaleUp(joint->GetMaxLength()); }
 
 void RopeJoint::setMaxLength(float maxLength)
 {
-	joint->SetMaxLength(Physics::scaleDown(maxLength));
+  joint->SetMaxLength(Physics::scaleDown(maxLength));
 }
 
-} // box2d
-} // physics
-} // love
+}  // namespace box2d
+}  // namespace physics
+}  // namespace love

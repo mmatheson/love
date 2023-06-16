@@ -32,5 +32,5 @@ namespace math
 Transform *luax_checktransform(lua_State *L, int idx);
 extern "C" int luaopen_transform(lua_State *L);
 
-} // math
-} // love
+}  // namespace math
+}  // namespace love

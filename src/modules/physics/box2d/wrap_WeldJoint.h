@@ -22,9 +22,9 @@
 #define LOVE_PHYSICS_BOX2D_WRAP_WELD_JOINT_H
 
 // LOVE
+#include "WeldJoint.h"
 #include "common/runtime.h"
 #include "wrap_Joint.h"
-#include "WeldJoint.h"
 
 namespace love
 {
@@ -36,8 +36,8 @@ namespace box2d
 WeldJoint *luax_checkweldjoint(lua_State *L, int idx);
 extern "C" int luaopen_weldjoint(lua_State *L);
 
-} // box2d
-} // physics
-} // love
+}  // namespace box2d
+}  // namespace physics
+}  // namespace love
 
-#endif // LOVE_PHYSICS_BOX2D_WRAP_WELD_JOINT_H
+#endif  // LOVE_PHYSICS_BOX2D_WRAP_WELD_JOINT_H

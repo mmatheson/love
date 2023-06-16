@@ -21,12 +21,12 @@
 #ifndef LOVE_GRAPHICS_OPENGL_CANVAS_H
 #define LOVE_GRAPHICS_OPENGL_CANVAS_H
 
-#include "common/config.h"
+#include "OpenGL.h"
 #include "common/Color.h"
+#include "common/config.h"
 #include "common/int.h"
 #include "graphics/Canvas.h"
 #include "graphics/Volatile.h"
-#include "OpenGL.h"
 
 namespace love
 {
@@ -37,84 +37,74 @@ namespace opengl
 
 class Canvas final : public love::graphics::Canvas, public Volatile
 {
-public:
+ public:
+  Canvas(const Settings &settings);
+  virtual ~Canvas();
 
-	Canvas(const Settings &settings);
-	virtual ~Canvas();
+  // Implements Volatile.
+  bool loadVolatile() override;
+  void unloadVolatile() override;
 
-	// Implements Volatile.
-	bool loadVolatile() override;
-	void unloadVolatile() override;
+  // Implements Texture.
+  void setFilter(const Texture::Filter &f) override;
+  bool setWrap(const Texture::Wrap &w) override;
+  bool setMipmapSharpness(float sharpness) override;
+  void setDepthSampleMode(Optional<CompareMode> mode) override;
+  ptrdiff_t getHandle() const override;
 
-	// Implements Texture.
-	void setFilter(const Texture::Filter &f) override;
-	bool setWrap(const Texture::Wrap &w) override;
-	bool setMipmapSharpness(float sharpness) override;
-	void setDepthSampleMode(Optional<CompareMode> mode) override;
-	ptrdiff_t getHandle() const override;
+  love::image::ImageData *newImageData(love::image::Image *module, int slice, int mipmap,
+                                       const Rect &rect) override;
+  void generateMipmaps() override;
 
-	love::image::ImageData *newImageData(love::image::Image *module, int slice, int mipmap, const Rect &rect) override;
-	void generateMipmaps() override;
+  int getMSAA() const override { return actualSamples; }
 
-	int getMSAA() const override
-	{
-		return actualSamples;
-	}
+  ptrdiff_t getRenderTargetHandle() const override
+  {
+    return renderbuffer != 0 ? renderbuffer : texture;
+  }
 
-	ptrdiff_t getRenderTargetHandle() const override
-	{
-		return renderbuffer != 0 ? renderbuffer : texture;
-	}
+  inline GLuint getFBO() const { return fbo; }
 
-	inline GLuint getFBO() const
-	{
-		return fbo;
-	}
+  static PixelFormat getSizedFormat(PixelFormat format);
+  static bool isSupported();
+  static bool isMultiFormatMultiCanvasSupported();
+  static bool isFormatSupported(PixelFormat format, bool readable);
+  static bool isFormatSupported(PixelFormat format);
+  static void resetFormatSupport();
 
-	static PixelFormat getSizedFormat(PixelFormat format);
-	static bool isSupported();
-	static bool isMultiFormatMultiCanvasSupported();
-	static bool isFormatSupported(PixelFormat format, bool readable);
-	static bool isFormatSupported(PixelFormat format);
-	static void resetFormatSupport();
+ private:
+  struct SupportedFormat
+  {
+    bool readable = false;
+    bool nonreadable = false;
 
-private:
+    bool get(bool getreadable) { return getreadable ? readable : nonreadable; }
 
-	struct SupportedFormat
-	{
-		bool readable = false;
-		bool nonreadable = false;
+    void set(bool setreadable, bool val)
+    {
+      if (setreadable)
+	readable = val;
+      else
+	nonreadable = val;
+    }
+  };
 
-		bool get(bool getreadable)
-		{
-			return getreadable ? readable : nonreadable;
-		}
+  GLuint fbo;
 
-		void set(bool setreadable, bool val)
-		{
-			if (setreadable)
-				readable = val;
-			else
-				nonreadable = val;
-		}
-	};
+  GLuint texture;
+  GLuint renderbuffer;
 
-	GLuint fbo;
+  GLenum status;
 
-	GLuint texture;
-	GLuint renderbuffer;
+  int actualSamples;
 
-	GLenum status;
+  static SupportedFormat supportedFormats[PIXELFORMAT_MAX_ENUM];
+  static SupportedFormat checkedFormats[PIXELFORMAT_MAX_ENUM];
 
-	int actualSamples;
+};  // Canvas
 
-	static SupportedFormat supportedFormats[PIXELFORMAT_MAX_ENUM];
-	static SupportedFormat checkedFormats[PIXELFORMAT_MAX_ENUM];
+}  // namespace opengl
+}  // namespace graphics
+}  // namespace love
 
-}; // Canvas
-
-} // opengl
-} // graphics
-} // love
-
-#endif // LOVE_GRAPHICS_OPENGL_CANVAS_H
+#endif  // LOVE_GRAPHICS_OPENGL_CANVAS_H

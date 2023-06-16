@@ -36,39 +36,39 @@ namespace opengl
 
 class Image final : public love::graphics::Image, public Volatile
 {
-public:
+ public:
+  Image(const Slices &data, const Settings &settings);
+  Image(TextureType textype, PixelFormat format, int width, int height, int slices,
+        const Settings &settings);
 
-	Image(const Slices &data, const Settings &settings);
-	Image(TextureType textype, PixelFormat format, int width, int height, int slices, const Settings &settings);
+  virtual ~Image();
 
-	virtual ~Image();
+  // Implements Volatile.
+  bool loadVolatile() override;
+  void unloadVolatile() override;
 
-	// Implements Volatile.
-	bool loadVolatile() override;
-	void unloadVolatile() override;
+  ptrdiff_t getHandle() const override;
 
-	ptrdiff_t getHandle() const override;
+  void setFilter(const Texture::Filter &f) override;
+  bool setWrap(const Texture::Wrap &w) override;
 
-	void setFilter(const Texture::Filter &f) override;
-	bool setWrap(const Texture::Wrap &w) override;
+  bool setMipmapSharpness(float sharpness) override;
 
-	bool setMipmapSharpness(float sharpness) override;
+  static bool isFormatSupported(PixelFormat pixelformat, bool sRGB);
 
-	static bool isFormatSupported(PixelFormat pixelformat, bool sRGB);
+ private:
+  void uploadByteData(PixelFormat pixelformat, const void *data, size_t size, int level, int slice,
+                      const Rect &r) override;
+  void generateMipmaps() override;
 
-private:
+  void loadDefaultTexture();
+  void loadData();
 
-	void uploadByteData(PixelFormat pixelformat, const void *data, size_t size, int level, int slice, const Rect &r) override;
-	void generateMipmaps() override;
+  // OpenGL texture identifier.
+  GLuint texture;
 
-	void loadDefaultTexture();
-	void loadData();
+};  // Image
 
-	// OpenGL texture identifier.
-	GLuint texture;
-
-}; // Image
-
-} // opengl
-} // graphics
-} // love
+}  // namespace opengl
+}  // namespace graphics
+}  // namespace love

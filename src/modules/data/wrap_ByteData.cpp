@@ -19,6 +19,7 @@
  **/
 
 #include "wrap_ByteData.h"
+
 #include "wrap_Data.h"
 
 namespace love
@@ -26,33 +27,26 @@ namespace love
 namespace data
 {
 
-ByteData *luax_checkbytedata(lua_State *L, int idx)
-{
-	return luax_checktype<ByteData>(L, idx);
-}
+ByteData *luax_checkbytedata(lua_State *L, int idx) { return luax_checktype<ByteData>(L, idx); }
 
 int w_ByteData_clone(lua_State *L)
 {
-	ByteData *t = luax_checkbytedata(L, 1);
-	ByteData *c = nullptr;
-	luax_catchexcept(L, [&](){ c = t->clone(); });
-	luax_pushtype(L, c);
-	c->release();
-	return 1;
+  ByteData *t = luax_checkbytedata(L, 1);
+  ByteData *c = nullptr;
+  luax_catchexcept(L, [&]() { c = t->clone(); });
+  luax_pushtype(L, c);
+  c->release();
+  return 1;
 }
 
-static const luaL_Reg w_ByteData_functions[] =
-{
-	{ "clone", w_ByteData_clone },
-	{ 0, 0 }
-};
+static const luaL_Reg w_ByteData_functions[] = {{"clone", w_ByteData_clone}, {0, 0}};
 
 int luaopen_bytedata(lua_State *L)
 {
-	luax_register_type(L, &ByteData::type, w_Data_functions, w_ByteData_functions, nullptr);
-	love::data::luax_rundatawrapper(L, ByteData::type);
-	return 0;
+  luax_register_type(L, &ByteData::type, w_Data_functions, w_ByteData_functions, nullptr);
+  love::data::luax_rundatawrapper(L, ByteData::type);
+  return 0;
 }
 
-} // data
-} // love
+}  // namespace data
+}  // namespace love

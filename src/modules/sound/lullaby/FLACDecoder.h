@@ -22,11 +22,11 @@
 #define LOVE_SOUND_LULLABY_FLAC_DECODER_H
 
 // LOVE
-#include "common/Data.h"
-#include "sound/Decoder.h"
-
-#include "dr_flac/dr_flac.h"
 #include <string.h>
+
+#include "common/Data.h"
+#include "dr_flac/dr_flac.h"
+#include "sound/Decoder.h"
 
 namespace love
 {
@@ -37,27 +37,27 @@ namespace lullaby
 
 class FLACDecoder : public Decoder
 {
-public:
-	FLACDecoder(Data *data, int bufferSize);
-	~FLACDecoder();
+ public:
+  FLACDecoder(Data *data, int bufferSize);
+  ~FLACDecoder();
 
-	static bool accepts(const std::string &ext);
-	love::sound::Decoder *clone();
-	int decode();
-	bool seek(double s);
-	bool rewind();
-	bool isSeekable();
-	int getChannelCount() const;
-	int getBitDepth() const;
-	int getSampleRate() const;
-	double getDuration();
+  static bool accepts(const std::string &ext);
+  love::sound::Decoder *clone();
+  int decode();
+  bool seek(double s);
+  bool rewind();
+  bool isSeekable();
+  int getChannelCount() const;
+  int getBitDepth() const;
+  int getSampleRate() const;
+  double getDuration();
 
-private:
-	drflac *flac;
-}; // Decoder
+ private:
+  drflac *flac;
+};  // Decoder
 
-} // lullaby
-} // sound
-} // love
+}  // namespace lullaby
+}  // namespace sound
+}  // namespace love
 
-#endif // LOVE_SOUND_LULLABY_FLAC_DECODER_H
+#endif  // LOVE_SOUND_LULLABY_FLAC_DECODER_H

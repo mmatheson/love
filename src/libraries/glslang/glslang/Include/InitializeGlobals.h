@@ -35,10 +35,11 @@
 #ifndef __INITIALIZE_GLOBALS_INCLUDED_
 #define __INITIALIZE_GLOBALS_INCLUDED_
 
-namespace glslang {
+namespace glslang
+{
 
 bool InitializePoolIndex();
 
-} // end namespace glslang
+}  // end namespace glslang
 
-#endif // __INITIALIZE_GLOBALS_INCLUDED_
+#endif  // __INITIALIZE_GLOBALS_INCLUDED_

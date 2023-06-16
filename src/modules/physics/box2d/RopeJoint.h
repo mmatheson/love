@@ -37,30 +37,30 @@ namespace box2d
  **/
 class RopeJoint : public Joint
 {
-public:
+ public:
+  static love::Type type;
 
-	static love::Type type;
+  /**
+   * Creates a RopeJoint connecting body1 to body2.
+   **/
+  RopeJoint(Body *body1, Body *body2, float x1, float y1, float x2, float y2, float maxLength,
+            bool collideConnected);
 
-	/**
-	 * Creates a RopeJoint connecting body1 to body2.
-	 **/
-	RopeJoint(Body *body1, Body *body2, float x1, float y1, float x2, float y2, float maxLength, bool collideConnected);
+  virtual ~RopeJoint();
 
-	virtual ~RopeJoint();
+  /**
+   * Gets the maximum length of the rope.
+   **/
+  float getMaxLength() const;
+  void setMaxLength(float length);
 
-	/**
-	 * Gets the maximum length of the rope.
-	 **/
-	float getMaxLength() const;
-	void setMaxLength(float length);
-
-private:
-	// The Box2D RopeJoint object.
-	b2RopeJoint *joint;
+ private:
+  // The Box2D RopeJoint object.
+  b2RopeJoint *joint;
 };
 
-} // box2d
-} // physics
-} // love
+}  // namespace box2d
+}  // namespace physics
+}  // namespace love
 
-#endif // LOVE_PHYSICS_BOX2D_ROPE_JOINT_H
+#endif  // LOVE_PHYSICS_BOX2D_ROPE_JOINT_H

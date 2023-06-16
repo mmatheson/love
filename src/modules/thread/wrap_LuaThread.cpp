@@ -25,71 +25,63 @@ namespace love
 namespace thread
 {
 
-LuaThread *luax_checkthread(lua_State *L, int idx)
-{
-	return luax_checktype<LuaThread>(L, idx);
-}
+LuaThread *luax_checkthread(lua_State *L, int idx) { return luax_checktype<LuaThread>(L, idx); }
 
 int w_Thread_start(lua_State *L)
 {
-	LuaThread *t = luax_checkthread(L, 1);
-	std::vector<Variant> args;
-	int nargs = lua_gettop(L) - 1;
+  LuaThread *t = luax_checkthread(L, 1);
+  std::vector<Variant> args;
+  int nargs = lua_gettop(L) - 1;
 
-	for (int i = 0; i < nargs; ++i)
-	{
-		luax_catchexcept(L, [&]() {
-			args.push_back(Variant::fromLua(L, i+2));
-		});
+  for (int i = 0; i < nargs; ++i)
+  {
+    luax_catchexcept(L, [&]() { args.push_back(Variant::fromLua(L, i + 2)); });
 
-		if (args.back().getType() == Variant::UNKNOWN)
-		{
-			args.clear();
-			return luaL_argerror(L, i+2, "boolean, number, string, love type, or flat table expected");
-		}
-	}
+    if (args.back().getType() == Variant::UNKNOWN)
+    {
+      args.clear();
+      return luaL_argerror(L, i + 2, "boolean, number, string, love type, or flat table expected");
+    }
+  }
 
-	luax_pushboolean(L, t->start(args));
-	return 1;
+  luax_pushboolean(L, t->start(args));
+  return 1;
 }
 
 int w_Thread_wait(lua_State *L)
 {
-	LuaThread *t = luax_checkthread(L, 1);
-	t->wait();
-	return 0;
+  LuaThread *t = luax_checkthread(L, 1);
+  t->wait();
+  return 0;
 }
 
 int w_Thread_getError(lua_State *L)
 {
-	LuaThread *t = luax_checkthread(L, 1);
-	if (t->hasError())
-		luax_pushstring(L, t->getError());
-	else
-		lua_pushnil(L);
-	return 1;
+  LuaThread *t = luax_checkthread(L, 1);
+  if (t->hasError())
+    luax_pushstring(L, t->getError());
+  else
+    lua_pushnil(L);
+  return 1;
 }
 
 int w_Thread_isRunning(lua_State *L)
 {
-	LuaThread *t = luax_checkthread(L, 1);
-	luax_pushboolean(L, t->isRunning());
-	return 1;
+  LuaThread *t = luax_checkthread(L, 1);
+  luax_pushboolean(L, t->isRunning());
+  return 1;
 }
 
-static const luaL_Reg w_Thread_functions[] =
-{
-	{ "start", w_Thread_start },
-	{ "wait", w_Thread_wait },
-	{ "getError", w_Thread_getError },
-	{ "isRunning", w_Thread_isRunning },
-	{ 0, 0 }
-};
+static const luaL_Reg w_Thread_functions[] = {{"start", w_Thread_start},
+                                              {"wait", w_Thread_wait},
+                                              {"getError", w_Thread_getError},
+                                              {"isRunning", w_Thread_isRunning},
+                                              {0, 0}};
 
 extern "C" int luaopen_thread(lua_State *L)
 {
-	return luax_register_type(L, &LuaThread::type, w_Thread_functions, nullptr);
+  return luax_register_type(L, &LuaThread::type, w_Thread_functions, nullptr);
 }
 
-} // thread
-} // love
+}  // namespace thread
+}  // namespace love

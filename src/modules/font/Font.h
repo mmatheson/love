@@ -24,10 +24,10 @@
 // LOVE
 #include "Rasterizer.h"
 #include "TrueTypeRasterizer.h"
-#include "image/ImageData.h"
-#include "filesystem/FileData.h"
 #include "common/Module.h"
 #include "common/int.h"
+#include "filesystem/FileData.h"
+#include "image/ImageData.h"
 
 // C++
 #include <string>
@@ -40,33 +40,38 @@ namespace font
 
 class Font : public Module
 {
+ public:
+  virtual ~Font() {}
 
-public:
+  virtual Rasterizer *newRasterizer(love::filesystem::FileData *data) = 0;
 
-	virtual ~Font() {}
+  virtual Rasterizer *newTrueTypeRasterizer(int size, TrueTypeRasterizer::Hinting hinting);
+  virtual Rasterizer *newTrueTypeRasterizer(int size, float dpiscale,
+                                            TrueTypeRasterizer::Hinting hinting);
+  virtual Rasterizer *newTrueTypeRasterizer(love::Data *data, int size,
+                                            TrueTypeRasterizer::Hinting hinting) = 0;
+  virtual Rasterizer *newTrueTypeRasterizer(love::Data *data, int size, float dpiscale,
+                                            TrueTypeRasterizer::Hinting hinting) = 0;
 
-	virtual Rasterizer *newRasterizer(love::filesystem::FileData *data) = 0;
+  virtual Rasterizer *newBMFontRasterizer(love::filesystem::FileData *fontdef,
+                                          const std::vector<image::ImageData *> &images,
+                                          float dpiscale);
 
-	virtual Rasterizer *newTrueTypeRasterizer(int size, TrueTypeRasterizer::Hinting hinting);
-	virtual Rasterizer *newTrueTypeRasterizer(int size, float dpiscale, TrueTypeRasterizer::Hinting hinting);
-	virtual Rasterizer *newTrueTypeRasterizer(love::Data *data, int size, TrueTypeRasterizer::Hinting hinting) = 0;
-	virtual Rasterizer *newTrueTypeRasterizer(love::Data *data, int size, float dpiscale, TrueTypeRasterizer::Hinting hinting) = 0;
+  virtual Rasterizer *newImageRasterizer(love::image::ImageData *data, const std::string &glyphs,
+                                         int extraspacing, float dpiscale);
+  virtual Rasterizer *newImageRasterizer(love::image::ImageData *data, uint32 *glyphs, int length,
+                                         int extraspacing, float dpiscale);
 
-	virtual Rasterizer *newBMFontRasterizer(love::filesystem::FileData *fontdef, const std::vector<image::ImageData *> &images, float dpiscale);
+  virtual GlyphData *newGlyphData(Rasterizer *r, const std::string &glyph);
+  virtual GlyphData *newGlyphData(Rasterizer *r, uint32 glyph);
 
-	virtual Rasterizer *newImageRasterizer(love::image::ImageData *data, const std::string &glyphs, int extraspacing, float dpiscale);
-	virtual Rasterizer *newImageRasterizer(love::image::ImageData *data, uint32 *glyphs, int length, int extraspacing, float dpiscale);
+  // Implement Module.
+  virtual ModuleType getModuleType() const { return M_FONT; }
+  virtual const char *getName() const = 0;
 
-	virtual GlyphData *newGlyphData(Rasterizer *r, const std::string &glyph);
-	virtual GlyphData *newGlyphData(Rasterizer *r, uint32 glyph);
+};  // Font
 
-	// Implement Module.
-	virtual ModuleType getModuleType() const { return M_FONT; }
-	virtual const char *getName() const = 0;
+}  // namespace font
+}  // namespace love
 
-}; // Font
-
-} // font
-} // love
-
-#endif // LOVE_FONT_FONT_H
+#endif  // LOVE_FONT_FONT_H

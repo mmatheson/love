@@ -19,10 +19,10 @@
  **/
 
 // LOVE
-#include "filesystem/wrap_Filesystem.h"
-
-#include "theora/Video.h"
 #include "wrap_Video.h"
+
+#include "filesystem/wrap_Filesystem.h"
+#include "theora/Video.h"
 #include "wrap_VideoStream.h"
 
 namespace love
@@ -34,54 +34,48 @@ namespace video
 
 int w_newVideoStream(lua_State *L)
 {
-	love::filesystem::File *file = love::filesystem::luax_getfile(L, 1);
+  love::filesystem::File *file = love::filesystem::luax_getfile(L, 1);
 
-	VideoStream *stream = nullptr;
-	luax_catchexcept(L, [&]() {
-		// Can't check if open for reading
-		if (!file->isOpen() && !file->open(love::filesystem::File::MODE_READ))
-			luaL_error(L, "File is not open and cannot be opened");
+  VideoStream *stream = nullptr;
+  luax_catchexcept(L,
+                   [&]()
+                   {
+                     // Can't check if open for reading
+                     if (!file->isOpen() && !file->open(love::filesystem::File::MODE_READ))
+                       luaL_error(L, "File is not open and cannot be opened");
 
-		stream = instance()->newVideoStream(file);
-	});
+                     stream = instance()->newVideoStream(file);
+                   });
 
-	luax_pushtype(L, stream);
-	stream->release();
-	file->release();
-	return 1;
+  luax_pushtype(L, stream);
+  stream->release();
+  file->release();
+  return 1;
 }
 
-static const lua_CFunction types[] =
-{
-	luaopen_videostream,
-	0
-};
+static const lua_CFunction types[] = {luaopen_videostream, 0};
 
-static const luaL_Reg functions[] =
-{
-	{ "newVideoStream", w_newVideoStream },
-	{ 0, 0 }
-};
+static const luaL_Reg functions[] = {{"newVideoStream", w_newVideoStream}, {0, 0}};
 
 extern "C" int luaopen_love_video(lua_State *L)
 {
-	Video *instance = instance();
-	if (instance == nullptr)
-	{
-		luax_catchexcept(L, [&](){ instance = new love::video::theora::Video(); });
-	}
-	else
-		instance->retain();
+  Video *instance = instance();
+  if (instance == nullptr)
+  {
+    luax_catchexcept(L, [&]() { instance = new love::video::theora::Video(); });
+  }
+  else
+    instance->retain();
 
-	WrappedModule w;
-	w.module = instance;
-	w.name = "video";
-	w.type = &Module::type;
-	w.functions = functions;
-	w.types = types;
+  WrappedModule w;
+  w.module = instance;
+  w.name = "video";
+  w.type = &Module::type;
+  w.functions = functions;
+  w.types = types;
 
-	return luax_register_module(L, w);
+  return luax_register_module(L, w);
 }
 
-} // video
-} // love
+}  // namespace video
+}  // namespace love

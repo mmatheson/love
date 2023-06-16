@@ -23,6 +23,7 @@
 
 // C
 #include <stddef.h>
+
 #include <vector>
 
 #pragma once
@@ -36,21 +37,22 @@ namespace opengl
 
 class FenceSync
 {
-public:
+ public:
+  FenceSync()
+      : sync(0)
+  {
+  }
+  ~FenceSync();
 
-	FenceSync() : sync(0) {}
-	~FenceSync();
+  bool fence();
+  bool cpuWait();
+  void cleanup();
 
-	bool fence();
-	bool cpuWait();
-	void cleanup();
+ private:
+  GLsync sync;
 
-private:
+};  // FenceSync
 
-	GLsync sync;
-
-}; // FenceSync
-
-} // opengl
-} // graphics
-} // love
+}  // namespace opengl
+}  // namespace graphics
+}  // namespace love

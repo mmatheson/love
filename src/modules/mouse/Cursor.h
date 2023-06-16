@@ -22,9 +22,9 @@
 #define LOVE_MOUSE_CURSOR_H
 
 // LOVE
-#include "image/ImageData.h"
 #include "common/Object.h"
 #include "common/StringMap.h"
+#include "image/ImageData.h"
 
 namespace love
 {
@@ -33,70 +33,67 @@ namespace mouse
 
 class Cursor : public Object
 {
-public:
+ public:
+  static love::Type type;
 
-	static love::Type type;
+  // Types of system cursors.
+  enum SystemCursor
+  {
+    CURSOR_ARROW,
+    CURSOR_IBEAM,
+    CURSOR_WAIT,
+    CURSOR_CROSSHAIR,
+    CURSOR_WAITARROW,
+    CURSOR_SIZENWSE,
+    CURSOR_SIZENESW,
+    CURSOR_SIZEWE,
+    CURSOR_SIZENS,
+    CURSOR_SIZEALL,
+    CURSOR_NO,
+    CURSOR_HAND,
+    CURSOR_MAX_ENUM
+  };
 
-	// Types of system cursors.
-	enum SystemCursor
-	{
-		CURSOR_ARROW,
-		CURSOR_IBEAM,
-		CURSOR_WAIT,
-		CURSOR_CROSSHAIR,
-		CURSOR_WAITARROW,
-		CURSOR_SIZENWSE,
-		CURSOR_SIZENESW,
-		CURSOR_SIZEWE,
-		CURSOR_SIZENS,
-		CURSOR_SIZEALL,
-		CURSOR_NO,
-		CURSOR_HAND,
-		CURSOR_MAX_ENUM
-	};
+  enum CursorType
+  {
+    CURSORTYPE_SYSTEM,
+    CURSORTYPE_IMAGE,
+    CURSORTYPE_MAX_ENUM
+  };
 
-	enum CursorType
-	{
-		CURSORTYPE_SYSTEM,
-		CURSORTYPE_IMAGE,
-		CURSORTYPE_MAX_ENUM
-	};
+  virtual ~Cursor();
 
-	virtual ~Cursor();
+  /**
+   * Returns a pointer to the implementation-dependent handle of this Cursor.
+   **/
+  virtual void *getHandle() const = 0;
 
-	/**
-	 * Returns a pointer to the implementation-dependent handle of this Cursor.
-	 **/
-	virtual void *getHandle() const = 0;
+  /**
+   * Returns whether this Cursor is system-defined or a custom image.
+   **/
+  virtual CursorType getType() const = 0;
 
-	/**
-	 * Returns whether this Cursor is system-defined or a custom image.
-	 **/
-	virtual CursorType getType() const = 0;
+  /**
+   * Returns the type type of system cursor used, if this Cursor is using a
+   * system-defined image.
+   **/
+  virtual SystemCursor getSystemType() const = 0;
 
-	/**
-	 * Returns the type type of system cursor used, if this Cursor is using a
-	 * system-defined image.
-	 **/
-	virtual SystemCursor getSystemType() const = 0;
+  static bool getConstant(const char *in, SystemCursor &out);
+  static bool getConstant(SystemCursor in, const char *&out);
 
-	static bool getConstant(const char *in, SystemCursor &out);
-	static bool getConstant(SystemCursor in, const char *&out);
+  static bool getConstant(const char *in, CursorType &out);
+  static bool getConstant(CursorType in, const char *&out);
 
-	static bool getConstant(const char *in, CursorType &out);
-	static bool getConstant(CursorType in, const char *&out);
+ private:
+  static StringMap<SystemCursor, CURSOR_MAX_ENUM>::Entry systemCursorEntries[];
+  static StringMap<SystemCursor, CURSOR_MAX_ENUM> systemCursors;
 
-private:
-
-	static StringMap<SystemCursor, CURSOR_MAX_ENUM>::Entry systemCursorEntries[];
-	static StringMap<SystemCursor, CURSOR_MAX_ENUM> systemCursors;
-
-	static StringMap<CursorType, CURSORTYPE_MAX_ENUM>::Entry typeEntries[];
-	static StringMap<CursorType, CURSORTYPE_MAX_ENUM> types;
-
+  static StringMap<CursorType, CURSORTYPE_MAX_ENUM>::Entry typeEntries[];
+  static StringMap<CursorType, CURSORTYPE_MAX_ENUM> types;
 };
 
-} // mouse
-} // love
+}  // namespace mouse
+}  // namespace love
 
-#endif // LOVE_MOUSE_CURSOR_H
+#endif  // LOVE_MOUSE_CURSOR_H

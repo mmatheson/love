@@ -31,6 +31,6 @@ namespace opengl
 
 love::graphics::StreamBuffer *CreateStreamBuffer(BufferType mode, size_t size);
 
-} // opengl
-} // graphics
-} // love
+}  // namespace opengl
+}  // namespace graphics
+}  // namespace love

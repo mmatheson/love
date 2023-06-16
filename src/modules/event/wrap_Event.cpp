@@ -22,13 +22,12 @@
 
 // LOVE
 #include "common/runtime.h"
-
 #include "sdl/Event.h"
 
 // Shove the wrap_Event.lua code directly into a raw string literal.
 static const char event_lua[] =
 #include "wrap_Event.lua"
-;
+    ;
 
 namespace love
 {
@@ -39,110 +38,110 @@ namespace event
 
 static int w_poll_i(lua_State *L)
 {
-	Message *m = nullptr;
+  Message *m = nullptr;
 
-	if (instance()->poll(m))
-	{
-		int args = m->toLua(L);
-		m->release();
-		return args;
-	}
+  if (instance()->poll(m))
+  {
+    int args = m->toLua(L);
+    m->release();
+    return args;
+  }
 
-	// No pending events.
-	return 0;
+  // No pending events.
+  return 0;
 }
 
 int w_pump(lua_State *L)
 {
-	luax_catchexcept(L, [&]() { instance()->pump(); });
-	return 0;
+  luax_catchexcept(L, [&]() { instance()->pump(); });
+  return 0;
 }
 
 int w_wait(lua_State *L)
 {
-	Message *m = nullptr;
-	luax_catchexcept(L, [&]() { m = instance()->wait(); });
-	if (m)
-	{
-		int args = m->toLua(L);
-		m->release();
-		return args;
-	}
+  Message *m = nullptr;
+  luax_catchexcept(L, [&]() { m = instance()->wait(); });
+  if (m)
+  {
+    int args = m->toLua(L);
+    m->release();
+    return args;
+  }
 
-	return 0;
+  return 0;
 }
 
 int w_push(lua_State *L)
 {
-	StrongRef<Message> m;
-	luax_catchexcept(L, [&]() { m.set(Message::fromLua(L, 1), Acquire::NORETAIN); });
+  StrongRef<Message> m;
+  luax_catchexcept(L, [&]() { m.set(Message::fromLua(L, 1), Acquire::NORETAIN); });
 
-	luax_pushboolean(L, m.get() != nullptr);
+  luax_pushboolean(L, m.get() != nullptr);
 
-	if (m.get() == nullptr)
-		return 1;
+  if (m.get() == nullptr)
+    return 1;
 
-	instance()->push(m);
-	return 1;
+  instance()->push(m);
+  return 1;
 }
 
 int w_clear(lua_State *L)
 {
-	luax_catchexcept(L, [&]() { instance()->clear(); });
-	return 0;
+  luax_catchexcept(L, [&]() { instance()->clear(); });
+  return 0;
 }
 
 int w_quit(lua_State *L)
 {
-	luax_catchexcept(L, [&]() {
-		std::vector<Variant> args = {Variant::fromLua(L, 1)};
+  luax_catchexcept(L,
+                   [&]()
+                   {
+                     std::vector<Variant> args = {Variant::fromLua(L, 1)};
 
-		StrongRef<Message> m(new Message("quit", args), Acquire::NORETAIN);
-		instance()->push(m);
-	});
+                     StrongRef<Message> m(new Message("quit", args), Acquire::NORETAIN);
+                     instance()->push(m);
+                   });
 
-	luax_pushboolean(L, true);
-	return 1;
+  luax_pushboolean(L, true);
+  return 1;
 }
 
 // List of functions to wrap.
-static const luaL_Reg functions[] =
-{
-	{ "pump", w_pump },
-	{ "poll_i", w_poll_i },
-	{ "wait", w_wait },
-	{ "push", w_push },
-	{ "clear", w_clear },
-	{ "quit", w_quit },
-	{ 0, 0 }
-};
+static const luaL_Reg functions[] = {{"pump", w_pump},
+                                     {"poll_i", w_poll_i},
+                                     {"wait", w_wait},
+                                     {"push", w_push},
+                                     {"clear", w_clear},
+                                     {"quit", w_quit},
+                                     {0, 0}};
 
 extern "C" int luaopen_love_event(lua_State *L)
 {
-	Event *instance = instance();
-	if (instance == nullptr)
-	{
-		luax_catchexcept(L, [&](){ instance = new love::event::sdl::Event(); });
-	}
-	else
-		instance->retain();
+  Event *instance = instance();
+  if (instance == nullptr)
+  {
+    luax_catchexcept(L, [&]() { instance = new love::event::sdl::Event(); });
+  }
+  else
+    instance->retain();
 
-	WrappedModule w;
-	w.module = instance;
-	w.name = "event";
-	w.type = &Module::type;
-	w.functions = functions;
-	w.types = nullptr;
+  WrappedModule w;
+  w.module = instance;
+  w.name = "event";
+  w.type = &Module::type;
+  w.functions = functions;
+  w.types = nullptr;
 
-	int ret = luax_register_module(L, w);
+  int ret = luax_register_module(L, w);
 
-	if (luaL_loadbuffer(L, (const char *)event_lua, sizeof(event_lua), "=[love \"wrap_Event.lua\"]") == 0)
-		lua_call(L, 0, 0);
-	else
-		lua_error(L);
+  if (luaL_loadbuffer(L, (const char *) event_lua, sizeof(event_lua),
+                      "=[love \"wrap_Event.lua\"]") == 0)
+    lua_call(L, 0, 0);
+  else
+    lua_error(L);
 
-	return ret;
+  return ret;
 }
 
-} // event
-} // love
+}  // namespace event
+}  // namespace love

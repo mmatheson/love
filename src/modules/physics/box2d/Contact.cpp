@@ -19,8 +19,9 @@
  **/
 
 #include "Contact.h"
-#include "World.h"
+
 #include "Physics.h"
+#include "World.h"
 
 namespace love
 {
@@ -32,126 +33,87 @@ namespace box2d
 love::Type Contact::type("Contact", &Object::type);
 
 Contact::Contact(World *world, b2Contact *contact)
-	: contact(contact)
-	, world(world)
+    : contact(contact),
+      world(world)
 {
-	world->registerObject(contact, this);
+  world->registerObject(contact, this);
 }
 
-Contact::~Contact()
-{
-	invalidate();
-}
+Contact::~Contact() { invalidate(); }
 
 void Contact::invalidate()
 {
-	if (contact != NULL)
-	{
-		world->unregisterObject(contact);
-		contact = NULL;
-	}
+  if (contact != NULL)
+  {
+    world->unregisterObject(contact);
+    contact = NULL;
+  }
 }
 
-bool Contact::isValid()
-{
-	return contact != NULL;
-}
+bool Contact::isValid() { return contact != NULL; }
 
 int Contact::getPositions(lua_State *L)
 {
-	love::luax_assert_argc(L, 1, 1);
-	b2WorldManifold manifold;
-	contact->GetWorldManifold(&manifold);
-	int points = contact->GetManifold()->pointCount;
-	for (int i = 0; i < points; i++)
-	{
-		b2Vec2 position = Physics::scaleUp(manifold.points[i]);
-		lua_pushnumber(L, position.x);
-		lua_pushnumber(L, position.y);
-	}
-	return points*2;
+  love::luax_assert_argc(L, 1, 1);
+  b2WorldManifold manifold;
+  contact->GetWorldManifold(&manifold);
+  int points = contact->GetManifold()->pointCount;
+  for (int i = 0; i < points; i++)
+  {
+    b2Vec2 position = Physics::scaleUp(manifold.points[i]);
+    lua_pushnumber(L, position.x);
+    lua_pushnumber(L, position.y);
+  }
+  return points * 2;
 }
 
 int Contact::getNormal(lua_State *L)
 {
-	love::luax_assert_argc(L, 1, 1);
-	b2WorldManifold manifold;
-	contact->GetWorldManifold(&manifold);
-	lua_pushnumber(L, manifold.normal.x);
-	lua_pushnumber(L, manifold.normal.y);
-	return 2;
+  love::luax_assert_argc(L, 1, 1);
+  b2WorldManifold manifold;
+  contact->GetWorldManifold(&manifold);
+  lua_pushnumber(L, manifold.normal.x);
+  lua_pushnumber(L, manifold.normal.y);
+  return 2;
 }
 
-float Contact::getFriction() const
-{
-	return contact->GetFriction();
-}
+float Contact::getFriction() const { return contact->GetFriction(); }
 
-float Contact::getRestitution() const
-{
-	return contact->GetRestitution();
-}
+float Contact::getRestitution() const { return contact->GetRestitution(); }
 
-bool Contact::isEnabled() const
-{
-	return contact->IsEnabled();
-}
+bool Contact::isEnabled() const { return contact->IsEnabled(); }
 
-bool Contact::isTouching() const
-{
-	return contact->IsTouching();
-}
+bool Contact::isTouching() const { return contact->IsTouching(); }
 
-void Contact::setFriction(float friction)
-{
-	contact->SetFriction(friction);
-}
+void Contact::setFriction(float friction) { contact->SetFriction(friction); }
 
-void Contact::setRestitution(float restitution)
-{
-	contact->SetRestitution(restitution);
-}
+void Contact::setRestitution(float restitution) { contact->SetRestitution(restitution); }
 
-void Contact::setEnabled(bool enabled)
-{
-	contact->SetEnabled(enabled);
-}
+void Contact::setEnabled(bool enabled) { contact->SetEnabled(enabled); }
 
-void Contact::resetFriction()
-{
-	contact->ResetFriction();
-}
+void Contact::resetFriction() { contact->ResetFriction(); }
 
-void Contact::resetRestitution()
-{
-	contact->ResetRestitution();
-}
+void Contact::resetRestitution() { contact->ResetRestitution(); }
 
-void Contact::setTangentSpeed(float speed)
-{
-	contact->SetTangentSpeed(speed);
-}
+void Contact::setTangentSpeed(float speed) { contact->SetTangentSpeed(speed); }
 
-float Contact::getTangentSpeed() const
-{
-	return contact->GetTangentSpeed();
-}
+float Contact::getTangentSpeed() const { return contact->GetTangentSpeed(); }
 
 void Contact::getChildren(int &childA, int &childB)
 {
-	childA = contact->GetChildIndexA();
-	childB = contact->GetChildIndexB();
+  childA = contact->GetChildIndexA();
+  childB = contact->GetChildIndexB();
 }
 
 void Contact::getFixtures(Fixture *&fixtureA, Fixture *&fixtureB)
 {
-	fixtureA = (Fixture *) world->findObject(contact->GetFixtureA());
-	fixtureB = (Fixture *) world->findObject(contact->GetFixtureB());
+  fixtureA = (Fixture *) world->findObject(contact->GetFixtureA());
+  fixtureB = (Fixture *) world->findObject(contact->GetFixtureB());
 
-	if (!fixtureA || !fixtureB)
-		throw love::Exception("A fixture has escaped Memoizer!");
+  if (!fixtureA || !fixtureB)
+    throw love::Exception("A fixture has escaped Memoizer!");
 }
 
-} // box2d
-} // physics
-} // love
+}  // namespace box2d
+}  // namespace physics
+}  // namespace love

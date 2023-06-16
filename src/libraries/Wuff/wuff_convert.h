@@ -1,7 +1,9 @@
 #ifndef WUFF_CONVERT_H
 #define WUFF_CONVERT_H
 
-#define WUFF_CONV_FUNC(name) WUFF_INTERN_API void name(wuff_uint8 * dst, wuff_uint8 * src, size_t samples, wuff_uint8 offset, wuff_uint8 head, wuff_uint8 tail)
+#define WUFF_CONV_FUNC(name)                                                                     \
+  WUFF_INTERN_API void name(wuff_uint8 *dst, wuff_uint8 *src, size_t samples, wuff_uint8 offset, \
+                            wuff_uint8 head, wuff_uint8 tail)
 
 WUFF_CONV_FUNC(wuff_int8_to_int8);
 WUFF_CONV_FUNC(wuff_int8_to_int16);

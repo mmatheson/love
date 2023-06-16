@@ -22,9 +22,9 @@
 #define LOVE_PHYSICS_BOX2D_CIRCLE_SHAPE_H
 
 // Module
-#include "Shape.h"
-
 #include <vector>
+
+#include "Shape.h"
 
 namespace love
 {
@@ -42,42 +42,41 @@ namespace box2d
  **/
 class CircleShape : public Shape
 {
-public:
+ public:
+  static love::Type type;
 
-	static love::Type type;
+  /**
+   * Create a new CircleShape from the a Box2D CircleShape definition.
+   * @param c The CircleShape definition.
+   **/
+  CircleShape(b2CircleShape *c, bool own = true);
 
-	/**
-	 * Create a new CircleShape from the a Box2D CircleShape definition.
-	 * @param c The CircleShape definition.
-	 **/
-	CircleShape(b2CircleShape *c, bool own = true);
+  virtual ~CircleShape();
 
-	virtual ~CircleShape();
+  /**
+   * Gets the radius for the circle.
+   **/
+  float getRadius() const;
 
-	/**
-	 * Gets the radius for the circle.
-	 **/
-	float getRadius() const;
+  /**
+   * Sets the radius of the circle.
+   **/
+  void setRadius(float r);
 
-	/**
-	 * Sets the radius of the circle.
-	 **/
-	void setRadius(float r);
+  /**
+   * Gets the position of the circle.
+   **/
+  void getPoint(float &x_o, float &y_o) const;
 
-	/**
-	 * Gets the position of the circle.
-	 **/
-	void getPoint(float &x_o, float &y_o) const;
+  /**
+   * Sets the position for the circle.
+   **/
+  void setPoint(float x, float y);
 
-	/**
-	 * Sets the position for the circle.
-	 **/
-	void setPoint(float x, float y);
+};  // CircleShape
 
-}; // CircleShape
+}  // namespace box2d
+}  // namespace physics
+}  // namespace love
 
-} // box2d
-} // physics
-} // love
-
-#endif // LOVE_PHYSICS_BOX2D_CIRCLE_SHAPE_H
+#endif  // LOVE_PHYSICS_BOX2D_CIRCLE_SHAPE_H

@@ -37,54 +37,54 @@ namespace box2d
  **/
 class DistanceJoint : public Joint
 {
-public:
+ public:
+  /**
+   * Creates a DistanceJoint connecting body1 to body2.
+   **/
+  DistanceJoint(Body *body1, Body *body2, float x1, float y1, float x2, float y2,
+                bool collideConnected);
 
-	/**
-	 * Creates a DistanceJoint connecting body1 to body2.
-	 **/
-	DistanceJoint(Body *body1, Body *body2, float x1, float y1, float x2, float y2, bool collideConnected);
+  virtual ~DistanceJoint();
 
-	virtual ~DistanceJoint();
+  /**
+   * Sets the equilibrium distance between the two bodies.
+   **/
+  void setLength(float length);
 
-	/**
-	 * Sets the equilibrium distance between the two bodies.
-	 **/
-	void setLength(float length);
+  /**
+   * Gets the equilibrium distance between the two bodies.
+   **/
+  float getLength() const;
 
-	/**
-	 * Gets the equilibrium distance between the two bodies.
-	 **/
-	float getLength() const;
+  /**
+   * Sets the response speed.
+   **/
+  void setFrequency(float hz);
 
-	/**
-	 * Sets the response speed.
-	 **/
-	void setFrequency(float hz);
+  /**
+   * Gets the response speed.
+   **/
+  float getFrequency() const;
 
-	/**
-	 * Gets the response speed.
-	 **/
-	float getFrequency() const;
+  /**
+   * Sets the damping ratio.
+   * 0 = no damping, 1 = critical damping.
+   **/
+  void setDampingRatio(float d);
 
-	/**
-	 * Sets the damping ratio.
-	 * 0 = no damping, 1 = critical damping.
-	 **/
-	void setDampingRatio(float d);
+  /**
+   * Gets the damping ratio.
+   * 0 = no damping, 1 = critical damping.
+   **/
+  float getDampingRatio() const;
 
-	/**
-	 * Gets the damping ratio.
-	 * 0 = no damping, 1 = critical damping.
-	 **/
-	float getDampingRatio() const;
-
-private:
-	// The Box2D DistanceJoint object.
-	b2DistanceJoint *joint;
+ private:
+  // The Box2D DistanceJoint object.
+  b2DistanceJoint *joint;
 };
 
-} // box2d
-} // physics
-} // love
+}  // namespace box2d
+}  // namespace physics
+}  // namespace love
 
-#endif // LOVE_PHYSICS_BOX2D_DISTANCE_JOINT_H
+#endif  // LOVE_PHYSICS_BOX2D_DISTANCE_JOINT_H

@@ -22,7 +22,7 @@
 #include "Quad.h"
 
 // C
-#include <cstring> // For memcpy
+#include <cstring>  // For memcpy
 
 namespace love
 {
@@ -32,67 +32,47 @@ namespace graphics
 love::Type Quad::type("Quad", &Object::type);
 
 Quad::Quad(const Quad::Viewport &v, double sw, double sh)
-	: sw(sw)
-	, sh(sh)
+    : sw(sw),
+      sh(sh)
 {
-	arrayLayer = 0;
-	refresh(v, sw, sh);
+  arrayLayer = 0;
+  refresh(v, sw, sh);
 }
 
-Quad::~Quad()
-{
-}
+Quad::~Quad() {}
 
 void Quad::refresh(const Quad::Viewport &v, double sw, double sh)
 {
-	this->viewport = v;
-	this->sw = sw;
-	this->sh = sh;
+  this->viewport = v;
+  this->sw = sw;
+  this->sh = sh;
 
-	// Vertices are ordered for use with triangle strips:
-	// 0---2
-	// | / |
-	// 1---3
-	vertexPositions[0] = Vector2(0.0f, 0.0f);
-	vertexPositions[1] = Vector2(0.0f, (float) v.h);
-	vertexPositions[2] = Vector2((float) v.w, 0.0f);
-	vertexPositions[3] = Vector2((float) v.w, (float) v.h);
+  // Vertices are ordered for use with triangle strips:
+  // 0---2
+  // | / |
+  // 1---3
+  vertexPositions[0] = Vector2(0.0f, 0.0f);
+  vertexPositions[1] = Vector2(0.0f, (float) v.h);
+  vertexPositions[2] = Vector2((float) v.w, 0.0f);
+  vertexPositions[3] = Vector2((float) v.w, (float) v.h);
 
-	vertexTexCoords[0] = Vector2((float) (v.x / sw), (float) (v.y / sh));
-	vertexTexCoords[1] = Vector2((float) (v.x / sw), (float) ((v.y + v.h) / sh));
-	vertexTexCoords[2] = Vector2((float) ((v.x + v.w) / sw), (float) (v.y / sh));
-	vertexTexCoords[3] = Vector2((float) ((v.x + v.w) / sw), (float) ((v.y + v.h) / sh));
+  vertexTexCoords[0] = Vector2((float) (v.x / sw), (float) (v.y / sh));
+  vertexTexCoords[1] = Vector2((float) (v.x / sw), (float) ((v.y + v.h) / sh));
+  vertexTexCoords[2] = Vector2((float) ((v.x + v.w) / sw), (float) (v.y / sh));
+  vertexTexCoords[3] = Vector2((float) ((v.x + v.w) / sw), (float) ((v.y + v.h) / sh));
 }
 
-void Quad::setViewport(const Quad::Viewport &v)
-{
-	refresh(v, sw, sh);
-}
+void Quad::setViewport(const Quad::Viewport &v) { refresh(v, sw, sh); }
 
-Quad::Viewport Quad::getViewport() const
-{
-	return viewport;
-}
+Quad::Viewport Quad::getViewport() const { return viewport; }
 
-double Quad::getTextureWidth() const
-{
-	return sw;
-}
+double Quad::getTextureWidth() const { return sw; }
 
-double Quad::getTextureHeight() const
-{
-	return sh;
-}
+double Quad::getTextureHeight() const { return sh; }
 
-void Quad::setLayer(int layer)
-{
-	arrayLayer = layer;
-}
+void Quad::setLayer(int layer) { arrayLayer = layer; }
 
-int Quad::getLayer() const
-{
-	return arrayLayer;
-}
+int Quad::getLayer() const { return arrayLayer; }
 
-} // graphics
-} // love
+}  // namespace graphics
+}  // namespace love

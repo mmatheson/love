@@ -42,37 +42,36 @@ namespace freetype
  **/
 class TrueTypeRasterizer : public love::font::TrueTypeRasterizer
 {
-public:
+ public:
+  TrueTypeRasterizer(FT_Library library, love::Data *data, int size, float dpiscale,
+                     Hinting hinting);
+  virtual ~TrueTypeRasterizer();
 
-	TrueTypeRasterizer(FT_Library library, love::Data *data, int size, float dpiscale, Hinting hinting);
-	virtual ~TrueTypeRasterizer();
+  // Implement Rasterizer
+  int getLineHeight() const override;
+  GlyphData *getGlyphData(uint32 glyph) const override;
+  int getGlyphCount() const override;
+  bool hasGlyph(uint32 glyph) const override;
+  float getKerning(uint32 leftglyph, uint32 rightglyph) const override;
+  DataType getDataType() const override;
 
-	// Implement Rasterizer
-	int getLineHeight() const override;
-	GlyphData *getGlyphData(uint32 glyph) const override;
-	int getGlyphCount() const override;
-	bool hasGlyph(uint32 glyph) const override;
-	float getKerning(uint32 leftglyph, uint32 rightglyph) const override;
-	DataType getDataType() const override;
+  static bool accepts(FT_Library library, love::Data *data);
 
-	static bool accepts(FT_Library library, love::Data *data);
+ private:
+  static FT_UInt hintingToLoadOption(Hinting hinting);
 
-private:
+  // TrueType face
+  FT_Face face;
 
-	static FT_UInt hintingToLoadOption(Hinting hinting);
+  // Font data
+  StrongRef<love::Data> data;
 
-	// TrueType face
-	FT_Face face;
+  Hinting hinting;
 
-	// Font data
-	StrongRef<love::Data> data;
+};  // TrueTypeRasterizer
 
-	Hinting hinting;
+}  // namespace freetype
+}  // namespace font
+}  // namespace love
 
-}; // TrueTypeRasterizer
-
-} // freetype
-} // font
-} // love
-
-#endif // LOVE_FONT_FREETYPE_TRUE_TYPE_RASTERIZER_H
+#endif  // LOVE_FONT_FREETYPE_TRUE_TYPE_RASTERIZER_H

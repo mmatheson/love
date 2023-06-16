@@ -20,9 +20,9 @@
 
 #pragma once
 
+#include "OpenGL.h"
 #include "graphics/ShaderStage.h"
 #include "graphics/Volatile.h"
-#include "OpenGL.h"
 
 namespace love
 {
@@ -33,23 +33,22 @@ namespace opengl
 
 class ShaderStage final : public love::graphics::ShaderStage
 {
-public:
+ public:
+  ShaderStage(love::graphics::Graphics *gfx, StageType stage, const std::string &source, bool gles,
+              const std::string &cachekey);
+  virtual ~ShaderStage();
 
-	ShaderStage(love::graphics::Graphics *gfx, StageType stage, const std::string &source, bool gles, const std::string &cachekey);
-	virtual ~ShaderStage();
+  ptrdiff_t getHandle() const override { return glShader; }
 
-	ptrdiff_t getHandle() const override { return glShader; }
+  // Implements Volatile.
+  bool loadVolatile() override;
+  void unloadVolatile() override;
 
-	// Implements Volatile.
-	bool loadVolatile() override;
-	void unloadVolatile() override;
+ private:
+  GLuint glShader;
 
-private:
+};  // ShaderStage
 
-	GLuint glShader;
-
-}; // ShaderStage
-
-} // opengl
-} // graphics
-} // love
+}  // namespace opengl
+}  // namespace graphics
+}  // namespace love

@@ -24,10 +24,10 @@
 #include "video/VideoStream.h"
 
 // LOVE
+#include "OggDemuxer.h"
 #include "common/int.h"
 #include "filesystem/File.h"
 #include "thread/threads.h"
-#include "OggDemuxer.h"
 
 // OGG/Theora
 #include <ogg/ogg.h>
@@ -43,53 +43,53 @@ namespace theora
 
 class TheoraVideoStream : public love::video::VideoStream
 {
-public:
-	TheoraVideoStream(love::filesystem::File *file);
-	~TheoraVideoStream();
+ public:
+  TheoraVideoStream(love::filesystem::File *file);
+  ~TheoraVideoStream();
 
-	const void *getFrontBuffer() const;
-	size_t getSize() const;
-	void fillBackBuffer();
-	bool swapBuffers();
+  const void *getFrontBuffer() const;
+  size_t getSize() const;
+  void fillBackBuffer();
+  bool swapBuffers();
 
-	int getWidth() const;
-	int getHeight() const;
-	const std::string &getFilename() const;
-	void setSync(FrameSync *frameSync);
+  int getWidth() const;
+  int getHeight() const;
+  const std::string &getFilename() const;
+  void setSync(FrameSync *frameSync);
 
-	bool isPlaying() const;
+  bool isPlaying() const;
 
-	void threadedFillBackBuffer(double dt);
+  void threadedFillBackBuffer(double dt);
 
-private:
-	OggDemuxer demuxer;
+ private:
+  OggDemuxer demuxer;
 
-	bool headerParsed;
+  bool headerParsed;
 
-	ogg_packet packet;
+  ogg_packet packet;
 
-	th_info videoInfo;
-	th_dec_ctx *decoder;
+  th_info videoInfo;
+  th_dec_ctx *decoder;
 
-	Frame *frontBuffer;
-	Frame *backBuffer;
-	unsigned int yPlaneXOffset;
-	unsigned int cPlaneXOffset;
-	unsigned int yPlaneYOffset;
-	unsigned int cPlaneYOffset;
+  Frame *frontBuffer;
+  Frame *backBuffer;
+  unsigned int yPlaneXOffset;
+  unsigned int cPlaneXOffset;
+  unsigned int yPlaneYOffset;
+  unsigned int cPlaneYOffset;
 
-	love::thread::MutexRef bufferMutex;
-	bool frameReady;
+  love::thread::MutexRef bufferMutex;
+  bool frameReady;
 
-	double lastFrame;
-	double nextFrame;
+  double lastFrame;
+  double nextFrame;
 
-	void parseHeader();
-	void seekDecoder(double target);
-}; // TheoraVideoStream
+  void parseHeader();
+  void seekDecoder(double target);
+};  // TheoraVideoStream
 
-} // theora
-} // video
-} // love
+}  // namespace theora
+}  // namespace video
+}  // namespace love
 
-#endif // LOVE_VIDEO_THEORA_VIDEOSTREAM_H
+#endif  // LOVE_VIDEO_THEORA_VIDEOSTREAM_H

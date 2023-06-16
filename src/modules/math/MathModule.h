@@ -25,9 +25,9 @@
 
 // LOVE
 #include "common/Module.h"
-#include "common/math.h"
 #include "common/Vector.h"
 #include "common/int.h"
+#include "common/math.h"
 
 // Noise
 #include "libraries/noise1234/noise1234.h"
@@ -46,10 +46,13 @@ class Transform;
 
 struct Triangle
 {
-	Triangle(const Vector2 &x, const Vector2 &y, const Vector2 &z)
-		: a(x), b(y), c(z)
-	{}
-	Vector2 a, b, c;
+  Triangle(const Vector2 &x, const Vector2 &y, const Vector2 &z)
+      : a(x),
+        b(y),
+        c(z)
+  {
+  }
+  Vector2 a, b, c;
 };
 
 /**
@@ -88,74 +91,56 @@ static float noise2(float x, float y);
 static float noise3(float x, float y, float z);
 static float noise4(float x, float y, float z, float w);
 
-
 class Math : public Module
 {
-public:
+ public:
+  Math();
+  virtual ~Math();
 
-	Math();
-	virtual ~Math();
+  RandomGenerator *getRandomGenerator() { return &rng; }
 
-	RandomGenerator *getRandomGenerator()
-	{
-		return &rng;
-	}
+  /**
+   * Create a new random number generator.
+   **/
+  RandomGenerator *newRandomGenerator();
 
-	/**
-	 * Create a new random number generator.
-	 **/
-	RandomGenerator *newRandomGenerator();
+  /**
+   * Creates a new bezier curve.
+   **/
+  BezierCurve *newBezierCurve(const std::vector<Vector2> &points);
 
-	/**
-	 * Creates a new bezier curve.
-	 **/
-	BezierCurve *newBezierCurve(const std::vector<Vector2> &points);
+  Transform *newTransform();
+  Transform *newTransform(float x, float y, float a, float sx, float sy, float ox, float oy,
+                          float kx, float ky);
 
-	Transform *newTransform();
-	Transform *newTransform(float x, float y, float a, float sx, float sy, float ox, float oy, float kx, float ky);
+  // Implements Module.
+  virtual ModuleType getModuleType() const { return M_MATH; }
 
-	// Implements Module.
-	virtual ModuleType getModuleType() const
-	{
-		return M_MATH;
-	}
+  virtual const char *getName() const { return "love.math"; }
 
-	virtual const char *getName() const
-	{
-		return "love.math";
-	}
+ private:
+  RandomGenerator rng;
 
-private:
+};  // Math
 
-	RandomGenerator rng;
+static inline float noise1(float x) { return SimplexNoise1234::noise(x) * 0.5f + 0.5f; }
 
-}; // Math
-
-
-static inline float noise1(float x)
-{
-	return SimplexNoise1234::noise(x) * 0.5f + 0.5f;
-}
-
-static inline float noise2(float x, float y)
-{
-	return SimplexNoise1234::noise(x, y) * 0.5f + 0.5f;
-}
+static inline float noise2(float x, float y) { return SimplexNoise1234::noise(x, y) * 0.5f + 0.5f; }
 
 // Perlin noise is used instead of Simplex noise in the 3D and 4D cases to avoid
 // patent issues.
 
 static inline float noise3(float x, float y, float z)
 {
-	return Noise1234::noise(x, y, z) * 0.5f + 0.5f;
+  return Noise1234::noise(x, y, z) * 0.5f + 0.5f;
 }
 
 static inline float noise4(float x, float y, float z, float w)
 {
-	return Noise1234::noise(x, y, z, w) * 0.5f + 0.5f;
+  return Noise1234::noise(x, y, z, w) * 0.5f + 0.5f;
 }
 
-} // math
-} // love
+}  // namespace math
+}  // namespace love
 
 #endif

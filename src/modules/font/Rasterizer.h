@@ -22,9 +22,9 @@
 #define LOVE_FONT_RASTERIZER_H
 
 // LOVE
+#include "GlyphData.h"
 #include "common/Object.h"
 #include "common/int.h"
-#include "GlyphData.h"
 
 namespace love
 {
@@ -36,10 +36,10 @@ namespace font
  **/
 struct FontMetrics
 {
-	int advance;
-	int ascent;
-	int descent;
-	int height;
+  int advance;
+  int ascent;
+  int descent;
+  int height;
 };
 
 /**
@@ -47,89 +47,87 @@ struct FontMetrics
  **/
 class Rasterizer : public Object
 {
-public:
+ public:
+  enum DataType
+  {
+    DATA_TRUETYPE,
+    DATA_IMAGE,
+  };
 
-	enum DataType
-	{
-		DATA_TRUETYPE,
-		DATA_IMAGE,
-	};
+  static love::Type type;
 
-	static love::Type type;
+  virtual ~Rasterizer();
 
-	virtual ~Rasterizer();
+  /**
+   * Gets the max height of the glyphs.
+   **/
+  virtual int getHeight() const;
 
-	/**
-	 * Gets the max height of the glyphs.
-	 **/
-	virtual int getHeight() const;
+  /**
+   * Gets the max advance of the glyphs.
+   **/
+  virtual int getAdvance() const;
 
-	/**
-	 * Gets the max advance of the glyphs.
-	 **/
-	virtual int getAdvance() const;
+  /**
+   * Gets the max ascent (height above baseline) for the font.
+   **/
+  virtual int getAscent() const;
 
-	/**
-	 * Gets the max ascent (height above baseline) for the font.
-	 **/
-	virtual int getAscent() const;
+  /**
+   * Gets the max descent (height below baseline) for the font.
+   **/
+  virtual int getDescent() const;
 
-	/**
-	 * Gets the max descent (height below baseline) for the font.
-	 **/
-	virtual int getDescent() const;
+  /**
+   * Gets the line height of the font.
+   **/
+  virtual int getLineHeight() const = 0;
 
-	/**
-	 * Gets the line height of the font.
-	 **/
-	virtual int getLineHeight() const = 0;
+  /**
+   * Gets a specific glyph.
+   * @param glyph The (UNICODE) glyph codepoint to get data for.
+   **/
+  virtual GlyphData *getGlyphData(uint32 glyph) const = 0;
 
-	/**
-	 * Gets a specific glyph.
-	 * @param glyph The (UNICODE) glyph codepoint to get data for.
-	 **/
-	virtual GlyphData *getGlyphData(uint32 glyph) const = 0;
+  /**
+   * Gets a specific glyph.
+   * @param text The (UNICODE) glyph character to get the data for.
+   **/
+  virtual GlyphData *getGlyphData(const std::string &text) const;
 
-	/**
-	 * Gets a specific glyph.
-	 * @param text The (UNICODE) glyph character to get the data for.
-	 **/
-	virtual GlyphData *getGlyphData(const std::string &text) const;
+  /**
+   * Gets the number of glyphs the rasterizer has data for.
+   **/
+  virtual int getGlyphCount() const = 0;
 
-	/**
-	 * Gets the number of glyphs the rasterizer has data for.
-	 **/
-	virtual int getGlyphCount() const = 0;
+  /**
+   * Gets whether this Rasterizer has a specific glyph.
+   * @param glyph The (UNICODE) glyph codepoint.
+   **/
+  virtual bool hasGlyph(uint32 glyph) const = 0;
 
-	/**
-	 * Gets whether this Rasterizer has a specific glyph.
-	 * @param glyph The (UNICODE) glyph codepoint.
-	 **/
-	virtual bool hasGlyph(uint32 glyph) const = 0;
+  /**
+   * Gets whether this Rasterizer has all the glyphs in a string.
+   * @param text The (UTF-8) string.
+   **/
+  virtual bool hasGlyphs(const std::string &text) const;
 
-	/**
-	 * Gets whether this Rasterizer has all the glyphs in a string.
-	 * @param text The (UTF-8) string.
-	 **/
-	virtual bool hasGlyphs(const std::string &text) const;
+  /**
+   * Gets the amount of horizontal kerning between two glyphs.
+   **/
+  virtual float getKerning(uint32 leftglyph, uint32 rightglyph) const;
 
-	/**
-	 * Gets the amount of horizontal kerning between two glyphs.
-	 **/
-	virtual float getKerning(uint32 leftglyph, uint32 rightglyph) const;
+  virtual DataType getDataType() const = 0;
 
-	virtual DataType getDataType() const = 0;
+  float getDPIScale() const;
 
-	float getDPIScale() const;
+ protected:
+  FontMetrics metrics;
+  float dpiScale;
 
-protected:
+};  // Rasterizer
 
-	FontMetrics metrics;
-	float dpiScale;
+}  // namespace font
+}  // namespace love
 
-}; // Rasterizer
-
-} // font
-} // love
-
-#endif // LOVE_FONT_RASTERIZER_H
+#endif  // LOVE_FONT_RASTERIZER_H

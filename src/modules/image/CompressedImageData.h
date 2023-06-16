@@ -21,16 +21,16 @@
 #pragma once
 
 // LOVE
+#include "CompressedSlice.h"
+#include "FormatHandler.h"
 #include "common/Data.h"
 #include "common/StringMap.h"
 #include "common/int.h"
 #include "common/pixelformat.h"
-#include "CompressedSlice.h"
-#include "FormatHandler.h"
 
 // STL
-#include <vector>
 #include <list>
+#include <vector>
 
 namespace love
 {
@@ -44,73 +44,71 @@ namespace image
  **/
 class CompressedImageData : public Data
 {
-public:
+ public:
+  static love::Type type;
 
-	static love::Type type;
+  CompressedImageData(const std::list<FormatHandler *> &formats, Data *filedata);
+  CompressedImageData(const CompressedImageData &c);
+  virtual ~CompressedImageData();
 
-	CompressedImageData(const std::list<FormatHandler *> &formats, Data *filedata);
-	CompressedImageData(const CompressedImageData &c);
-	virtual ~CompressedImageData();
+  // Implements Data.
+  CompressedImageData *clone() const override;
+  void *getData() const override;
+  size_t getSize() const override;
 
-	// Implements Data.
-	CompressedImageData *clone() const override;
-	void *getData() const override;
-	size_t getSize() const override;
+  /**
+   * Gets the number of mipmaps in this Compressed Image Data.
+   * Includes the base image level.
+   **/
+  int getMipmapCount() const;
 
-	/**
-	 * Gets the number of mipmaps in this Compressed Image Data.
-	 * Includes the base image level.
-	 **/
-	int getMipmapCount() const;
+  /**
+   * Gets the number of slices (array layers, cube faces, 3D layers, etc.)
+   **/
+  int getSliceCount(int mip = 0) const;
 
-	/**
-	 * Gets the number of slices (array layers, cube faces, 3D layers, etc.)
-	 **/
-	int getSliceCount(int mip = 0) const;
+  /**
+   * Gets the size in bytes of a sub-image at the specified mipmap level.
+   **/
+  size_t getSize(int miplevel) const;
 
-	/**
-	 * Gets the size in bytes of a sub-image at the specified mipmap level.
-	 **/
-	size_t getSize(int miplevel) const;
+  /**
+   * Gets the byte data of a sub-image at the specified mipmap level.
+   **/
+  void *getData(int miplevel) const;
 
-	/**
-	 * Gets the byte data of a sub-image at the specified mipmap level.
-	 **/
-	void *getData(int miplevel) const;
+  /**
+   * Gets the width of a sub-image at the specified mipmap level.
+   **/
+  int getWidth(int miplevel = 0) const;
 
-	/**
-	 * Gets the width of a sub-image at the specified mipmap level.
-	 **/
-	int getWidth(int miplevel = 0) const;
+  /**
+   * Gets the height of a sub-image at the specified mipmap level.
+   **/
+  int getHeight(int miplevel = 0) const;
 
-	/**
-	 * Gets the height of a sub-image at the specified mipmap level.
-	 **/
-	int getHeight(int miplevel = 0) const;
+  /**
+   * Gets the format of the compressed data.
+   **/
+  PixelFormat getFormat() const;
 
-	/**
-	 * Gets the format of the compressed data.
-	 **/
-	PixelFormat getFormat() const;
+  bool isSRGB() const;
 
-	bool isSRGB() const;
+  CompressedSlice *getSlice(int slice, int miplevel) const;
 
-	CompressedSlice *getSlice(int slice, int miplevel) const;
+ protected:
+  PixelFormat format;
+  bool sRGB;
 
-protected:
+  // Single block of memory containing all of the sub-images.
+  StrongRef<CompressedMemory> memory;
 
-	PixelFormat format;
-	bool sRGB;
+  // Texture info for each mipmap level.
+  std::vector<StrongRef<CompressedSlice>> dataImages;
 
-	// Single block of memory containing all of the sub-images.
-	StrongRef<CompressedMemory> memory;
+  void checkSliceExists(int slice, int miplevel) const;
 
-	// Texture info for each mipmap level.
-	std::vector<StrongRef<CompressedSlice>> dataImages;
+};  // CompressedImageData
 
-	void checkSliceExists(int slice, int miplevel) const;
-
-}; // CompressedImageData
-
-} // image
-} // love
+}  // namespace image
+}  // namespace love

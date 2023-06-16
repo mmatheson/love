@@ -22,11 +22,10 @@
 #define LOVE_SOUND_SOUND_H
 
 // LOVE
+#include "Decoder.h"
+#include "SoundData.h"
 #include "common/Module.h"
 #include "filesystem/File.h"
-
-#include "SoundData.h"
-#include "Decoder.h"
 
 namespace love
 {
@@ -39,59 +38,57 @@ namespace sound
  **/
 class Sound : public Module
 {
+ public:
+  static love::Type type;
 
-public:
+  virtual ~Sound();
 
-	static love::Type type;
+  // Implements Module.
+  virtual ModuleType getModuleType() const { return M_SOUND; }
 
-	virtual ~Sound();
+  /**
+   * Creates new SoundData from a decoder. Fully expands the
+   * encoded sound data into raw sound data. Not recommended
+   * on large (long-duration) files.
+   * @param decoder The file to decode the data from.
+   * @return A SoundData object, or zero if the file type couldn't be handled.
+   **/
+  SoundData *newSoundData(Decoder *decoder);
 
-	// Implements Module.
-	virtual ModuleType getModuleType() const { return M_SOUND; }
+  /**
+   * Creates a new SoundData with the specified number of samples and format.
+   * @param samples The number of samples.
+   * @param sampleRate Number of samples per second.
+   * @param bitDepth Bits per sample (8 or 16).
+   * @param channels Either 1 for mono, or 2 for stereo.
+   * @return A new SoundData object, or zero in case of errors.
+   **/
+  SoundData *newSoundData(int samples, int sampleRate, int bitDepth, int channels);
 
-	/**
-	 * Creates new SoundData from a decoder. Fully expands the
-	 * encoded sound data into raw sound data. Not recommended
-	 * on large (long-duration) files.
-	 * @param decoder The file to decode the data from.
-	 * @return A SoundData object, or zero if the file type couldn't be handled.
-	 **/
-	SoundData *newSoundData(Decoder *decoder);
+  /**
+   * Creates a new SoundData with the specified number of samples and format
+   * and loads data from specified buffer.
+   * @param data Buffer to load data from.
+   * @param samples The number of samples.
+   * @param sampleRate Number of samples per second.
+   * @param bitDepth Bits per sample (8 or 16).
+   * @param channels Either 1 for mono, or 2 for stereo.
+   * @return A new SoundData object, or zero in case of errors.
+   **/
+  SoundData *newSoundData(void *data, int samples, int sampleRate, int bitDepth, int channels);
 
-	/**
-	 * Creates a new SoundData with the specified number of samples and format.
-	 * @param samples The number of samples.
-	 * @param sampleRate Number of samples per second.
-	 * @param bitDepth Bits per sample (8 or 16).
-	 * @param channels Either 1 for mono, or 2 for stereo.
-	 * @return A new SoundData object, or zero in case of errors.
-	 **/
-	SoundData *newSoundData(int samples, int sampleRate, int bitDepth, int channels);
+  /**
+   * Attempts to find a decoder for the encoded sound data in the
+   * specified file.
+   * @param file The file with encoded sound data.
+   * @param bufferSize The size of each decoded chunk.
+   * @return A Decoder object on success, or zero if no decoder could be found.
+   **/
+  virtual Decoder *newDecoder(filesystem::FileData *file, int bufferSize) = 0;
 
-	/**
-	 * Creates a new SoundData with the specified number of samples and format
-	 * and loads data from specified buffer.
-	 * @param data Buffer to load data from.
-	 * @param samples The number of samples.
-	 * @param sampleRate Number of samples per second.
-	 * @param bitDepth Bits per sample (8 or 16).
-	 * @param channels Either 1 for mono, or 2 for stereo.
-	 * @return A new SoundData object, or zero in case of errors.
-	 **/
-	SoundData *newSoundData(void *data, int samples, int sampleRate, int bitDepth, int channels);
+};  // Sound
 
-	/**
-	 * Attempts to find a decoder for the encoded sound data in the
-	 * specified file.
-	 * @param file The file with encoded sound data.
-	 * @param bufferSize The size of each decoded chunk.
-	 * @return A Decoder object on success, or zero if no decoder could be found.
-	 **/
-	virtual Decoder *newDecoder(filesystem::FileData *file, int bufferSize) = 0;
+}  // namespace sound
+}  // namespace love
 
-}; // Sound
-
-} // sound
-} // love
-
-#endif // LOVE_SOUND_SOUND_H
+#endif  // LOVE_SOUND_SOUND_H

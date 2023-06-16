@@ -20,9 +20,9 @@
 
 #pragma once
 
-#include "common/Data.h"
-
 #include <stddef.h>
+
+#include "common/Data.h"
 
 namespace love
 {
@@ -31,29 +31,27 @@ namespace data
 
 class ByteData : public love::Data
 {
-public:
+ public:
+  static love::Type type;
 
-	static love::Type type;
+  ByteData(size_t size);
+  ByteData(const void *d, size_t size);
+  ByteData(void *d, size_t size, bool own);
+  ByteData(const ByteData &d);
+  virtual ~ByteData();
 
-	ByteData(size_t size);
-	ByteData(const void *d, size_t size);
-	ByteData(void *d, size_t size, bool own);
-	ByteData(const ByteData &d);
-	virtual ~ByteData();
+  // Implements Data.
+  ByteData *clone() const override;
+  void *getData() const override;
+  size_t getSize() const override;
 
-	// Implements Data.
-	ByteData *clone() const override;
-	void *getData() const override;
-	size_t getSize() const override;
+ private:
+  void create();
 
-private:
+  char *data;
+  size_t size;
 
-	void create();
+};  // ByteData
 
-	char *data;
-	size_t size;
-
-}; // ByteData
-
-} // data
-} // love
+}  // namespace data
+}  // namespace love

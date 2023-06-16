@@ -36,19 +36,18 @@ namespace magpie
  **/
 class ASTCHandler : public FormatHandler
 {
-public:
+ public:
+  virtual ~ASTCHandler() {}
 
-	virtual ~ASTCHandler() {}
+  // Implements FormatHandler.
+  bool canParseCompressed(Data *data) override;
 
-	// Implements FormatHandler.
-	bool canParseCompressed(Data *data) override;
+  StrongRef<CompressedMemory> parseCompressed(Data *filedata,
+                                              std::vector<StrongRef<CompressedSlice>> &images,
+                                              PixelFormat &format, bool &sRGB) override;
 
-	StrongRef<CompressedMemory> parseCompressed(Data *filedata,
-	        std::vector<StrongRef<CompressedSlice>> &images,
-	        PixelFormat &format, bool &sRGB) override;
+};  // ASTCHandler
 
-}; // ASTCHandler
-
-} // magpie
-} // image
-} // love
+}  // namespace magpie
+}  // namespace image
+}  // namespace love

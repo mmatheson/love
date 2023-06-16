@@ -45,8 +45,8 @@ class World;
  **/
 struct jointudata
 {
-    // Reference to arbitrary data.
-    Reference *ref = nullptr;
+  // Reference to arbitrary data.
+  Reference *ref = nullptr;
 };
 
 /**
@@ -56,107 +56,104 @@ struct jointudata
  **/
 class Joint : public love::physics::Joint
 {
-public:
-	friend class GearJoint;
+ public:
+  friend class GearJoint;
 
-	/**
-	 * This constructor will connect one end of the joint to body1,
-	 * and the other one to the default ground body.
-	 *
-	 * This constructor is mainly used by MouseJoint.
-	 **/
-	Joint(Body *body1);
+  /**
+   * This constructor will connect one end of the joint to body1,
+   * and the other one to the default ground body.
+   *
+   * This constructor is mainly used by MouseJoint.
+   **/
+  Joint(Body *body1);
 
-	/**
-	 * Create a joint between body1 and body2.
-	 **/
-	Joint(Body *body1, Body *body2);
+  /**
+   * Create a joint between body1 and body2.
+   **/
+  Joint(Body *body1, Body *body2);
 
-	virtual ~Joint();
+  virtual ~Joint();
 
-	/**
-	 * Returns true if the joint is active in a Box2D world.
-	 **/
-	bool isValid() const;
+  /**
+   * Returns true if the joint is active in a Box2D world.
+   **/
+  bool isValid() const;
 
-	/**
-	 * Gets the type of joint.
-	 **/
-	Type getType() const;
+  /**
+   * Gets the type of joint.
+   **/
+  Type getType() const;
 
-	virtual Body *getBodyA() const;
-	virtual Body *getBodyB() const;
+  virtual Body *getBodyA() const;
+  virtual Body *getBodyB() const;
 
-	/**
-	 * Gets the anchor positions of the Joint in world
-	 * coordinates. This is useful for debugdrawing the joint.
-	 **/
-	int getAnchors(lua_State *L);
+  /**
+   * Gets the anchor positions of the Joint in world
+   * coordinates. This is useful for debugdrawing the joint.
+   **/
+  int getAnchors(lua_State *L);
 
-	/**
-	 * Gets the reaction force on body2 at the joint anchor.
-	 **/
-	int getReactionForce(lua_State *L);
+  /**
+   * Gets the reaction force on body2 at the joint anchor.
+   **/
+  int getReactionForce(lua_State *L);
 
-	/**
-	 * Gets the reaction torque on body2.
-	 **/
-	float getReactionTorque(float dt);
+  /**
+   * Gets the reaction torque on body2.
+   **/
+  float getReactionTorque(float dt);
 
-	bool isActive() const;
+  bool isActive() const;
 
-	bool getCollideConnected() const;
+  bool getCollideConnected() const;
 
-	/**
-	 * This function stores an in-C reference to arbitrary Lua data in the Box2D
-	 * Joint object.
-	 **/
-	int setUserData(lua_State *L);
+  /**
+   * This function stores an in-C reference to arbitrary Lua data in the Box2D
+   * Joint object.
+   **/
+  int setUserData(lua_State *L);
 
-	/**
-	 * Gets the data set with setUserData. If no data is set, nil is returned.
-	 **/
-	int getUserData(lua_State *L);
+  /**
+   * Gets the data set with setUserData. If no data is set, nil is returned.
+   **/
+  int getUserData(lua_State *L);
 
-	/**
-	 * Joints require pointers to a Box2D joint objects at
-	 * different polymorphic levels, which is why these function
-	 * were created.
-	 **/
+  /**
+   * Joints require pointers to a Box2D joint objects at
+   * different polymorphic levels, which is why these function
+   * were created.
+   **/
 
-	/**
-	 * Destroys the joint. This function was created just to
-	 * get some cinsistency.
-	 **/
-	void destroyJoint(bool implicit = false);
+  /**
+   * Destroys the joint. This function was created just to
+   * get some cinsistency.
+   **/
+  void destroyJoint(bool implicit = false);
 
-protected:
+ protected:
+  /**
+   * Creates a Joint, and ensures that the parent class
+   * gets a copy of the pointer.
+   **/
+  b2Joint *createJoint(b2JointDef *def);
 
-	/**
-	 * Creates a Joint, and ensures that the parent class
-	 * gets a copy of the pointer.
-	 **/
-	b2Joint *createJoint(b2JointDef *def);
+  World *world;
 
-	World *world;
+  jointudata *udata;
 
-    jointudata *udata;
+ private:
+  // A Joint must be destroyed *before* the bodies it acts upon,
+  // and the world they reside in. We therefore need refs
+  // parents and associations to prevent wrong destruction order.
+  Body *body1, *body2;
 
-private:
+  // The Box2D joint object.
+  b2Joint *joint;
 
-	// A Joint must be destroyed *before* the bodies it acts upon,
-	// and the world they reside in. We therefore need refs
-	// parents and associations to prevent wrong destruction order.
-	Body *body1, * body2;
+};  // Joint
 
+}  // namespace box2d
+}  // namespace physics
+}  // namespace love
 
-	// The Box2D joint object.
-	b2Joint *joint;
-
-}; // Joint
-
-} // box2d
-} // physics
-} // love
-
-#endif // LOVE_PHYSICS_BOX2D_JOINT_H
+#endif  // LOVE_PHYSICS_BOX2D_JOINT_H

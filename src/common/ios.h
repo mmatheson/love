@@ -25,9 +25,9 @@
 
 #ifdef LOVE_IOS
 
-#include "common/math.h"
-
 #include <string>
+
+#include "common/math.h"
 
 struct SDL_Window;
 
@@ -83,15 +83,15 @@ bool hasBackgroundMusic();
  **/
 void initAudioSessionInterruptionHandler();
 void destroyAudioSessionInterruptionHandler();
-    
+
 /**
  * Gets the area in the window that is safe for UI to render to (not covered by
  * the status bar, notch, etc.)
  **/
 Rect getSafeArea(SDL_Window *window);
 
-} // ios
-} // love
+}  // namespace ios
+}  // namespace love
 
-#endif // LOVE_IOS
-#endif // LOVE_IOS_H
+#endif  // LOVE_IOS
+#endif  // LOVE_IOS_H

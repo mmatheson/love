@@ -36,14 +36,14 @@
 
 #include "../glslang/OSDependent/osinclude.h"
 
-namespace glslang {
+namespace glslang
+{
 
 bool InitProcess();
 bool InitThread();
-bool DetachThread();  // not called from standalone, perhaps other tools rely on parts of it
-bool DetachProcess(); // not called from standalone, perhaps other tools rely on parts of it
+bool DetachThread();   // not called from standalone, perhaps other tools rely on parts of it
+bool DetachProcess();  // not called from standalone, perhaps other tools rely on parts of it
 
-} // end namespace glslang
+}  // end namespace glslang
 
-#endif // __INITIALIZEDLL_H
-
+#endif  // __INITIALIZEDLL_H

@@ -39,40 +39,40 @@ namespace theora
 
 class OggDemuxer
 {
-public:
-	enum StreamType
-	{
-		TYPE_THEORA,
-		TYPE_UNKNOWN,
-	};
+ public:
+  enum StreamType
+  {
+    TYPE_THEORA,
+    TYPE_UNKNOWN,
+  };
 
-	OggDemuxer(love::filesystem::File *file);
-	~OggDemuxer();
+  OggDemuxer(love::filesystem::File *file);
+  ~OggDemuxer();
 
-	StreamType findStream();
-	bool readPacket(ogg_packet &packet, bool mustSucceed = false);
-	void resync();
-	bool isEos() const;
-	const std::string &getFilename() const;
-	bool seek(ogg_packet &packet, double target, std::function<double(int64)> getTime);
+  StreamType findStream();
+  bool readPacket(ogg_packet &packet, bool mustSucceed = false);
+  void resync();
+  bool isEos() const;
+  const std::string &getFilename() const;
+  bool seek(ogg_packet &packet, double target, std::function<double(int64)> getTime);
 
-private:
-	StrongRef<love::filesystem::File> file;
+ private:
+  StrongRef<love::filesystem::File> file;
 
-	ogg_sync_state sync;
-	ogg_stream_state stream;
-	ogg_page page;
+  ogg_sync_state sync;
+  ogg_stream_state stream;
+  ogg_page page;
 
-	bool streamInited;
-	int videoSerial;
-	bool eos;
+  bool streamInited;
+  int videoSerial;
+  bool eos;
 
-	bool readPage(bool erroreof = false);
-	StreamType determineType();
-}; // OggDemuxer
+  bool readPage(bool erroreof = false);
+  StreamType determineType();
+};  // OggDemuxer
 
-} // theora
-} // video
-} // love
+}  // namespace theora
+}  // namespace video
+}  // namespace love
 
-#endif // LOVE_VIDEO_THEORA_OGGDEMUXER_H
+#endif  // LOVE_VIDEO_THEORA_OGGDEMUXER_H

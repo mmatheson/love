@@ -27,29 +27,21 @@ namespace physics
 
 love::Type Shape::type("Shape", &Object::type);
 
-Shape::~Shape()
-{
-}
+Shape::~Shape() {}
 
-bool Shape::getConstant(const char *in, Type &out)
-{
-	return types.find(in, out);
-}
+bool Shape::getConstant(const char *in, Type &out) { return types.find(in, out); }
 
-bool Shape::getConstant(Type in, const char  *&out)
-{
-	return types.find(in, out);
-}
+bool Shape::getConstant(Type in, const char *&out) { return types.find(in, out); }
 
-StringMap<Shape::Type, Shape::SHAPE_MAX_ENUM>::Entry Shape::typeEntries[] =
-{
-	{"circle", Shape::SHAPE_CIRCLE},
-	{"polygon", Shape::SHAPE_POLYGON},
-	{"edge", Shape::SHAPE_EDGE},
-	{"chain", Shape::SHAPE_CHAIN},
+StringMap<Shape::Type, Shape::SHAPE_MAX_ENUM>::Entry Shape::typeEntries[] = {
+    {"circle", Shape::SHAPE_CIRCLE},
+    {"polygon", Shape::SHAPE_POLYGON},
+    {"edge", Shape::SHAPE_EDGE},
+    {"chain", Shape::SHAPE_CHAIN},
 };
 
-StringMap<Shape::Type, Shape::SHAPE_MAX_ENUM> Shape::types(Shape::typeEntries, sizeof(Shape::typeEntries));
+StringMap<Shape::Type, Shape::SHAPE_MAX_ENUM> Shape::types(Shape::typeEntries,
+                                                           sizeof(Shape::typeEntries));
 
-} // physics
-} // love
+}  // namespace physics
+}  // namespace love

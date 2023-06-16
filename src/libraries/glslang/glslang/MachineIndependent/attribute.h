@@ -40,68 +40,71 @@
 #include "../Include/Common.h"
 #include "../Include/ConstantUnion.h"
 
-namespace glslang {
+namespace glslang
+{
 
-    enum TAttributeType {
-        EatNone,
-        EatAllow_uav_condition,
-        EatBranch,
-        EatCall,
-        EatDomain,
-        EatEarlyDepthStencil,
-        EatFastOpt,
-        EatFlatten,
-        EatForceCase,
-        EatInstance,
-        EatMaxTessFactor,
-        EatNumThreads,
-        EatMaxVertexCount,
-        EatOutputControlPoints,
-        EatOutputTopology,
-        EatPartitioning,
-        EatPatchConstantFunc,
-        EatPatchSize,
-        EatUnroll,
-        EatLoop,
-        EatBinding,
-        EatGlobalBinding,
-        EatLocation,
-        EatInputAttachment,
-        EatBuiltIn,
-        EatPushConstant,
-        EatConstantId,
-        EatDependencyInfinite,
-        EatDependencyLength,
-        EatMinIterations,
-        EatMaxIterations,
-        EatIterationMultiple,
-        EatPeelCount,
-        EatPartialCount
-    };
+enum TAttributeType
+{
+  EatNone,
+  EatAllow_uav_condition,
+  EatBranch,
+  EatCall,
+  EatDomain,
+  EatEarlyDepthStencil,
+  EatFastOpt,
+  EatFlatten,
+  EatForceCase,
+  EatInstance,
+  EatMaxTessFactor,
+  EatNumThreads,
+  EatMaxVertexCount,
+  EatOutputControlPoints,
+  EatOutputTopology,
+  EatPartitioning,
+  EatPatchConstantFunc,
+  EatPatchSize,
+  EatUnroll,
+  EatLoop,
+  EatBinding,
+  EatGlobalBinding,
+  EatLocation,
+  EatInputAttachment,
+  EatBuiltIn,
+  EatPushConstant,
+  EatConstantId,
+  EatDependencyInfinite,
+  EatDependencyLength,
+  EatMinIterations,
+  EatMaxIterations,
+  EatIterationMultiple,
+  EatPeelCount,
+  EatPartialCount
+};
 
-    class TIntermAggregate;
+class TIntermAggregate;
 
-    struct TAttributeArgs {
-        TAttributeType name;
-        const TIntermAggregate* args;
+struct TAttributeArgs
+{
+  TAttributeType name;
+  const TIntermAggregate *args;
 
-        // Obtain attribute as integer
-        // Return false if it cannot be obtained
-        bool getInt(int& value, int argNum = 0) const;
+  // Obtain attribute as integer
+  // Return false if it cannot be obtained
+  bool getInt(int &value, int argNum = 0) const;
 
-        // Obtain attribute as string, with optional to-lower transform
-        // Return false if it cannot be obtained
-        bool getString(TString& value, int argNum = 0, bool convertToLower = true) const;
+  // Obtain attribute as string, with optional to-lower transform
+  // Return false if it cannot be obtained
+  bool getString(TString &value, int argNum = 0, bool convertToLower = true) const;
 
-        // How many arguments were provided to the attribute?
-        int size() const;
+  // How many arguments were provided to the attribute?
+  int size() const;
 
-    protected:
-        const TConstUnion* getConstUnion(TBasicType basicType, int argNum) const;
-    };
+ protected:
+  const TConstUnion *getConstUnion(TBasicType basicType, int argNum) const;
+};
 
-    typedef TList<TAttributeArgs> TAttributes;
+typedef TList<TAttributeArgs> TAttributes;
 
-} // end namespace glslang
+}  // end namespace glslang
 
-#endif // _ATTRIBUTE_INCLUDED_
+#endif  // _ATTRIBUTE_INCLUDED_

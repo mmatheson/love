@@ -29,55 +29,53 @@ namespace box2d
 
 CircleShape *luax_checkcircleshape(lua_State *L, int idx)
 {
-	return luax_checktype<CircleShape>(L, idx);
+  return luax_checktype<CircleShape>(L, idx);
 }
 
 int w_CircleShape_getRadius(lua_State *L)
 {
-	CircleShape *c = luax_checkcircleshape(L, 1);
-	lua_pushnumber(L, c->getRadius());
-	return 1;
+  CircleShape *c = luax_checkcircleshape(L, 1);
+  lua_pushnumber(L, c->getRadius());
+  return 1;
 }
 
 int w_CircleShape_setRadius(lua_State *L)
 {
-	CircleShape *c = luax_checkcircleshape(L, 1);
-	float r = (float)luaL_checknumber(L, 2);
-	c->setRadius(r);
-	return 0;
+  CircleShape *c = luax_checkcircleshape(L, 1);
+  float r = (float) luaL_checknumber(L, 2);
+  c->setRadius(r);
+  return 0;
 }
 
 int w_CircleShape_getPoint(lua_State *L)
 {
-	CircleShape *c = luax_checkcircleshape(L, 1);
-	float x, y;
-	c->getPoint(x, y);
-	lua_pushnumber(L, x);
-	lua_pushnumber(L, y);
-	return 2;
+  CircleShape *c = luax_checkcircleshape(L, 1);
+  float x, y;
+  c->getPoint(x, y);
+  lua_pushnumber(L, x);
+  lua_pushnumber(L, y);
+  return 2;
 }
 
 int w_CircleShape_setPoint(lua_State *L)
 {
-	CircleShape *c = luax_checkcircleshape(L, 1);
-	c->setPoint((float) luaL_checknumber(L, 2), (float) luaL_checknumber(L, 3));
-	return 0;
+  CircleShape *c = luax_checkcircleshape(L, 1);
+  c->setPoint((float) luaL_checknumber(L, 2), (float) luaL_checknumber(L, 3));
+  return 0;
 }
 
-static const luaL_Reg w_CircleShape_functions[] =
-{
-	{ "getRadius", w_CircleShape_getRadius },
-	{ "setRadius", w_CircleShape_setRadius },
-	{ "getPoint", w_CircleShape_getPoint },
-	{ "setPoint", w_CircleShape_setPoint },
-	{ 0, 0 }
-};
+static const luaL_Reg w_CircleShape_functions[] = {{"getRadius", w_CircleShape_getRadius},
+                                                   {"setRadius", w_CircleShape_setRadius},
+                                                   {"getPoint", w_CircleShape_getPoint},
+                                                   {"setPoint", w_CircleShape_setPoint},
+                                                   {0, 0}};
 
 extern "C" int luaopen_circleshape(lua_State *L)
 {
-	return luax_register_type(L, &CircleShape::type, w_Shape_functions, w_CircleShape_functions, nullptr);
+  return luax_register_type(L, &CircleShape::type, w_Shape_functions, w_CircleShape_functions,
+                            nullptr);
 }
 
-} // box2d
-} // physics
-} // love
+}  // namespace box2d
+}  // namespace physics
+}  // namespace love

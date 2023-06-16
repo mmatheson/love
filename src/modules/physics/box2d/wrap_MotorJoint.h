@@ -22,9 +22,9 @@
 #define LOVE_PHYSICS_BOX2D_WRAP_MOTOR_JOINT_H
 
 // LOVE
+#include "MotorJoint.h"
 #include "common/runtime.h"
 #include "wrap_Joint.h"
-#include "MotorJoint.h"
 
 namespace love
 {
@@ -36,8 +36,8 @@ namespace box2d
 MotorJoint *luax_checkmotorjoint(lua_State *L, int idx);
 extern "C" int luaopen_motorjoint(lua_State *L);
 
-} // box2d
-} // physics
-} // love
+}  // namespace box2d
+}  // namespace physics
+}  // namespace love
 
-#endif // LOVE_PHYSICS_BOX2D_WRAP_MOTOR_JOINT_H
+#endif  // LOVE_PHYSICS_BOX2D_WRAP_MOTOR_JOINT_H

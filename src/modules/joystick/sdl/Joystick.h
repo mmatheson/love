@@ -22,8 +22,8 @@
 #define LOVE_JOYSTICK_SDL_JOYSTICK_H
 
 // LOVE
-#include "joystick/Joystick.h"
 #include "common/EnumMap.h"
+#include "joystick/Joystick.h"
 
 // SDL
 #include <SDL.h>
@@ -37,108 +37,107 @@ namespace sdl
 
 class Joystick : public love::joystick::Joystick
 {
-public:
+ public:
+  Joystick(int id);
+  Joystick(int id, int joyindex);
 
-	Joystick(int id);
-	Joystick(int id, int joyindex);
+  virtual ~Joystick();
 
-	virtual ~Joystick();
+  bool open(int deviceindex) override;
+  void close() override;
 
-	bool open(int deviceindex) override;
-	void close() override;
+  bool isConnected() const override;
 
-	bool isConnected() const override;
+  const char *getName() const override;
 
-	const char *getName() const override;
+  int getAxisCount() const override;
+  int getButtonCount() const override;
+  int getHatCount() const override;
 
-	int getAxisCount() const override;
-	int getButtonCount() const override;
-	int getHatCount() const override;
+  float getAxis(int axisindex) const override;
+  std::vector<float> getAxes() const override;
+  Hat getHat(int hatindex) const override;
 
-	float getAxis(int axisindex) const override;
-	std::vector<float> getAxes() const override;
-	Hat getHat(int hatindex) const override;
+  bool isDown(const std::vector<int> &buttonlist) const override;
 
-	bool isDown(const std::vector<int> &buttonlist) const override;
+  bool openGamepad(int deviceindex) override;
+  bool isGamepad() const override;
 
-	bool openGamepad(int deviceindex) override;
-	bool isGamepad() const override;
+  float getGamepadAxis(GamepadAxis axis) const override;
+  bool isGamepadDown(const std::vector<GamepadButton> &blist) const override;
 
-	float getGamepadAxis(GamepadAxis axis) const override;
-	bool isGamepadDown(const std::vector<GamepadButton> &blist) const override;
+  JoystickInput getGamepadMapping(const GamepadInput &input) const override;
+  std::string getGamepadMappingString() const override;
 
-	JoystickInput getGamepadMapping(const GamepadInput &input) const override;
-	std::string getGamepadMappingString() const override;
+  void *getHandle() const override;
 
-	void *getHandle() const override;
+  std::string getGUID() const override;
+  int getInstanceID() const override;
+  int getID() const override;
 
-	std::string getGUID() const override;
-	int getInstanceID() const override;
-	int getID() const override;
+  void getDeviceInfo(int &vendorID, int &productID, int &productVersion) const override;
 
-	void getDeviceInfo(int &vendorID, int &productID, int &productVersion) const override;
+  bool isVibrationSupported() override;
+  bool setVibration(float left, float right, float duration = -1.0f) override;
+  bool setVibration() override;
+  void getVibration(float &left, float &right) override;
 
-	bool isVibrationSupported() override;
-	bool setVibration(float left, float right, float duration = -1.0f) override;
-	bool setVibration() override;
-	void getVibration(float &left, float &right) override;
+  static bool getConstant(Hat in, Uint8 &out);
+  static bool getConstant(Uint8 in, Hat &out);
 
-	static bool getConstant(Hat in, Uint8 &out);
-	static bool getConstant(Uint8 in, Hat &out);
+  static bool getConstant(SDL_GameControllerAxis in, GamepadAxis &out);
+  static bool getConstant(GamepadAxis in, SDL_GameControllerAxis &out);
 
-	static bool getConstant(SDL_GameControllerAxis in, GamepadAxis &out);
-	static bool getConstant(GamepadAxis in, SDL_GameControllerAxis &out);
+  static bool getConstant(SDL_GameControllerButton in, GamepadButton &out);
+  static bool getConstant(GamepadButton in, SDL_GameControllerButton &out);
 
-	static bool getConstant(SDL_GameControllerButton in, GamepadButton &out);
-	static bool getConstant(GamepadButton in, SDL_GameControllerButton &out);
+ private:
+  Joystick() {}
 
-private:
+  bool checkCreateHaptic();
+  bool runVibrationEffect();
 
-	Joystick() {}
+  SDL_Joystick *joyhandle;
+  SDL_GameController *controller;
+  SDL_Haptic *haptic;
 
-	bool checkCreateHaptic();
-	bool runVibrationEffect();
+  SDL_JoystickID instanceid;
+  std::string pguid;
+  int id;
 
-	SDL_Joystick *joyhandle;
-	SDL_GameController *controller;
-	SDL_Haptic *haptic;
+  std::string name;
 
-	SDL_JoystickID instanceid;
-	std::string pguid;
-	int id;
+  struct Vibration
+  {
+    float left = 0.0f;
+    float right = 0.0f;
+    SDL_HapticEffect effect;
+    Uint16 data[4];
+    int id = -1;
+    Uint32 endtime = SDL_HAPTIC_INFINITY;
 
-	std::string name;
+    // Old versions of VS2013 have trouble with initializing these in-line.
+    Vibration()
+        : effect(),
+          data()
+    {
+    }
 
-	struct Vibration
-	{
-		float left  = 0.0f;
-		float right = 0.0f;
-		SDL_HapticEffect effect;
-		Uint16 data[4];
-		int id = -1;
-		Uint32 endtime = SDL_HAPTIC_INFINITY;
+  } vibration;
 
-		// Old versions of VS2013 have trouble with initializing these in-line.
-		Vibration()
-			: effect()
-			, data()
-		{}
+  static EnumMap<Hat, Uint8, Joystick::HAT_MAX_ENUM>::Entry hatEntries[];
+  static EnumMap<Hat, Uint8, Joystick::HAT_MAX_ENUM> hats;
 
-	} vibration;
+  static EnumMap<GamepadAxis, SDL_GameControllerAxis, GAMEPAD_AXIS_MAX_ENUM>::Entry gpAxisEntries[];
+  static EnumMap<GamepadAxis, SDL_GameControllerAxis, GAMEPAD_AXIS_MAX_ENUM> gpAxes;
 
-	static EnumMap<Hat, Uint8, Joystick::HAT_MAX_ENUM>::Entry hatEntries[];
-	static EnumMap<Hat, Uint8, Joystick::HAT_MAX_ENUM> hats;
-
-	static EnumMap<GamepadAxis, SDL_GameControllerAxis, GAMEPAD_AXIS_MAX_ENUM>::Entry gpAxisEntries[];
-	static EnumMap<GamepadAxis, SDL_GameControllerAxis, GAMEPAD_AXIS_MAX_ENUM> gpAxes;
-
-	static EnumMap<GamepadButton, SDL_GameControllerButton, GAMEPAD_BUTTON_MAX_ENUM>::Entry gpButtonEntries[];
-	static EnumMap<GamepadButton, SDL_GameControllerButton, GAMEPAD_BUTTON_MAX_ENUM> gpButtons;
-
+  static EnumMap<GamepadButton, SDL_GameControllerButton, GAMEPAD_BUTTON_MAX_ENUM>::Entry
+      gpButtonEntries[];
+  static EnumMap<GamepadButton, SDL_GameControllerButton, GAMEPAD_BUTTON_MAX_ENUM> gpButtons;
 };
 
-} // sdl
-} // joystick
-} // love
+}  // namespace sdl
+}  // namespace joystick
+}  // namespace love
 
-#endif // LOVE_JOYSTICK_SDL_JOYSTICK_H
+#endif  // LOVE_JOYSTICK_SDL_JOYSTICK_H

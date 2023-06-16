@@ -22,8 +22,8 @@
 #define LOVE_PHYSICS_BOX2D_WRAP_SHAPE_H
 
 // LOVE
-#include "common/runtime.h"
 #include "Shape.h"
+#include "common/runtime.h"
 #include "wrap_Physics.h"
 
 namespace love
@@ -38,8 +38,8 @@ extern "C" int luaopen_shape(lua_State *L);
 
 extern const luaL_Reg w_Shape_functions[];
 
-} // box2d
-} // physics
-} // love
+}  // namespace box2d
+}  // namespace physics
+}  // namespace love
 
-#endif // LOVE_PHYSICS_BOX2D_WRAP_SHAPE_H
+#endif  // LOVE_PHYSICS_BOX2D_WRAP_SHAPE_H

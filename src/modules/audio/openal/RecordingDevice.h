@@ -25,15 +25,15 @@
 
 #ifdef LOVE_APPLE_USE_FRAMEWORKS
 #ifdef LOVE_IOS
-#include <OpenAL/alc.h>
 #include <OpenAL/al.h>
+#include <OpenAL/alc.h>
 #else
-#include <OpenAL-Soft/alc.h>
 #include <OpenAL-Soft/al.h>
+#include <OpenAL-Soft/alc.h>
 #endif
 #else
-#include <AL/alc.h>
 #include <AL/al.h>
+#include <AL/alc.h>
 #endif
 
 #include "audio/RecordingDevice.h"
@@ -48,35 +48,33 @@ namespace openal
 
 class RecordingDevice : public love::audio::RecordingDevice
 {
-public:
+ public:
+  RecordingDevice(const char *name);
+  virtual ~RecordingDevice();
+  virtual bool start(int samples, int sampleRate, int bitDepth, int channels);
+  virtual void stop();
+  virtual love::sound::SoundData *getData();
+  virtual const char *getName() const;
+  virtual int getSampleCount() const;
+  virtual int getMaxSamples() const;
+  virtual int getSampleRate() const;
+  virtual int getBitDepth() const;
+  virtual int getChannelCount() const;
+  virtual bool isRecording() const;
 
-	RecordingDevice(const char *name);
-	virtual ~RecordingDevice();
-	virtual bool start(int samples, int sampleRate, int bitDepth, int channels);
-	virtual void stop();
-	virtual love::sound::SoundData *getData();
-	virtual const char *getName() const;
-	virtual int getSampleCount() const;
-	virtual int getMaxSamples() const;
-	virtual int getSampleRate() const;
-	virtual int getBitDepth() const;
-	virtual int getChannelCount() const;
-	virtual bool isRecording() const;
+ private:
+  int samples = DEFAULT_SAMPLES;
+  int sampleRate = DEFAULT_SAMPLE_RATE;
+  int bitDepth = DEFAULT_BIT_DEPTH;
+  int channels = DEFAULT_CHANNELS;
 
-private:
+  std::string name;
+  ALCdevice *device = nullptr;
 
-	int samples = DEFAULT_SAMPLES;
-	int sampleRate = DEFAULT_SAMPLE_RATE;
-	int bitDepth = DEFAULT_BIT_DEPTH;
-	int channels = DEFAULT_CHANNELS;
+};  // RecordingDevice
 
-	std::string name;
-	ALCdevice *device = nullptr;
+}  // namespace openal
+}  // namespace audio
+}  // namespace love
 
-}; //RecordingDevice
-
-} //openal
-} //audio
-} //love
-
-#endif //LOVE_AUDIO_OPENAL_RECORDING_DEVICE_H
+#endif  // LOVE_AUDIO_OPENAL_RECORDING_DEVICE_H

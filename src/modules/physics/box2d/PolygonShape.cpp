@@ -22,8 +22,8 @@
 
 // Module
 #include "Body.h"
-#include "World.h"
 #include "Physics.h"
+#include "World.h"
 
 namespace love
 {
@@ -35,34 +35,32 @@ namespace box2d
 love::Type PolygonShape::type("PolygonShape", &Shape::type);
 
 PolygonShape::PolygonShape(b2PolygonShape *p, bool own)
-	: Shape(p, own)
+    : Shape(p, own)
 {
 }
 
-PolygonShape::~PolygonShape()
-{
-}
+PolygonShape::~PolygonShape() {}
 
 int PolygonShape::getPoints(lua_State *L)
 {
-	love::luax_assert_argc(L, 0);
-	b2PolygonShape *p = (b2PolygonShape *)shape;
-	int count = p->GetVertexCount();
-	for (int i = 0; i<count; i++)
-	{
-		b2Vec2 v = Physics::scaleUp(p->GetVertex(i));
-		lua_pushnumber(L, v.x);
-		lua_pushnumber(L, v.y);
-	}
-	return count*2;
+  love::luax_assert_argc(L, 0);
+  b2PolygonShape *p = (b2PolygonShape *) shape;
+  int count = p->GetVertexCount();
+  for (int i = 0; i < count; i++)
+  {
+    b2Vec2 v = Physics::scaleUp(p->GetVertex(i));
+    lua_pushnumber(L, v.x);
+    lua_pushnumber(L, v.y);
+  }
+  return count * 2;
 }
 
 bool PolygonShape::validate() const
 {
-	b2PolygonShape *p = (b2PolygonShape *)shape;
-	return p->Validate();
+  b2PolygonShape *p = (b2PolygonShape *) shape;
+  return p->Validate();
 }
 
-} // box2d
-} // physics
-} // love
+}  // namespace box2d
+}  // namespace physics
+}  // namespace love

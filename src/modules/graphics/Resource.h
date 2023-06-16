@@ -29,12 +29,11 @@ namespace graphics
 
 class Resource
 {
-public:
+ public:
+  virtual ~Resource() {}
+  virtual ptrdiff_t getHandle() const = 0;
 
-	virtual ~Resource() {}
-	virtual ptrdiff_t getHandle() const = 0;
+};  // Resource
 
-}; // Resource
-
-} // graphics
-} // love
+}  // namespace graphics
+}  // namespace love

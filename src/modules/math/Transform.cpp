@@ -28,129 +28,118 @@ namespace math
 love::Type Transform::type("Transform", &Object::type);
 
 Transform::Transform()
-	: matrix()
-	, inverseDirty(true)
-	, inverseMatrix()
+    : matrix(),
+      inverseDirty(true),
+      inverseMatrix()
 {
 }
 
 Transform::Transform(const Matrix4 &m)
-	: matrix(m)
-	, inverseDirty(true)
-	, inverseMatrix()
+    : matrix(m),
+      inverseDirty(true),
+      inverseMatrix()
 {
 }
 
-Transform::Transform(float x, float y, float a, float sx, float sy, float ox, float oy, float kx, float ky)
-	: matrix(x, y, a, sx, sy, ox, oy, kx, ky)
-	, inverseDirty(true)
-	, inverseMatrix()
+Transform::Transform(float x, float y, float a, float sx, float sy, float ox, float oy, float kx,
+                     float ky)
+    : matrix(x, y, a, sx, sy, ox, oy, kx, ky),
+      inverseDirty(true),
+      inverseMatrix()
 {
 }
 
-Transform::~Transform()
-{
-}
+Transform::~Transform() {}
 
-Transform *Transform::clone()
-{
-	return new Transform(*this);
-}
+Transform *Transform::clone() { return new Transform(*this); }
 
-Transform *Transform::inverse()
-{
-	return new Transform(getInverseMatrix());
-}
+Transform *Transform::inverse() { return new Transform(getInverseMatrix()); }
 
 void Transform::apply(Transform *other)
 {
-	matrix *= other->getMatrix();
-	inverseDirty = true;
+  matrix *= other->getMatrix();
+  inverseDirty = true;
 }
 
 void Transform::translate(float x, float y)
 {
-	matrix.translate(x, y);
-	inverseDirty = true;
+  matrix.translate(x, y);
+  inverseDirty = true;
 }
 
 void Transform::rotate(float angle)
 {
-	matrix.rotate(angle);
-	inverseDirty = true;
+  matrix.rotate(angle);
+  inverseDirty = true;
 }
 
 void Transform::scale(float x, float y)
 {
-	matrix.scale(x, y);
-	inverseDirty = true;
+  matrix.scale(x, y);
+  inverseDirty = true;
 }
 
 void Transform::shear(float x, float y)
 {
-	matrix.shear(x, y);
-	inverseDirty = true;
+  matrix.shear(x, y);
+  inverseDirty = true;
 }
 
 void Transform::reset()
 {
-	matrix.setIdentity();
-	inverseDirty = true;
+  matrix.setIdentity();
+  inverseDirty = true;
 }
 
-void Transform::setTransformation(float x, float y, float a, float sx, float sy, float ox, float oy, float kx, float ky)
+void Transform::setTransformation(float x, float y, float a, float sx, float sy, float ox, float oy,
+                                  float kx, float ky)
 {
-	matrix.setTransformation(x, y, a, sx, sy, ox, oy, kx, ky);
-	inverseDirty = true;
+  matrix.setTransformation(x, y, a, sx, sy, ox, oy, kx, ky);
+  inverseDirty = true;
 }
 
 love::Vector2 Transform::transformPoint(love::Vector2 p) const
 {
-	love::Vector2 result;
-	matrix.transformXY(&result, &p, 1);
-	return result;
+  love::Vector2 result;
+  matrix.transformXY(&result, &p, 1);
+  return result;
 }
 
 love::Vector2 Transform::inverseTransformPoint(love::Vector2 p)
 {
-	love::Vector2 result;
-	getInverseMatrix().transformXY(&result, &p, 1);
-	return result;
+  love::Vector2 result;
+  getInverseMatrix().transformXY(&result, &p, 1);
+  return result;
 }
 
-const Matrix4 &Transform::getMatrix() const
-{
-	return matrix;
-}
+const Matrix4 &Transform::getMatrix() const { return matrix; }
 
 void Transform::setMatrix(const Matrix4 &m)
 {
-	matrix = m;
-	inverseDirty = true;
+  matrix = m;
+  inverseDirty = true;
 }
 
 bool Transform::getConstant(const char *in, MatrixLayout &out)
 {
-	return matrixLayouts.find(in, out);
+  return matrixLayouts.find(in, out);
 }
 
 bool Transform::getConstant(MatrixLayout in, const char *&out)
 {
-	return matrixLayouts.find(in, out);
+  return matrixLayouts.find(in, out);
 }
 
-std::vector<std::string> Transform::getConstants(MatrixLayout)
-{
-	return matrixLayouts.getNames();
-}
+std::vector<std::string> Transform::getConstants(MatrixLayout) { return matrixLayouts.getNames(); }
 
-StringMap<Transform::MatrixLayout, Transform::MATRIX_MAX_ENUM>::Entry Transform::matrixLayoutEntries[] =
-{
-	{ "row",    MATRIX_ROW_MAJOR    },
-	{ "column", MATRIX_COLUMN_MAJOR },
+StringMap<Transform::MatrixLayout, Transform::MATRIX_MAX_ENUM>::Entry
+    Transform::matrixLayoutEntries[] = {
+        {"row", MATRIX_ROW_MAJOR},
+        {"column", MATRIX_COLUMN_MAJOR},
 };
 
-StringMap<Transform::MatrixLayout, Transform::MATRIX_MAX_ENUM> Transform::matrixLayouts(Transform::matrixLayoutEntries, sizeof(Transform::matrixLayoutEntries));
+StringMap<Transform::MatrixLayout, Transform::MATRIX_MAX_ENUM> Transform::matrixLayouts(
+    Transform::matrixLayoutEntries, sizeof(Transform::matrixLayoutEntries));
 
-} // math
-} // love
+}  // namespace math
+}  // namespace love

@@ -23,8 +23,8 @@
 
 // LOVE
 #include "Touch.h"
-#include "common/runtime.h"
 #include "common/int.h"
+#include "common/runtime.h"
 
 namespace love
 {
@@ -34,7 +34,7 @@ namespace touch
 int64 luax_checktouchid(lua_State *L, int idx);
 extern "C" LOVE_EXPORT int luaopen_love_touch(lua_State *L);
 
-} // touch
-} // love
+}  // namespace touch
+}  // namespace love
 
-#endif // LOVE_TOUCH_WRAP_TOUCH_H
+#endif  // LOVE_TOUCH_WRAP_TOUCH_H

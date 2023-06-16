@@ -22,9 +22,9 @@
 #define LOVE_PHYSICS_BOX2D_WRAP_DISTANCE_JOINT_H
 
 // LOVE
+#include "DistanceJoint.h"
 #include "common/runtime.h"
 #include "wrap_Joint.h"
-#include "DistanceJoint.h"
 
 namespace love
 {
@@ -36,8 +36,8 @@ namespace box2d
 DistanceJoint *luax_checkdistancejoint(lua_State *L, int idx);
 extern "C" int luaopen_distancejoint(lua_State *L);
 
-} // box2d
-} // physics
-} // love
+}  // namespace box2d
+}  // namespace physics
+}  // namespace love
 
-#endif // LOVE_PHYSICS_BOX2D_WRAP_DISTANCE_JOINT_H
+#endif  // LOVE_PHYSICS_BOX2D_WRAP_DISTANCE_JOINT_H

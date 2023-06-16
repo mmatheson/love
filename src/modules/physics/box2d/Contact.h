@@ -22,9 +22,9 @@
 #define LOVE_PHYSICS_BOX2D_CONTACT_H
 
 // LOVE
+#include "World.h"
 #include "common/Object.h"
 #include "common/runtime.h"
-#include "World.h"
 
 // Box2D
 #include <Box2D/Box2D.h>
@@ -44,127 +44,126 @@ class World;
  **/
 class Contact : public Object
 {
-public:
-	// Friends.
-	friend class World;
-	friend class World::ContactCallback;
+ public:
+  // Friends.
+  friend class World;
+  friend class World::ContactCallback;
 
-	static love::Type type;
+  static love::Type type;
 
-	/**
-	 * Creates a new Contact by copying a Box2D contact
-	 * point. It does not store the pointer, but copy the
-	 * data pointed to.
-	 * @param contact Pointer to the Box2D contact.
-	 **/
-	Contact(World *world, b2Contact *contact);
+  /**
+   * Creates a new Contact by copying a Box2D contact
+   * point. It does not store the pointer, but copy the
+   * data pointed to.
+   * @param contact Pointer to the Box2D contact.
+   **/
+  Contact(World *world, b2Contact *contact);
 
-	virtual ~Contact();
+  virtual ~Contact();
 
-	/**
-	 * Removes the b2Contact pointer from Memoizer and sets it
-	 * to null on the Contact.
-	 **/
-	void invalidate();
+  /**
+   * Removes the b2Contact pointer from Memoizer and sets it
+   * to null on the Contact.
+   **/
+  void invalidate();
 
-	/**
-	 * Returns if the Contact still points to a valid b2Contact.
-	 * @return True if the contact is still valid or false if it has been destroyed.
-	 **/
-	bool isValid();
+  /**
+   * Returns if the Contact still points to a valid b2Contact.
+   * @return True if the contact is still valid or false if it has been destroyed.
+   **/
+  bool isValid();
 
-	/**
-	 * Gets the position of each point of contact.
-	 * @return The position along the x-axis.
-	 * @return The position along the y-axis.
-	 **/
-	int getPositions(lua_State *L);
+  /**
+   * Gets the position of each point of contact.
+   * @return The position along the x-axis.
+   * @return The position along the y-axis.
+   **/
+  int getPositions(lua_State *L);
 
-	/**
-	 * Gets the collision normal.
-	 * @return The x-component of the normal.
-	 * @return The y-component of the normal.
-	 **/
-	int getNormal(lua_State *L);
+  /**
+   * Gets the collision normal.
+   * @return The x-component of the normal.
+   * @return The y-component of the normal.
+   **/
+  int getNormal(lua_State *L);
 
-	/**
-	 * The mixed friction between the two fixtures at
-	 * the point of impact.
-	 **/
-	float getFriction() const;
+  /**
+   * The mixed friction between the two fixtures at
+   * the point of impact.
+   **/
+  float getFriction() const;
 
-	/**
-	 * The mixed restitution of the two fixtures
-	 * at the point of impact.
-	 **/
-	float getRestitution() const;
+  /**
+   * The mixed restitution of the two fixtures
+   * at the point of impact.
+   **/
+  float getRestitution() const;
 
-	/**
-	 * Check if the contact is enabled.
-	 **/
-	bool isEnabled() const;
+  /**
+   * Check if the contact is enabled.
+   **/
+  bool isEnabled() const;
 
-	/**
-	 * Check if the contact is touching.
-	 **/
-	bool isTouching() const;
+  /**
+   * Check if the contact is touching.
+   **/
+  bool isTouching() const;
 
-	// Only call the setters in PreSolve
+  // Only call the setters in PreSolve
 
-	/**
-	 * Override the default friction mixture.
-	 **/
-	void setFriction(float friction);
+  /**
+   * Override the default friction mixture.
+   **/
+  void setFriction(float friction);
 
-	/**
-	 * Override the default restitution mixture.
-	 **/
-	void setRestitution(float restitution);
+  /**
+   * Override the default restitution mixture.
+   **/
+  void setRestitution(float restitution);
 
-	/**
-	 * Enable/disable this contact.
-	 **/
-	void setEnabled(bool enabled);
+  /**
+   * Enable/disable this contact.
+   **/
+  void setEnabled(bool enabled);
 
-	/**
-	 * Reset the friction mixture to the default
-	 * value.
-	 **/
-	void resetFriction();
+  /**
+   * Reset the friction mixture to the default
+   * value.
+   **/
+  void resetFriction();
 
-	/**
-	 * Reset the restitution mixture to the default
-	 * value.
-	 **/
-	void resetRestitution();
+  /**
+   * Reset the restitution mixture to the default
+   * value.
+   **/
+  void resetRestitution();
 
-	/**
-	 * Set the desired tangent speed.
-	 **/
-	void setTangentSpeed(float speed);
+  /**
+   * Set the desired tangent speed.
+   **/
+  void setTangentSpeed(float speed);
 
-	/**
-	 * Get the desired tangent speed.
-	 **/
-	float getTangentSpeed() const;
+  /**
+   * Get the desired tangent speed.
+   **/
+  float getTangentSpeed() const;
 
-	void getChildren(int &childA, int &childB);
+  void getChildren(int &childA, int &childB);
 
-	/**
-	 * Gets the Fixtures associated with this Contact.
-	 **/
-	void getFixtures(Fixture *&fixtureA, Fixture *&fixtureB);
+  /**
+   * Gets the Fixtures associated with this Contact.
+   **/
+  void getFixtures(Fixture *&fixtureA, Fixture *&fixtureB);
 
-private:
+ private:
+  // The Box2D contact.
+  b2Contact *contact;
 
-	// The Box2D contact.
-	b2Contact *contact;
-
-	World *world;
+  World *world;
 };
 
-} // box2d
-} // physics
-} // love
+}  // namespace box2d
+}  // namespace physics
+}  // namespace love
 
-#endif // LOVE_PHYSICS_BOX2D_CONTACT_H
+#endif  // LOVE_PHYSICS_BOX2D_CONTACT_H

@@ -22,8 +22,8 @@
 
 // Module
 #include "Body.h"
-#include "World.h"
 #include "Physics.h"
+#include "World.h"
 
 namespace love
 {
@@ -35,37 +35,29 @@ namespace box2d
 love::Type CircleShape::type("CircleShape", &Shape::type);
 
 CircleShape::CircleShape(b2CircleShape *c, bool own)
-	: Shape(c, own)
+    : Shape(c, own)
 {
 }
 
-CircleShape::~CircleShape()
-{
-}
+CircleShape::~CircleShape() {}
 
-float CircleShape::getRadius() const
-{
-	return Physics::scaleUp(shape->m_radius);
-}
+float CircleShape::getRadius() const { return Physics::scaleUp(shape->m_radius); }
 
-void CircleShape::setRadius(float r)
-{
-	shape->m_radius = Physics::scaleDown(r);
-}
+void CircleShape::setRadius(float r) { shape->m_radius = Physics::scaleDown(r); }
 
 void CircleShape::getPoint(float &x_o, float &y_o) const
 {
-	b2CircleShape *c = (b2CircleShape *) shape;
-	x_o = Physics::scaleUp(c->m_p.x);
-	y_o = Physics::scaleUp(c->m_p.y);
+  b2CircleShape *c = (b2CircleShape *) shape;
+  x_o = Physics::scaleUp(c->m_p.x);
+  y_o = Physics::scaleUp(c->m_p.y);
 }
 
 void CircleShape::setPoint(float x, float y)
 {
-	b2CircleShape *c = (b2CircleShape *) shape;
-	c->m_p = Physics::scaleDown(b2Vec2(x, y));
+  b2CircleShape *c = (b2CircleShape *) shape;
+  c->m_p = Physics::scaleDown(b2Vec2(x, y));
 }
 
-} // box2d
-} // physics
-} // love
+}  // namespace box2d
+}  // namespace physics
+}  // namespace love

@@ -22,8 +22,8 @@
 #define LOVE_TIMER_WRAP_TIMER_H
 
 // LOVE
-#include "common/runtime.h"
 #include "Timer.h"
+#include "common/runtime.h"
 
 namespace love
 {
@@ -32,7 +32,7 @@ namespace timer
 
 extern "C" LOVE_EXPORT int luaopen_love_timer(lua_State *L);
 
-} // timer
-} // love
+}  // namespace timer
+}  // namespace love
 
-#endif // LOVE_TIMER_WRAP_TIMER_H
+#endif  // LOVE_TIMER_WRAP_TIMER_H

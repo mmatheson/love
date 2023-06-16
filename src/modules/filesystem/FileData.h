@@ -22,11 +22,11 @@
 #define LOVE_FILESYSTEM_FILE_DATA_H
 
 // LOVE
-#include "common/Data.h"
-#include "common/int.h"
-#include "common/Exception.h"
-
 #include <string>
+
+#include "common/Data.h"
+#include "common/Exception.h"
+#include "common/int.h"
 
 namespace love
 {
@@ -35,44 +35,42 @@ namespace filesystem
 
 class FileData : public Data
 {
-public:
+ public:
+  static love::Type type;
 
-	static love::Type type;
+  FileData(uint64 size, const std::string &filename);
+  FileData(const FileData &c);
 
-	FileData(uint64 size, const std::string &filename);
-	FileData(const FileData &c);
+  virtual ~FileData();
 
-	virtual ~FileData();
+  // Implements Data.
+  FileData *clone() const;
+  void *getData() const;
+  size_t getSize() const;
 
-	// Implements Data.
-	FileData *clone() const;
-	void *getData() const;
-	size_t getSize() const;
+  const std::string &getFilename() const;
+  const std::string &getExtension() const;
+  const std::string &getName() const;
 
-	const std::string &getFilename() const;
-	const std::string &getExtension() const;
-	const std::string &getName() const;
+ private:
+  // The actual data.
+  char *data;
 
-private:
+  // Size of the data.
+  uint64 size;
 
-	// The actual data.
-	char *data;
+  // The filename used for error purposes.
+  std::string filename;
 
-	// Size of the data.
-	uint64 size;
+  // The extension (without dot). Used to identify file type.
+  std::string extension;
 
-	// The filename used for error purposes.
-	std::string filename;
+  // The file name without the extension (and without the dot).
+  std::string name;
 
-	// The extension (without dot). Used to identify file type.
-	std::string extension;
+};  // FileData
 
-	// The file name without the extension (and without the dot).
-	std::string name;
+}  // namespace filesystem
+}  // namespace love
 
-}; // FileData
-
-} // filesystem
-} // love
-
-#endif // LOVE_FILESYSTEM_FILE_DATA_H
+#endif  // LOVE_FILESYSTEM_FILE_DATA_H

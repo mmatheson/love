@@ -22,32 +22,32 @@
 #define LOVE_AUDIO_OPENAL_POOL_H
 
 // STD
-#include <queue>
-#include <map>
-#include <vector>
 #include <cmath>
+#include <map>
+#include <queue>
+#include <vector>
 
 // LOVE
-#include "common/config.h"
-#include "common/Exception.h"
-#include "thread/threads.h"
 #include "audio/Source.h"
+#include "common/Exception.h"
+#include "common/config.h"
+#include "thread/threads.h"
 
 // OpenAL
 #ifdef LOVE_APPLE_USE_FRAMEWORKS
 #ifdef LOVE_IOS
-#include <OpenAL/alc.h>
 #include <OpenAL/al.h>
+#include <OpenAL/alc.h>
 #include <OpenAL/oalMacOSX_OALExtensions.h>
 #include <OpenAL/oalStaticBufferExtension.h>
 #else
-#include <OpenAL-Soft/alc.h>
 #include <OpenAL-Soft/al.h>
+#include <OpenAL-Soft/alc.h>
 #include <OpenAL-Soft/alext.h>
 #endif
 #else
-#include <AL/alc.h>
 #include <AL/al.h>
+#include <AL/alc.h>
 #include <AL/alext.h>
 #endif
 
@@ -62,65 +62,63 @@ class Source;
 
 class Pool
 {
-public:
+ public:
+  Pool();
+  ~Pool();
 
-	Pool();
-	~Pool();
+  /**
+   * Checks whether an OpenAL source is available.
+   * @return True if at least one is available, false otherwise.
+   **/
+  bool isAvailable() const;
 
-	/**
-	 * Checks whether an OpenAL source is available.
-	 * @return True if at least one is available, false otherwise.
-	 **/
-	bool isAvailable() const;
+  /**
+   * Checks whether a Source is currently in the playing list.
+   **/
+  bool isPlaying(Source *s);
 
-	/**
-	 * Checks whether a Source is currently in the playing list.
-	 **/
-	bool isPlaying(Source *s);
+  void update();
 
-	void update();
+  int getActiveSourceCount() const;
+  int getMaxSources() const;
 
-	int getActiveSourceCount() const;
-	int getMaxSources() const;
+ private:
+  friend class Source;
+  LOVE_WARN_UNUSED thread::Lock lock();
+  std::vector<love::audio::Source *> getPlayingSources();
 
-private:
+  /**
+   * Makes the specified OpenAL source available for use.
+   * @param source The OpenAL source.
+   **/
+  bool releaseSource(Source *source, bool stop = true);
 
-	friend class Source;
-	LOVE_WARN_UNUSED thread::Lock lock();
-	std::vector<love::audio::Source*> getPlayingSources();
+  bool assignSource(Source *source, ALuint &out, char &wasPlaying);
+  bool findSource(Source *source, ALuint &out);
 
-	/**
-	 * Makes the specified OpenAL source available for use.
-	 * @param source The OpenAL source.
-	 **/
-	bool releaseSource(Source *source, bool stop = true);
+  // Maximum possible number of OpenAL sources the pool attempts to generate.
+  static const int MAX_SOURCES = 64;
 
-	bool assignSource(Source *source, ALuint &out, char &wasPlaying);
-	bool findSource(Source *source, ALuint &out);
+  // OpenAL sources
+  ALuint sources[MAX_SOURCES];
 
-	// Maximum possible number of OpenAL sources the pool attempts to generate.
-	static const int MAX_SOURCES = 64;
+  // Total number of created sources in the pool.
+  int totalSources;
 
-	// OpenAL sources
-	ALuint sources[MAX_SOURCES];
+  // A queue of available sources.
+  std::queue<ALuint> available;
 
-	// Total number of created sources in the pool.
-	int totalSources;
+  // A map of playing sources.
+  std::map<Source *, ALuint> playing;
 
-	// A queue of available sources.
-	std::queue<ALuint> available;
+  // Only one thread can access this object at the same time. This mutex will
+  // make sure of that.
+  love::thread::MutexRef mutex;
 
-	// A map of playing sources.
-	std::map<Source *, ALuint> playing;
+};  // Pool
 
-	// Only one thread can access this object at the same time. This mutex will
-	// make sure of that.
-	love::thread::MutexRef mutex;
+}  // namespace openal
+}  // namespace audio
+}  // namespace love
 
-}; // Pool
-
-} // openal
-} // audio
-} // love
-
-#endif // LOVE_AUDIO_OPENAL_POOL_H
+#endif  // LOVE_AUDIO_OPENAL_POOL_H

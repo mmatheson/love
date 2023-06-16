@@ -22,8 +22,9 @@
 
 #ifdef LOVE_WINDOWS
 
-#include <string>
 #include <windows.h>
+
+#include <string>
 
 namespace love
 {
@@ -39,7 +40,7 @@ std::string to_utf8(LPCWSTR wstr);
  * Convert a UTF-8 encoded string to a wide string.
  * @param str The UTF-8 string.
  * @return A wide string.
-**/
+ **/
 std::wstring to_widestr(const std::string &str);
 
 /**
@@ -50,6 +51,6 @@ std::wstring to_widestr(const std::string &str);
  **/
 void replace_char(std::string &str, char find, char replace);
 
-} // love
+}  // namespace love
 
-#endif // LOVE_WINDOWS
+#endif  // LOVE_WINDOWS

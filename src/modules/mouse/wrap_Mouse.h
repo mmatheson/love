@@ -22,8 +22,8 @@
 #define LOVE_MOUSE_WRAP_MOUSE_H
 
 // LOVE
-#include "common/runtime.h"
 #include "common/config.h"
+#include "common/runtime.h"
 
 namespace love
 {
@@ -32,8 +32,7 @@ namespace mouse
 
 extern "C" LOVE_EXPORT int luaopen_love_mouse(lua_State *L);
 
-} // mouse
-} // love
+}  // namespace mouse
+}  // namespace love
 
-#endif // LOVE_MOUSE_WRAP_MOUSE_H
-
+#endif  // LOVE_MOUSE_WRAP_MOUSE_H

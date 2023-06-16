@@ -21,8 +21,8 @@
 #pragma once
 
 // LOVE
-#include "common/runtime.h"
 #include "ByteData.h"
+#include "common/runtime.h"
 
 namespace love
 {
@@ -32,5 +32,5 @@ namespace data
 ByteData *luax_checkbytedata(lua_State *L, int idx);
 int luaopen_bytedata(lua_State *L);
 
-} // data
-} // love
+}  // namespace data
+}  // namespace love

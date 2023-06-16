@@ -42,50 +42,41 @@
 //
 // Actual link object, derived from the shader handle base classes.
 //
-class TGenericLinker : public TLinker {
-public:
-    TGenericLinker(EShExecutable e, int dOptions) : TLinker(e, infoSink), debugOptions(dOptions) { }
-    bool link(TCompilerList&, TUniformMap*) { return true; }
-    void getAttributeBindings(ShBindingTable const **) const { }
-    TInfoSink infoSink;
-    int debugOptions;
+class TGenericLinker : public TLinker
+{
+ public:
+  TGenericLinker(EShExecutable e, int dOptions)
+      : TLinker(e, infoSink),
+        debugOptions(dOptions)
+  {
+  }
+  bool link(TCompilerList &, TUniformMap *) { return true; }
+  void getAttributeBindings(ShBindingTable const **) const {}
+  TInfoSink infoSink;
+  int debugOptions;
 };
 
 //
 // The internal view of a uniform/float object exchanged with the driver.
 //
-class TUniformLinkedMap : public TUniformMap {
-public:
-    TUniformLinkedMap() { }
-    virtual int getLocation(const char*) { return 0; }
+class TUniformLinkedMap : public TUniformMap
+{
+ public:
+  TUniformLinkedMap() {}
+  virtual int getLocation(const char *) { return 0; }
 };
 
-TShHandleBase* ConstructLinker(EShExecutable executable, int debugOptions)
+TShHandleBase *ConstructLinker(EShExecutable executable, int debugOptions)
 {
-    return new TGenericLinker(executable, debugOptions);
+  return new TGenericLinker(executable, debugOptions);
 }
 
-void DeleteLinker(TShHandleBase* linker)
-{
-    delete linker;
-}
+void DeleteLinker(TShHandleBase *linker) { delete linker; }
 
-TUniformMap* ConstructUniformMap()
-{
-    return new TUniformLinkedMap();
-}
+TUniformMap *ConstructUniformMap() { return new TUniformLinkedMap(); }
 
-void DeleteUniformMap(TUniformMap* map)
-{
-    delete map;
-}
+void DeleteUniformMap(TUniformMap *map) { delete map; }
 
-TShHandleBase* ConstructBindings()
-{
-    return 0;
-}
+TShHandleBase *ConstructBindings() { return 0; }
 
-void DeleteBindingList(TShHandleBase* bindingList)
-{
-    delete bindingList;
-}
+void DeleteBindingList(TShHandleBase *bindingList) { delete bindingList; }

@@ -30,148 +30,112 @@ namespace thread
 {
 
 Lock::Lock(Mutex *m)
-	: mutex(m)
+    : mutex(m)
 {
-	mutex->lock();
+  mutex->lock();
 }
 
 Lock::Lock(Mutex &m)
-	: mutex(&m)
+    : mutex(&m)
 {
-	mutex->lock();
+  mutex->lock();
 }
 
 Lock::Lock(Lock &&other)
 {
-	mutex = other.mutex;
-	other.mutex = nullptr;
+  mutex = other.mutex;
+  other.mutex = nullptr;
 }
 
 Lock::~Lock()
 {
-	if (mutex)
-		mutex->unlock();
+  if (mutex)
+    mutex->unlock();
 }
 
 EmptyLock::EmptyLock()
-	: mutex(nullptr)
+    : mutex(nullptr)
 {
 }
 
 EmptyLock::~EmptyLock()
 {
-	if (mutex)
-		mutex->unlock();
+  if (mutex)
+    mutex->unlock();
 }
 
 void EmptyLock::setLock(Mutex *m)
 {
-	if (m)
-		m->lock();
+  if (m)
+    m->lock();
 
-	if (mutex)
-		mutex->unlock();
+  if (mutex)
+    mutex->unlock();
 
-	mutex = m;
+  mutex = m;
 }
 
 void EmptyLock::setLock(Mutex &m)
 {
-	m.lock();
+  m.lock();
 
-	if (mutex)
-		mutex->unlock();
+  if (mutex)
+    mutex->unlock();
 
-	mutex = &m;
+  mutex = &m;
 }
 
 love::Type Threadable::type("Threadable", &Object::type);
 
-Threadable::Threadable()
-{
-	owner = newThread(this);
-}
+Threadable::Threadable() { owner = newThread(this); }
 
-Threadable::~Threadable()
-{
-	delete owner;
-}
+Threadable::~Threadable() { delete owner; }
 
-bool Threadable::start()
-{
-	return owner->start();
-}
+bool Threadable::start() { return owner->start(); }
 
-void Threadable::wait()
-{
-	owner->wait();
-}
+void Threadable::wait() { owner->wait(); }
 
-bool Threadable::isRunning() const
-{
-	return owner->isRunning();
-}
+bool Threadable::isRunning() const { return owner->isRunning(); }
 
 const char *Threadable::getThreadName() const
 {
-	return threadName.empty() ? nullptr : threadName.c_str();
+  return threadName.empty() ? nullptr : threadName.c_str();
 }
 
 MutexRef::MutexRef()
-	: mutex(newMutex())
+    : mutex(newMutex())
 {
 }
 
-MutexRef::~MutexRef()
-{
-	delete mutex;
-}
+MutexRef::~MutexRef() { delete mutex; }
 
-MutexRef::operator Mutex*() const
-{
-	return mutex;
-}
+MutexRef::operator Mutex *() const { return mutex; }
 
-Mutex *MutexRef::operator->() const
-{
-	return mutex;
-}
+Mutex *MutexRef::operator->() const { return mutex; }
 
 ConditionalRef::ConditionalRef()
-	: conditional(newConditional())
+    : conditional(newConditional())
 {
 }
 
-ConditionalRef::~ConditionalRef()
-{
-	delete conditional;
-}
+ConditionalRef::~ConditionalRef() { delete conditional; }
 
-ConditionalRef::operator Conditional*() const
-{
-	return conditional;
-}
+ConditionalRef::operator Conditional *() const { return conditional; }
 
-Conditional *ConditionalRef::operator->() const
-{
-	return conditional;
-}
+Conditional *ConditionalRef::operator->() const { return conditional; }
 
 #if defined(LOVE_LINUX)
 static sigset_t oldset;
 
 void disableSignals()
 {
-	sigset_t newset;
-	sigfillset(&newset);
-	pthread_sigmask(SIG_SETMASK, &newset, &oldset);
+  sigset_t newset;
+  sigfillset(&newset);
+  pthread_sigmask(SIG_SETMASK, &newset, &oldset);
 }
 
-void reenableSignals()
-{
-	pthread_sigmask(SIG_SETMASK, &oldset, nullptr);
-}
+void reenableSignals() { pthread_sigmask(SIG_SETMASK, &oldset, nullptr); }
 #endif
 
-} // thread
-} // love
+}  // namespace thread
+}  // namespace love

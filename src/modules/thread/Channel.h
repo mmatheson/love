@@ -36,42 +36,40 @@ namespace thread
 
 class Channel : public love::Object
 {
-// FOR WRAPPER USE ONLY
-friend int w_Channel_performAtomic(lua_State *);
+  // FOR WRAPPER USE ONLY
+  friend int w_Channel_performAtomic(lua_State *);
 
-public:
+ public:
+  static love::Type type;
 
-	static love::Type type;
+  Channel();
+  ~Channel();
 
-	Channel();
-	~Channel();
+  uint64 push(const Variant &var);
+  bool supply(const Variant &var);  // blocking push
+  bool supply(const Variant &var, double timeout);
+  bool pop(Variant *var);
+  bool demand(Variant *var);                  // blocking pop
+  bool demand(Variant *var, double timeout);  // blocking pop
+  bool peek(Variant *var);
+  int getCount() const;
+  bool hasRead(uint64 id) const;
+  void clear();
 
-	uint64 push(const Variant &var);
-	bool supply(const Variant &var); // blocking push
-	bool supply(const Variant &var, double timeout);
-	bool pop(Variant *var);
-	bool demand(Variant *var); // blocking pop
-	bool demand(Variant *var, double timeout); // blocking pop
-	bool peek(Variant *var);
-	int getCount() const;
-	bool hasRead(uint64 id) const;
-	void clear();
+ private:
+  void lockMutex();
+  void unlockMutex();
 
-private:
+  MutexRef mutex;
+  ConditionalRef cond;
+  std::queue<Variant> queue;
 
-	void lockMutex();
-	void unlockMutex();
+  uint64 sent;
+  uint64 received;
 
-	MutexRef mutex;
-	ConditionalRef cond;
-	std::queue<Variant> queue;
+};  // Channel
 
-	uint64 sent;
-	uint64 received;
+}  // namespace thread
+}  // namespace love
 
-}; // Channel
-
-} // thread
-} // love
-
-#endif // LOVE_THREAD_CHANNEL_H
+#endif  // LOVE_THREAD_CHANNEL_H

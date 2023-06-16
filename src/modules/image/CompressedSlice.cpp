@@ -19,6 +19,7 @@
  **/
 
 #include "CompressedSlice.h"
+
 #include "common/Exception.h"
 
 namespace love
@@ -27,48 +28,41 @@ namespace image
 {
 
 CompressedMemory::CompressedMemory(size_t size)
-	: data(nullptr)
-	, size(size)
+    : data(nullptr),
+      size(size)
 {
-	try
-	{
-		data = new uint8[size];
-	}
-	catch (std::exception &)
-	{
-		throw love::Exception("Out of memory.");
-	}
+  try
+  {
+    data = new uint8[size];
+  }
+  catch (std::exception &)
+  {
+    throw love::Exception("Out of memory.");
+  }
 }
 
-CompressedMemory::~CompressedMemory()
-{
-	delete[] data;
-}
+CompressedMemory::~CompressedMemory() { delete[] data; }
 
-CompressedSlice::CompressedSlice(PixelFormat format, int width, int height, CompressedMemory *memory, size_t offset, size_t size)
-	: ImageDataBase(format, width, height)
-	, memory(memory)
-	, offset(offset)
-	, dataSize(size)
+CompressedSlice::CompressedSlice(PixelFormat format, int width, int height,
+                                 CompressedMemory *memory, size_t offset, size_t size)
+    : ImageDataBase(format, width, height),
+      memory(memory),
+      offset(offset),
+      dataSize(size)
 {
 }
 
 CompressedSlice::CompressedSlice(const CompressedSlice &s)
-	: ImageDataBase(s.getFormat(), s.getWidth(), s.getHeight())
-	, memory(s.memory)
-	, offset(s.offset)
-	, dataSize(s.dataSize)
+    : ImageDataBase(s.getFormat(), s.getWidth(), s.getHeight()),
+      memory(s.memory),
+      offset(s.offset),
+      dataSize(s.dataSize)
 {
 }
 
-CompressedSlice::~CompressedSlice()
-{
-}
+CompressedSlice::~CompressedSlice() {}
 
-CompressedSlice *CompressedSlice::clone() const
-{
-	return new CompressedSlice(*this);
-}
+CompressedSlice *CompressedSlice::clone() const { return new CompressedSlice(*this); }
 
-} // image
-} // love
+}  // namespace image
+}  // namespace love

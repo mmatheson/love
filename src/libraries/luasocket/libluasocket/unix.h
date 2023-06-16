@@ -4,24 +4,24 @@
 * Unix domain object
 * LuaSocket toolkit
 *
-* This module is just an example of how to extend LuaSocket with a new 
+* This module is just an example of how to extend LuaSocket with a new
 * domain.
 \*=========================================================================*/
-#include "lua.h"
-
 #include "buffer.h"
-#include "timeout.h"
+#include "lua.h"
 #include "socket.h"
+#include "timeout.h"
 
 #ifndef UNIX_API
 #define UNIX_API extern
 #endif
 
-typedef struct t_unix_ {
-    t_socket sock;
-    t_io io;
-    t_buffer buf;
-    t_timeout tm;
+typedef struct t_unix_
+{
+  t_socket sock;
+  t_io io;
+  t_buffer buf;
+  t_timeout tm;
 } t_unix;
 typedef t_unix *p_unix;
 

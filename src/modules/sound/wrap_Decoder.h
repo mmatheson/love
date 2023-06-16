@@ -22,8 +22,8 @@
 #define LOVE_SOUND_WRAP_DECODER_H
 
 // LOVE
-#include "common/runtime.h"
 #include "Decoder.h"
+#include "common/runtime.h"
 
 namespace love
 {
@@ -33,7 +33,7 @@ namespace sound
 Decoder *luax_checkdecoder(lua_State *L, int idx);
 extern "C" int luaopen_decoder(lua_State *L);
 
-} // sound
-} // love
+}  // namespace sound
+}  // namespace love
 
-#endif // LOVE_SOUND_WRAP_DECODER_H
+#endif  // LOVE_SOUND_WRAP_DECODER_H

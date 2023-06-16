@@ -35,4 +35,4 @@ size_t getPageSize();
  **/
 size_t alignUp(size_t size, size_t alignment);
 
-} // love
+}  // namespace love

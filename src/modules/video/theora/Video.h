@@ -25,11 +25,11 @@
 #include <vector>
 
 // LOVE
-#include "filesystem/File.h"
-#include "video/Video.h"
-#include "thread/threads.h"
-#include "video/VideoStream.h"
 #include "TheoraVideoStream.h"
+#include "filesystem/File.h"
+#include "thread/threads.h"
+#include "video/Video.h"
+#include "video/VideoStream.h"
 
 namespace love
 {
@@ -42,44 +42,43 @@ class Worker;
 
 class Video : public love::video::Video
 {
-public:
-	Video();
-	virtual ~Video();
+ public:
+  Video();
+  virtual ~Video();
 
-	// Implements Module
-	virtual const char *getName() const;
+  // Implements Module
+  virtual const char *getName() const;
 
-	VideoStream *newVideoStream(love::filesystem::File* file);
+  VideoStream *newVideoStream(love::filesystem::File *file);
 
-private:
-	Worker *workerThread;
-}; // Video
+ private:
+  Worker *workerThread;
+};  // Video
 
 class Worker : public love::thread::Threadable
 {
-public:
-	Worker();
-	virtual ~Worker();
+ public:
+  Worker();
+  virtual ~Worker();
 
-	// Implements Threadable
-	void threadFunction();
+  // Implements Threadable
+  void threadFunction();
 
-	void addStream(TheoraVideoStream *stream);
-	// Frees itself!
-	void stop();
+  void addStream(TheoraVideoStream *stream);
+  // Frees itself!
+  void stop();
 
-private:
+ private:
+  std::vector<StrongRef<TheoraVideoStream>> streams;
 
-	std::vector<StrongRef<TheoraVideoStream>> streams;
+  love::thread::MutexRef mutex;
+  love::thread::ConditionalRef cond;
 
-	love::thread::MutexRef mutex;
-	love::thread::ConditionalRef cond;
+  bool stopping;
+};  // Worker
 
-	bool stopping;
-}; // Worker
+}  // namespace theora
+}  // namespace video
+}  // namespace love
 
-} // theora
-} // video
-} // love
-
-#endif // LOVE_VIDEO_THEORA_VIDEO_H
+#endif  // LOVE_VIDEO_THEORA_VIDEO_H

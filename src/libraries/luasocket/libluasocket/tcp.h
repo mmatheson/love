@@ -14,18 +14,18 @@
 * tcp objects either connected to some address or returned by the accept
 * method of a server object.
 \*=========================================================================*/
-#include "lua.h"
-
 #include "buffer.h"
-#include "timeout.h"
+#include "lua.h"
 #include "socket.h"
+#include "timeout.h"
 
-typedef struct t_tcp_ {
-    t_socket sock;
-    t_io io;
-    t_buffer buf;
-    t_timeout tm;
-    int family;
+typedef struct t_tcp_
+{
+  t_socket sock;
+  t_io io;
+  t_buffer buf;
+  t_timeout tm;
+  int family;
 } t_tcp;
 
 typedef t_tcp *p_tcp;

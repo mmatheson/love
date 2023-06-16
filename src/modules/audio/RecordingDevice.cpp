@@ -27,13 +27,9 @@ namespace audio
 
 love::Type RecordingDevice::type("RecordingDevice", &Object::type);
 
-RecordingDevice::RecordingDevice()
-{
-}
+RecordingDevice::RecordingDevice() {}
 
-RecordingDevice::~RecordingDevice()
-{
-}
+RecordingDevice::~RecordingDevice() {}
 
-} //audio
-} //love
+}  // namespace audio
+}  // namespace love

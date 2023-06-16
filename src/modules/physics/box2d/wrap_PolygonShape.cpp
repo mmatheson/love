@@ -29,35 +29,32 @@ namespace box2d
 
 PolygonShape *luax_checkpolygonshape(lua_State *L, int idx)
 {
-	return luax_checktype<PolygonShape>(L, idx);
+  return luax_checktype<PolygonShape>(L, idx);
 }
 
 int w_PolygonShape_getPoints(lua_State *L)
 {
-	PolygonShape *t = luax_checkpolygonshape(L, 1);
-	lua_remove(L, 1);
-	return t->getPoints(L);
+  PolygonShape *t = luax_checkpolygonshape(L, 1);
+  lua_remove(L, 1);
+  return t->getPoints(L);
 }
 
 int w_PolygonShape_validate(lua_State *L)
 {
-	PolygonShape *t = luax_checkpolygonshape(L, 1);
-	luax_pushboolean(L, t->validate());
-	return 1;
+  PolygonShape *t = luax_checkpolygonshape(L, 1);
+  luax_pushboolean(L, t->validate());
+  return 1;
 }
 
-static const luaL_Reg w_PolygonShape_functions[] =
-{
-	{ "getPoints", w_PolygonShape_getPoints },
-	{ "validate", w_PolygonShape_validate },
-	{ 0, 0 }
-};
+static const luaL_Reg w_PolygonShape_functions[] = {
+    {"getPoints", w_PolygonShape_getPoints}, {"validate", w_PolygonShape_validate}, {0, 0}};
 
 extern "C" int luaopen_polygonshape(lua_State *L)
 {
-	return luax_register_type(L, &PolygonShape::type, w_Shape_functions, w_PolygonShape_functions, nullptr);
+  return luax_register_type(L, &PolygonShape::type, w_Shape_functions, w_PolygonShape_functions,
+                            nullptr);
 }
 
-} // box2d
-} // physics
-} // love
+}  // namespace box2d
+}  // namespace physics
+}  // namespace love

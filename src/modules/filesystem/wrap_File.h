@@ -22,8 +22,8 @@
 #define LOVE_FILESYSTEM_WRAP_FILE_H
 
 // LOVE
-#include "common/runtime.h"
 #include "File.h"
+#include "common/runtime.h"
 
 namespace love
 {
@@ -39,7 +39,7 @@ extern "C" int luaopen_file(lua_State *L);
 
 extern const luaL_Reg w_File_functions[];
 
-} // filesystem
-} // love
+}  // namespace filesystem
+}  // namespace love
 
-#endif // LOVE_FILESYSTEM_WRAP_FILE_H
+#endif  // LOVE_FILESYSTEM_WRAP_FILE_H

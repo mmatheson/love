@@ -22,13 +22,13 @@
 #define LOVE_TOUCH_TOUCH_H
 
 // LOVE
-#include "common/int.h"
-#include "common/Object.h"
 #include "common/Module.h"
+#include "common/Object.h"
+#include "common/int.h"
 
 // C++
-#include <vector>
 #include <limits>
+#include <vector>
 
 namespace love
 {
@@ -37,36 +37,35 @@ namespace touch
 
 class Touch : public Module
 {
-public:
+ public:
+  struct TouchInfo
+  {
+    int64 id;   // Identifier. Only unique for the duration of the touch-press.
+    double x;   // Position in pixels along the x-axis.
+    double y;   // Position in pixels along the y-axis.
+    double dx;  // Amount in pixels moved along the x-axis.
+    double dy;  // Amount in pixels moved along the y-axis.
+    double pressure;
+  };
 
-	struct TouchInfo
-	{
-		int64 id;  // Identifier. Only unique for the duration of the touch-press.
-		double x;  // Position in pixels along the x-axis.
-		double y;  // Position in pixels along the y-axis.
-		double dx; // Amount in pixels moved along the x-axis.
-		double dy; // Amount in pixels moved along the y-axis.
-		double pressure;
-	};
+  virtual ~Touch() {}
 
-	virtual ~Touch() {}
+  // Implements Module.
+  virtual ModuleType getModuleType() const { return M_TOUCH; }
 
-	// Implements Module.
-	virtual ModuleType getModuleType() const { return M_TOUCH; }
+  /**
+   * Gets all currently active touches.
+   **/
+  virtual const std::vector<TouchInfo> &getTouches() const = 0;
 
-	/**
-	 * Gets all currently active touches.
-	 **/
-	virtual const std::vector<TouchInfo> &getTouches() const = 0;
+  /**
+   * Gets a specific touch, using its ID.
+   **/
+  virtual const TouchInfo &getTouch(int64 id) const = 0;
 
-	/**
-	 * Gets a specific touch, using its ID.
-	 **/
-	virtual const TouchInfo &getTouch(int64 id) const = 0;
+};  // Touch
 
-}; // Touch
+}  // namespace touch
+}  // namespace love
 
-} // touch
-} // love
-
-#endif // LOVE_TOUCH_TOUCH_H
+#endif  // LOVE_TOUCH_TOUCH_H

@@ -31,16 +31,15 @@ namespace thread
 
 class Thread
 {
-public:
+ public:
+  virtual ~Thread() {}
+  virtual bool start() = 0;
+  virtual void wait() = 0;
+  virtual bool isRunning() = 0;
 
-	virtual ~Thread() {}
-	virtual bool start() = 0;
-	virtual void wait() = 0;
-	virtual bool isRunning() = 0;
+};  // Thread
 
-}; // Thread
+}  // namespace thread
+}  // namespace love
 
-} // thread
-} // love
-
-#endif // LOVE_THREAD_THREAD_H
+#endif  // LOVE_THREAD_THREAD_H

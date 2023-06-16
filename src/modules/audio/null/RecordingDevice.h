@@ -33,26 +33,26 @@ namespace null
 
 class RecordingDevice : public love::audio::RecordingDevice
 {
-public:
-	RecordingDevice(const char *name);
-	virtual ~RecordingDevice();
-	virtual bool start(int samples, int sampleRate, int bitDepth, int channels);
-	virtual void stop();
-	virtual love::sound::SoundData *getData();
-	virtual const char *getName() const;
-	virtual int getMaxSamples() const;
-	virtual int getSampleCount() const;
-	virtual int getSampleRate() const;
-	virtual int getBitDepth() const;
-	virtual int getChannelCount() const;
-	virtual bool isRecording() const;
+ public:
+  RecordingDevice(const char *name);
+  virtual ~RecordingDevice();
+  virtual bool start(int samples, int sampleRate, int bitDepth, int channels);
+  virtual void stop();
+  virtual love::sound::SoundData *getData();
+  virtual const char *getName() const;
+  virtual int getMaxSamples() const;
+  virtual int getSampleCount() const;
+  virtual int getSampleRate() const;
+  virtual int getBitDepth() const;
+  virtual int getChannelCount() const;
+  virtual bool isRecording() const;
 
-private:
-	static const char *name;
-}; //RecordingDevice
+ private:
+  static const char *name;
+};  // RecordingDevice
 
-} //null
-} //audio
-} //love
+}  // namespace null
+}  // namespace audio
+}  // namespace love
 
-#endif //LOVE_AUDIO_NULL_RECORDING_DEVICE_H
+#endif  // LOVE_AUDIO_NULL_RECORDING_DEVICE_H

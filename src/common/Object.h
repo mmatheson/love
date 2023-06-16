@@ -22,6 +22,7 @@
 #define LOVE_OBJECT_H
 
 #include <atomic>
+
 #include "types.h"
 
 namespace love
@@ -37,126 +38,114 @@ namespace love
  **/
 class Object
 {
-public:
+ public:
+  static love::Type type;
 
-	static love::Type type;
+  /**
+   * Constructor. Sets reference count to one.
+   **/
+  Object();
+  Object(const Object &other);
 
-	/**
-	 * Constructor. Sets reference count to one.
-	 **/
-	Object();
-	Object(const Object &other);
+  /**
+   * Destructor.
+   **/
+  virtual ~Object() = 0;
 
-	/**
-	 * Destructor.
-	 **/
-	virtual ~Object() = 0;
+  /**
+   * Gets the reference count of this Object.
+   * @returns The reference count.
+   **/
+  int getReferenceCount() const;
 
-	/**
-	 * Gets the reference count of this Object.
-	 * @returns The reference count.
-	 **/
-	int getReferenceCount() const;
+  /**
+   * Retains the Object, i.e. increases the
+   * reference count by one.
+   **/
+  void retain();
 
-	/**
-	 * Retains the Object, i.e. increases the
-	 * reference count by one.
-	 **/
-	void retain();
+  /**
+   * Releases one reference to the Object, i.e. decrements the
+   * reference count by one, and potentially deletes the Object
+   * if there are no more references.
+   **/
+  void release();
 
-	/**
-	 * Releases one reference to the Object, i.e. decrements the
-	 * reference count by one, and potentially deletes the Object
-	 * if there are no more references.
-	 **/
-	void release();
+ private:
+  // The reference count.
+  std::atomic<int> count;
 
-private:
-
-	// The reference count.
-	std::atomic<int> count;
-
-}; // Object
-
+};  // Object
 
 enum class Acquire
 {
-	RETAIN,
-	NORETAIN,
+  RETAIN,
+  NORETAIN,
 };
 
 template <typename T>
 class StrongRef
 {
-public:
+ public:
+  StrongRef()
+      : object(nullptr)
+  {
+  }
 
-	StrongRef()
-		: object(nullptr)
-	{
-	}
+  StrongRef(T *obj, Acquire acquire = Acquire::RETAIN)
+      : object(obj)
+  {
+    if (object && acquire == Acquire::RETAIN)
+      object->retain();
+  }
 
-	StrongRef(T *obj, Acquire acquire = Acquire::RETAIN)
-		: object(obj)
-	{
-		if (object && acquire == Acquire::RETAIN) object->retain();
-	}
+  StrongRef(const StrongRef &other)
+      : object(other.get())
+  {
+    if (object)
+      object->retain();
+  }
 
-	StrongRef(const StrongRef &other)
-		: object(other.get())
-	{
-		if (object) object->retain();
-	}
+  StrongRef(StrongRef &&other)
+      : object(other.object)
+  {
+    other.object = nullptr;
+  }
 
-	StrongRef(StrongRef &&other)
-		: object(other.object)
-	{
-		other.object = nullptr;
-	}
+  ~StrongRef()
+  {
+    if (object)
+      object->release();
+  }
 
-	~StrongRef()
-	{
-		if (object) object->release();
-	}
+  StrongRef &operator=(const StrongRef &other)
+  {
+    set(other.get());
+    return *this;
+  }
 
-	StrongRef &operator = (const StrongRef &other)
-	{
-		set(other.get());
-		return *this;
-	}
+  T *operator->() const { return object; }
 
-	T *operator->() const
-	{
-		return object;
-	}
+  explicit operator bool() const { return object != nullptr; }
 
-	explicit operator bool() const
-	{
-		return object != nullptr;
-	}
+  operator T *() const { return object; }
 
-	operator T*() const
-	{
-		return object;
-	}
+  void set(T *obj, Acquire acquire = Acquire::RETAIN)
+  {
+    if (obj && acquire == Acquire::RETAIN)
+      obj->retain();
+    if (object)
+      object->release();
+    object = obj;
+  }
 
-	void set(T *obj, Acquire acquire = Acquire::RETAIN)
-	{
-		if (obj && acquire == Acquire::RETAIN) obj->retain();
-		if (object) object->release();
-		object = obj;
-	}
+  T *get() const { return object; }
 
-	T *get() const
-	{
-		return object;
-	}
+ private:
+  T *object;
 
-private:
+};  // StrongRef
 
-	T *object;
+}  // namespace love
 
-}; // StrongRef
-
-} // love
-
-#endif // LOVE_OBJECT_H
+#endif  // LOVE_OBJECT_H

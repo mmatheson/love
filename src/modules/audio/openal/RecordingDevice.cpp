@@ -19,6 +19,7 @@
  **/
 
 #include "RecordingDevice.h"
+
 #include "Audio.h"
 #include "sound/Sound.h"
 
@@ -33,120 +34,99 @@ namespace openal
 
 class InvalidFormatException : public love::Exception
 {
-public:
-
-	InvalidFormatException(int channels, int bitdepth)
-		: Exception("Recording %d channels with %d bits per sample is not supported.", channels, bitdepth)
-	{
-	}
-
+ public:
+  InvalidFormatException(int channels, int bitdepth)
+      : Exception("Recording %d channels with %d bits per sample is not supported.", channels,
+                  bitdepth)
+  {
+  }
 };
 
-RecordingDevice::RecordingDevice(const char *name) 
-	: name(name)
+RecordingDevice::RecordingDevice(const char *name)
+    : name(name)
 {
 }
 
-RecordingDevice::~RecordingDevice()
-{
-	stop();
-}
+RecordingDevice::~RecordingDevice() { stop(); }
 
 bool RecordingDevice::start(int samples, int sampleRate, int bitDepth, int channels)
 {
-	ALenum format = Audio::getFormat(bitDepth, channels);
-	if (format == AL_NONE)
-		throw InvalidFormatException(channels, bitDepth);
+  ALenum format = Audio::getFormat(bitDepth, channels);
+  if (format == AL_NONE)
+    throw InvalidFormatException(channels, bitDepth);
 
-	if (samples <= 0)
-		throw love::Exception("Invalid number of samples.");
+  if (samples <= 0)
+    throw love::Exception("Invalid number of samples.");
 
-	if (sampleRate <= 0)
-		throw love::Exception("Invalid sample rate.");
+  if (sampleRate <= 0)
+    throw love::Exception("Invalid sample rate.");
 
-	if (isRecording())
-		stop();
+  if (isRecording())
+    stop();
 
-	device = alcCaptureOpenDevice(name.c_str(), sampleRate, format, samples);
-	if (device == nullptr)
-		return false;
+  device = alcCaptureOpenDevice(name.c_str(), sampleRate, format, samples);
+  if (device == nullptr)
+    return false;
 
-	alcCaptureStart(device);
+  alcCaptureStart(device);
 
-	this->samples = samples;
-	this->sampleRate = sampleRate;
-	this->bitDepth = bitDepth;
-	this->channels = channels;
+  this->samples = samples;
+  this->sampleRate = sampleRate;
+  this->bitDepth = bitDepth;
+  this->channels = channels;
 
-	return true;
+  return true;
 }
 
 void RecordingDevice::stop()
 {
-	if (!isRecording())
-		return;
+  if (!isRecording())
+    return;
 
-	alcCaptureStop(device);
-	alcCaptureCloseDevice(device);
-	device = nullptr;
+  alcCaptureStop(device);
+  alcCaptureCloseDevice(device);
+  device = nullptr;
 }
 
 love::sound::SoundData *RecordingDevice::getData()
 {
-	if (!isRecording())
-		return nullptr;
+  if (!isRecording())
+    return nullptr;
 
-	int samples = getSampleCount();
-	if (samples == 0)
-		return nullptr;
+  int samples = getSampleCount();
+  if (samples == 0)
+    return nullptr;
 
-	love::sound::SoundData *soundData = soundInstance()->newSoundData(samples, sampleRate, bitDepth, channels);
+  love::sound::SoundData *soundData =
+      soundInstance()->newSoundData(samples, sampleRate, bitDepth, channels);
 
-	alcCaptureSamples(device, soundData->getData(), samples);
+  alcCaptureSamples(device, soundData->getData(), samples);
 
-	return soundData;
+  return soundData;
 }
 
 int RecordingDevice::getSampleCount() const
 {
-	if (!isRecording())
-		return 0;
+  if (!isRecording())
+    return 0;
 
-	ALCint samples;
-	alcGetIntegerv(device, ALC_CAPTURE_SAMPLES, sizeof(ALCint), &samples);
-	return (int)samples;
+  ALCint samples;
+  alcGetIntegerv(device, ALC_CAPTURE_SAMPLES, sizeof(ALCint), &samples);
+  return (int) samples;
 }
 
-int RecordingDevice::getMaxSamples() const
-{
-	return samples;
-}
+int RecordingDevice::getMaxSamples() const { return samples; }
 
-int RecordingDevice::getSampleRate() const
-{
-	return sampleRate;
-}
+int RecordingDevice::getSampleRate() const { return sampleRate; }
 
-int RecordingDevice::getBitDepth() const
-{
-	return bitDepth;
-}
+int RecordingDevice::getBitDepth() const { return bitDepth; }
 
-int RecordingDevice::getChannelCount() const
-{
-	return channels;
-}
+int RecordingDevice::getChannelCount() const { return channels; }
 
-const char *RecordingDevice::getName() const
-{
-	return name.c_str();
-}
+const char *RecordingDevice::getName() const { return name.c_str(); }
 
-bool RecordingDevice::isRecording() const
-{
-	return device != nullptr;
-}
+bool RecordingDevice::isRecording() const { return device != nullptr; }
 
-} //openal
-} //audio
-} //love
+}  // namespace openal
+}  // namespace audio
+}  // namespace love

@@ -34,20 +34,19 @@ namespace magpie
  **/
 class EXRHandler : public FormatHandler
 {
-public:
+ public:
+  // Implements FormatHandler.
 
-	// Implements FormatHandler.
+  virtual bool canDecode(Data *data);
+  virtual bool canEncode(PixelFormat rawFormat, EncodedFormat encodedFormat);
 
-	virtual bool canDecode(Data *data);
-	virtual bool canEncode(PixelFormat rawFormat, EncodedFormat encodedFormat);
+  virtual DecodedImage decode(Data *data);
+  virtual EncodedImage encode(const DecodedImage &img, EncodedFormat format);
 
-	virtual DecodedImage decode(Data *data);
-	virtual EncodedImage encode(const DecodedImage &img, EncodedFormat format);
+  virtual void freeRawPixels(unsigned char *mem);
 
-	virtual void freeRawPixels(unsigned char *mem);
+};  // EXRHandler
 
-}; // EXRHandler
-
-} // magpie
-} // image
-} // love
+}  // namespace magpie
+}  // namespace image
+}  // namespace love

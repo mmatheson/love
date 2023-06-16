@@ -28,257 +28,127 @@ namespace null
 {
 
 Source::Source()
-	: love::audio::Source(Source::TYPE_STATIC)
+    : love::audio::Source(Source::TYPE_STATIC)
 {
 }
 
-Source::~Source()
-{
-}
+Source::~Source() {}
 
 love::audio::Source *Source::clone()
 {
-	this->retain();
-	return this;
+  this->retain();
+  return this;
 }
 
-bool Source::play()
-{
-	return false;
-}
+bool Source::play() { return false; }
 
-void Source::stop()
-{
-}
+void Source::stop() {}
 
-void Source::pause()
-{
-}
+void Source::pause() {}
 
-bool Source::isPlaying() const
-{
-	return false;
-}
+bool Source::isPlaying() const { return false; }
 
-bool Source::isFinished() const
-{
-	return true;
-}
+bool Source::isFinished() const { return true; }
 
-bool Source::update()
-{
-	return false;
-}
+bool Source::update() { return false; }
 
-void Source::setPitch(float pitch)
-{
-	this->pitch = pitch;
-}
+void Source::setPitch(float pitch) { this->pitch = pitch; }
 
-float Source::getPitch() const
-{
-	return pitch;
-}
+float Source::getPitch() const { return pitch; }
 
-void Source::setVolume(float volume)
-{
-	this->volume = volume;
-}
+void Source::setVolume(float volume) { this->volume = volume; }
 
-float Source::getVolume() const
-{
-	return volume;
-}
+float Source::getVolume() const { return volume; }
 
-void Source::seek(double, Source::Unit)
-{
-}
+void Source::seek(double, Source::Unit) {}
 
-double Source::tell(Source::Unit)
-{
-	return 0.0f;
-}
+double Source::tell(Source::Unit) { return 0.0f; }
 
-double Source::getDuration(Unit)
-{
-	return -1.0f;
-}
+double Source::getDuration(Unit) { return -1.0f; }
 
-void Source::setPosition(float *)
-{
-}
+void Source::setPosition(float *) {}
 
-void Source::getPosition(float *) const
-{
-}
+void Source::getPosition(float *) const {}
 
-void Source::setVelocity(float *)
-{
-}
+void Source::setVelocity(float *) {}
 
-void Source::getVelocity(float *) const
-{
-}
+void Source::getVelocity(float *) const {}
 
-void Source::setDirection(float *)
-{
-}
+void Source::setDirection(float *) {}
 
-void Source::getDirection(float *) const
-{
-}
+void Source::getDirection(float *) const {}
 
 void Source::setCone(float innerAngle, float outerAngle, float outerVolume, float outerHighGain)
 {
-	coneInnerAngle = innerAngle;
-	coneOuterAngle = outerAngle;
-	coneOuterVolume = outerVolume;
-	coneOuterHighGain = outerHighGain;
+  coneInnerAngle = innerAngle;
+  coneOuterAngle = outerAngle;
+  coneOuterVolume = outerVolume;
+  coneOuterHighGain = outerHighGain;
 }
 
-void Source::getCone(float &innerAngle, float &outerAngle, float &outerVolume, float &outerHighGain) const
+void Source::getCone(float &innerAngle, float &outerAngle, float &outerVolume,
+                     float &outerHighGain) const
 {
-	innerAngle = coneInnerAngle;
-	outerAngle = coneOuterAngle;
-	outerVolume = coneOuterVolume;
-	outerHighGain = coneOuterHighGain;
+  innerAngle = coneInnerAngle;
+  outerAngle = coneOuterAngle;
+  outerVolume = coneOuterVolume;
+  outerHighGain = coneOuterHighGain;
 }
 
-void Source::setRelative(bool enable)
-{
-	relative = enable;
-}
+void Source::setRelative(bool enable) { relative = enable; }
 
-bool Source::isRelative() const
-{
-	return relative;
-}
+bool Source::isRelative() const { return relative; }
 
-void Source::setLooping(bool looping)
-{
-	this->looping = looping;
-}
+void Source::setLooping(bool looping) { this->looping = looping; }
 
-bool Source::isLooping() const
-{
-	return looping;
-}
+bool Source::isLooping() const { return looping; }
 
-void Source::setMinVolume(float volume)
-{
-	this->minVolume = volume;
-}
+void Source::setMinVolume(float volume) { this->minVolume = volume; }
 
-float Source::getMinVolume() const
-{
-	return this->minVolume;
-}
+float Source::getMinVolume() const { return this->minVolume; }
 
-void Source::setMaxVolume(float volume)
-{
-	this->maxVolume = volume;
-}
+void Source::setMaxVolume(float volume) { this->maxVolume = volume; }
 
-float Source::getMaxVolume() const
-{
-	return this->maxVolume;
-}
+float Source::getMaxVolume() const { return this->maxVolume; }
 
-void Source::setReferenceDistance(float distance)
-{
-	this->referenceDistance = distance;
-}
+void Source::setReferenceDistance(float distance) { this->referenceDistance = distance; }
 
-float Source::getReferenceDistance() const
-{
-	return this->referenceDistance;
-}
+float Source::getReferenceDistance() const { return this->referenceDistance; }
 
-void Source::setRolloffFactor(float factor)
-{
-	this->rolloffFactor = factor;
-}
+void Source::setRolloffFactor(float factor) { this->rolloffFactor = factor; }
 
-float Source::getRolloffFactor() const
-{
-	return this->rolloffFactor;
-}
+float Source::getRolloffFactor() const { return this->rolloffFactor; }
 
-void Source::setMaxDistance(float distance)
-{
-	this->maxDistance = distance;
-}
+void Source::setMaxDistance(float distance) { this->maxDistance = distance; }
 
-float Source::getMaxDistance() const
-{
-	return this->maxDistance;
-}
+float Source::getMaxDistance() const { return this->maxDistance; }
 
-void Source::setAirAbsorptionFactor(float factor)
-{
-	absorptionFactor = factor;
-}
+void Source::setAirAbsorptionFactor(float factor) { absorptionFactor = factor; }
 
-float Source::getAirAbsorptionFactor() const
-{
-	return absorptionFactor;
-}
+float Source::getAirAbsorptionFactor() const { return absorptionFactor; }
 
-int Source::getChannelCount() const
-{
-	return 2;
-}
+int Source::getChannelCount() const { return 2; }
 
-int Source::getFreeBufferCount() const
-{
-	return 0;
-}
+int Source::getFreeBufferCount() const { return 0; }
 
-bool Source::queue(void *, size_t, int, int, int)
-{
-	return false;
-}
+bool Source::queue(void *, size_t, int, int, int) { return false; }
 
-bool Source::setFilter(const std::map<Filter::Parameter, float> &)
-{
-	return false;
-}
+bool Source::setFilter(const std::map<Filter::Parameter, float> &) { return false; }
 
-bool Source::setFilter()
-{
-	return false;
-}
+bool Source::setFilter() { return false; }
 
-bool Source::getFilter(std::map<Filter::Parameter, float> &)
-{
-	return false;
-}
+bool Source::getFilter(std::map<Filter::Parameter, float> &) { return false; }
 
-bool Source::setEffect(const char *)
-{
-	return false;
-}
+bool Source::setEffect(const char *) { return false; }
 
-bool Source::setEffect(const char *, const std::map<Filter::Parameter, float> &)
-{
-	return false;
-}
+bool Source::setEffect(const char *, const std::map<Filter::Parameter, float> &) { return false; }
 
-bool Source::unsetEffect(const char *)
-{
-	return false;
-}
+bool Source::unsetEffect(const char *) { return false; }
 
-bool Source::getEffect(const char *, std::map<Filter::Parameter, float> &)
-{
-	return false;
-}
+bool Source::getEffect(const char *, std::map<Filter::Parameter, float> &) { return false; }
 
-bool Source::getActiveEffects(std::vector<std::string> &) const
-{
-	return false;
-}
+bool Source::getActiveEffects(std::vector<std::string> &) const { return false; }
 
-} // null
-} // audio
-} // love
+}  // namespace null
+}  // namespace audio
+}  // namespace love

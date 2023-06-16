@@ -22,8 +22,8 @@
 #define LOVE_PHYSICS_BOX2D_WRAP_PHYSICS_H
 
 // LOVE
-#include "common/config.h"
 #include "Physics.h"
+#include "common/config.h"
 
 namespace love
 {
@@ -34,8 +34,8 @@ namespace box2d
 
 extern "C" LOVE_EXPORT int luaopen_love_physics(lua_State *L);
 
-} // box2d
-} // physics
-} // love
+}  // namespace box2d
+}  // namespace physics
+}  // namespace love
 
-#endif // LOVE_PHYSICS_BOX2D_WRAP_PHYSICS_H
+#endif  // LOVE_PHYSICS_BOX2D_WRAP_PHYSICS_H

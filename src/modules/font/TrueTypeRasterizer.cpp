@@ -27,28 +27,27 @@ namespace font
 
 bool TrueTypeRasterizer::getConstant(const char *in, Hinting &out)
 {
-	return hintings.find(in, out);
+  return hintings.find(in, out);
 }
 
 bool TrueTypeRasterizer::getConstant(Hinting in, const char *&out)
 {
-	return hintings.find(in, out);
+  return hintings.find(in, out);
 }
 
-std::vector<std::string> TrueTypeRasterizer::getConstants(Hinting)
-{
-	return hintings.getNames();
-}
+std::vector<std::string> TrueTypeRasterizer::getConstants(Hinting) { return hintings.getNames(); }
 
-StringMap<TrueTypeRasterizer::Hinting, TrueTypeRasterizer::HINTING_MAX_ENUM>::Entry TrueTypeRasterizer::hintingEntries[] =
-{
-	{"normal", HINTING_NORMAL},
-	{"light", HINTING_LIGHT},
-	{"mono", HINTING_MONO},
-	{"none", HINTING_NONE},
+StringMap<TrueTypeRasterizer::Hinting, TrueTypeRasterizer::HINTING_MAX_ENUM>::Entry
+    TrueTypeRasterizer::hintingEntries[] = {
+        {"normal", HINTING_NORMAL},
+        {"light", HINTING_LIGHT},
+        {"mono", HINTING_MONO},
+        {"none", HINTING_NONE},
 };
 
-StringMap<TrueTypeRasterizer::Hinting, TrueTypeRasterizer::HINTING_MAX_ENUM> TrueTypeRasterizer::hintings(TrueTypeRasterizer::hintingEntries, sizeof(TrueTypeRasterizer::hintingEntries));
+StringMap<TrueTypeRasterizer::Hinting, TrueTypeRasterizer::HINTING_MAX_ENUM>
+    TrueTypeRasterizer::hintings(TrueTypeRasterizer::hintingEntries,
+                                 sizeof(TrueTypeRasterizer::hintingEntries));
 
-} // font
-} // love
+}  // namespace font
+}  // namespace love

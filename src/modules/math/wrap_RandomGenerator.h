@@ -37,7 +37,7 @@ RandomGenerator::Seed luax_checkrandomseed(lua_State *L, int idx);
 RandomGenerator *luax_checkrandomgenerator(lua_State *L, int idx);
 extern "C" int luaopen_randomgenerator(lua_State *L);
 
-} // math
-} // love
+}  // namespace math
+}  // namespace love
 
-#endif // LOVE_MATH_WRAP_RANDOM_GENERATOR_H
+#endif  // LOVE_MATH_WRAP_RANDOM_GENERATOR_H

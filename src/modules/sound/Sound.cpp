@@ -27,24 +27,19 @@ namespace sound
 
 love::Type Sound::type("Sound", &Module::type);
 
-Sound::~Sound()
-{
-}
+Sound::~Sound() {}
 
-SoundData *Sound::newSoundData(Decoder *decoder)
-{
-	return new SoundData(decoder);
-}
+SoundData *Sound::newSoundData(Decoder *decoder) { return new SoundData(decoder); }
 
 SoundData *Sound::newSoundData(int samples, int sampleRate, int bitDepth, int channels)
 {
-	return new SoundData(samples, sampleRate, bitDepth, channels);
+  return new SoundData(samples, sampleRate, bitDepth, channels);
 }
 
 SoundData *Sound::newSoundData(void *data, int samples, int sampleRate, int bitDepth, int channels)
 {
-	return new SoundData(data, samples, sampleRate, bitDepth, channels);
+  return new SoundData(data, samples, sampleRate, bitDepth, channels);
 }
 
-} // sound
-} // love
+}  // namespace sound
+}  // namespace love

@@ -23,9 +23,8 @@
 
 // LOVE
 #include "common/Data.h"
-#include "sound/Decoder.h"
-
 #include "libraries/Wuff/wuff.h"
+#include "sound/Decoder.h"
 
 namespace love
 {
@@ -37,40 +36,38 @@ namespace lullaby
 // Struct for handling data
 struct WaveFile
 {
-	char *data;
-	size_t size;
-	size_t offset;
+  char *data;
+  size_t size;
+  size_t offset;
 };
 
 class WaveDecoder : public Decoder
 {
-public:
+ public:
+  WaveDecoder(Data *data, int bufferSize);
+  virtual ~WaveDecoder();
 
-	WaveDecoder(Data *data, int bufferSize);
-	virtual ~WaveDecoder();
+  static bool accepts(const std::string &ext);
 
-	static bool accepts(const std::string &ext);
+  love::sound::Decoder *clone();
+  int decode();
+  bool seek(double s);
+  bool rewind();
+  bool isSeekable();
+  int getChannelCount() const;
+  int getBitDepth() const;
+  int getSampleRate() const;
+  double getDuration();
 
-	love::sound::Decoder *clone();
-	int decode();
-	bool seek(double s);
-	bool rewind();
-	bool isSeekable();
-	int getChannelCount() const;
-	int getBitDepth() const;
-	int getSampleRate() const;
-	double getDuration();
+ private:
+  WaveFile dataFile;
+  wuff_handle *handle;
+  wuff_info info;
 
-private:
+};  // WaveDecoder
 
-	WaveFile dataFile;
-	wuff_handle *handle;
-	wuff_info info;
+}  // namespace lullaby
+}  // namespace sound
+}  // namespace love
 
-}; // WaveDecoder
-
-} // lullaby
-} // sound
-} // love
-
-#endif // LOVE_SOUND_LULLABY_WAVE_DECODER_H
+#endif  // LOVE_SOUND_LULLABY_WAVE_DECODER_H

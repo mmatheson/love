@@ -27,82 +27,82 @@ namespace thread
 namespace sdl
 {
 Thread::Thread(Threadable *t)
-	: t(t)
-	, running(false)
-	, thread(nullptr)
+    : t(t),
+      running(false),
+      thread(nullptr)
 {
 }
 
 Thread::~Thread()
 {
-	// Clean up handle
-	if (thread)
-		SDL_DetachThread(thread);
+  // Clean up handle
+  if (thread)
+    SDL_DetachThread(thread);
 }
 
 bool Thread::start()
 {
 #if defined(LOVE_LINUX)
-	// Temporarly block signals, as the thread inherits this mask
-	love::thread::ScopedDisableSignals disableSignals;
+  // Temporarly block signals, as the thread inherits this mask
+  love::thread::ScopedDisableSignals disableSignals;
 #endif
 
-	Lock l(mutex);
+  Lock l(mutex);
 
-	if (running)
-		return false;
+  if (running)
+    return false;
 
-	if (thread) // Clean old handle up
-		SDL_WaitThread(thread, nullptr);
+  if (thread)  // Clean old handle up
+    SDL_WaitThread(thread, nullptr);
 
-	// Keep the threadable around until the thread is done with it.
-	// This is done before thread_runner executes because there can be a delay
-	// between CreateThread and the start of the thread code's execution.
-	t->retain();
+  // Keep the threadable around until the thread is done with it.
+  // This is done before thread_runner executes because there can be a delay
+  // between CreateThread and the start of the thread code's execution.
+  t->retain();
 
-	thread = SDL_CreateThread(thread_runner, t->getThreadName(), this);
-	running = (thread != nullptr);
+  thread = SDL_CreateThread(thread_runner, t->getThreadName(), this);
+  running = (thread != nullptr);
 
-	if (!running)
-		t->release(); // thread_runner is never called in this situation.
+  if (!running)
+    t->release();  // thread_runner is never called in this situation.
 
-	return running;
+  return running;
 }
 
 void Thread::wait()
 {
-	{
-		Lock l(mutex);
-		if (!thread)
-			return;
-	}
-	SDL_WaitThread(thread, nullptr);
-	Lock l(mutex);
-	running = false;
-	thread = nullptr;
+  {
+    Lock l(mutex);
+    if (!thread)
+      return;
+  }
+  SDL_WaitThread(thread, nullptr);
+  Lock l(mutex);
+  running = false;
+  thread = nullptr;
 }
 
 bool Thread::isRunning()
 {
-	Lock l(mutex);
-	return running;
+  Lock l(mutex);
+  return running;
 }
 
 int Thread::thread_runner(void *data)
 {
-	Thread *self = (Thread *) data; // some compilers don't like 'this'
+  Thread *self = (Thread *) data;  // some compilers don't like 'this'
 
-	self->t->threadFunction();
+  self->t->threadFunction();
 
-	{
-		Lock l(self->mutex);
-		self->running = false;
-	}
+  {
+    Lock l(self->mutex);
+    self->running = false;
+  }
 
-	// This was retained in start().
-	self->t->release();
-	return 0;
+  // This was retained in start().
+  self->t->release();
+  return 0;
 }
-} // sdl
-} // thread
-} // love
+}  // namespace sdl
+}  // namespace thread
+}  // namespace love

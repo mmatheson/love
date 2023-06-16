@@ -38,99 +38,98 @@ namespace box2d
  **/
 class WheelJoint : public Joint
 {
-public:
+ public:
+  static love::Type type;
 
-	static love::Type type;
+  /**
+   * Creates a new WheelJoint connecting body1 and body2.
+   **/
+  WheelJoint(Body *body1, Body *body2, float xA, float yA, float xB, float yB, float ax, float ay,
+             bool collideConnected);
 
-	/**
-	 * Creates a new WheelJoint connecting body1 and body2.
-	 **/
-	WheelJoint(Body *body1, Body *body2, float xA, float yA, float xB, float yB, float ax, float ay, bool collideConnected);
+  virtual ~WheelJoint();
 
-	virtual ~WheelJoint();
+  /**
+   * Get the current joint translation, usually in meters.
+   **/
+  float getJointTranslation() const;
 
-	/**
-	 * Get the current joint translation, usually in meters.
-	 **/
-	float getJointTranslation() const;
+  /**
+   * Get the current joint translation speed, usually in meters per second.
+   **/
+  float getJointSpeed() const;
 
-	/**
-	 * Get the current joint translation speed, usually in meters per second.
-	 **/
-	float getJointSpeed() const;
+  /**
+   * Enable/disable the joint motor.
+   **/
+  void setMotorEnabled(bool enable);
 
-	/**
-	 * Enable/disable the joint motor.
-	 **/
-	void setMotorEnabled(bool enable);
+  /**
+   * Checks whether the motor is enabled.
+   **/
+  bool isMotorEnabled() const;
 
-	/**
-	 * Checks whether the motor is enabled.
-	 **/
-	bool isMotorEnabled() const;
+  /**
+   * Set the motor speed, usually in meters per second.
+   **/
+  void setMotorSpeed(float speed);
 
-	/**
-	 * Set the motor speed, usually in meters per second.
-	 **/
-	void setMotorSpeed(float speed);
+  /**
+   * Get the motor speed, usually in meters per second.
+   **/
+  float getMotorSpeed() const;
 
-	/**
-	 * Get the motor speed, usually in meters per second.
-	 **/
-	float getMotorSpeed() const;
+  /**
+   * Set the maximum motor torque, usually in N.
+   **/
+  void setMaxMotorTorque(float torque);
 
-	/**
-	 * Set the maximum motor torque, usually in N.
-	 **/
-	void setMaxMotorTorque(float torque);
+  /**
+   * Get the maximum motor torque, usually in N.
+   **/
+  float getMaxMotorTorque() const;
 
-	/**
-	 * Get the maximum motor torque, usually in N.
-	 **/
-	float getMaxMotorTorque() const;
+  /**
+   * Get the current motor torque, usually in N.
+   * @param inv_dt The inverse time step.
+   **/
+  float getMotorTorque(float inv_dt) const;
 
-	/**
-	 * Get the current motor torque, usually in N.
-	 * @param inv_dt The inverse time step.
-	 **/
-	float getMotorTorque(float inv_dt) const;
+  /**
+   * Set the spring frequency, in hertz. Setting the frequency to 0
+   * disables the spring.
+   **/
+  void setSpringFrequency(float hz);
 
-	/**
-	 * Set the spring frequency, in hertz. Setting the frequency to 0
-	 * disables the spring.
-	 **/
-	void setSpringFrequency(float hz);
+  /**
+   * Get the spring frequency, in hertz.
+   **/
+  float getSpringFrequency() const;
 
-	/**
-	 * Get the spring frequency, in hertz.
-	 **/
-	float getSpringFrequency() const;
+  /**
+   * Set the spring damping ratio.
+   **/
+  void setSpringDampingRatio(float ratio);
 
-	/**
-	 * Set the spring damping ratio.
-	 **/
-	void setSpringDampingRatio(float ratio);
+  /**
+   * Get the spring damping ratio.
+   **/
+  float getSpringDampingRatio() const;
 
-	/**
-	 * Get the spring damping ratio.
-	 **/
-	float getSpringDampingRatio() const;
+  /**
+   * Gets the axis unit vector, relative to body1.
+   * @returns The X component of the axis unit vector.
+   * @returns The Y component of the axis unit vector.
+   **/
+  int getAxis(lua_State *L);
 
-	/**
-	 * Gets the axis unit vector, relative to body1.
-	 * @returns The X component of the axis unit vector.
-	 * @returns The Y component of the axis unit vector.
-	 **/
-	int getAxis(lua_State *L);
-
-private:
-
-	// The Box2D wheel joint object.
-	b2WheelJoint *joint;
+ private:
+  // The Box2D wheel joint object.
+  b2WheelJoint *joint;
 };
 
-} // box2d
-} // physics
-} // love
+}  // namespace box2d
+}  // namespace physics
+}  // namespace love
 
-#endif // LOVE_PHYSICS_BOX2D_WHEEL_JOINT_H
+#endif  // LOVE_PHYSICS_BOX2D_WHEEL_JOINT_H

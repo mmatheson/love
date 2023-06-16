@@ -21,8 +21,8 @@
 #pragma once
 
 // LOVE
-#include "common/runtime.h"
 #include "common/Data.h"
+#include "common/runtime.h"
 
 namespace love
 {
@@ -34,5 +34,5 @@ Data *luax_checkdata(lua_State *L, int idx);
 int luaopen_data(lua_State *L);
 extern const luaL_Reg w_Data_functions[];
 
-} // data
-} // love
+}  // namespace data
+}  // namespace love

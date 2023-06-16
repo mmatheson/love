@@ -40,52 +40,50 @@ namespace physfs
 
 class File : public love::filesystem::File
 {
-public:
+ public:
+  /**
+   * Constructs an File with the given ilename.
+   * @param filename The relative filepath of the file to load.
+   **/
+  File(const std::string &filename);
 
-	/**
-	 * Constructs an File with the given ilename.
-	 * @param filename The relative filepath of the file to load.
-	 **/
-	File(const std::string &filename);
+  virtual ~File();
 
-	virtual ~File();
+  // Implements love::filesystem::File.
+  using love::filesystem::File::read;
+  using love::filesystem::File::write;
+  bool open(Mode mode) override;
+  bool close() override;
+  bool isOpen() const override;
+  int64 getSize() override;
+  virtual int64 read(void *dst, int64 size) override;
+  bool write(const void *data, int64 size) override;
+  bool flush() override;
+  bool isEOF() override;
+  int64 tell() override;
+  bool seek(uint64 pos) override;
+  bool setBuffer(BufferMode bufmode, int64 size) override;
+  BufferMode getBuffer(int64 &size) const override;
+  Mode getMode() const override;
+  const std::string &getFilename() const override;
 
-	// Implements love::filesystem::File.
-	using love::filesystem::File::read;
-	using love::filesystem::File::write;
-	bool open(Mode mode) override;
-	bool close() override;
-	bool isOpen() const override;
-	int64 getSize() override;
-	virtual int64 read(void *dst, int64 size) override;
-	bool write(const void *data, int64 size) override;
-	bool flush() override;
-	bool isEOF() override;
-	int64 tell() override;
-	bool seek(uint64 pos) override;
-	bool setBuffer(BufferMode bufmode, int64 size) override;
-	BufferMode getBuffer(int64 &size) const override;
-	Mode getMode() const override;
-	const std::string &getFilename() const override;
+ private:
+  // filename
+  std::string filename;
 
-private:
+  // PHYSFS File handle.
+  PHYSFS_File *file;
 
-	// filename
-	std::string filename;
+  // The current mode of the file.
+  Mode mode;
 
-	// PHYSFS File handle.
-	PHYSFS_File *file;
+  BufferMode bufferMode;
+  int64 bufferSize;
 
-	// The current mode of the file.
-	Mode mode;
+};  // File
 
-	BufferMode bufferMode;
-	int64 bufferSize;
+}  // namespace physfs
+}  // namespace filesystem
+}  // namespace love
 
-}; // File
-
-} // physfs
-} // filesystem
-} // love
-
-#endif // LOVE_FILESYSTEM_PHYSFS_FILE_H
+#endif  // LOVE_FILESYSTEM_PHYSFS_FILE_H

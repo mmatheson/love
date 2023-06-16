@@ -22,8 +22,8 @@
 #define LOVE_GRAPHICS_WRAP_QUAD_H
 
 // LOVE
-#include "common/runtime.h"
 #include "Quad.h"
+#include "common/runtime.h"
 
 namespace love
 {
@@ -33,7 +33,7 @@ namespace graphics
 Quad *luax_checkquad(lua_State *L, int idx);
 extern "C" int luaopen_quad(lua_State *L);
 
-} // graphics
-} // love
+}  // namespace graphics
+}  // namespace love
 
-#endif // LOVE_GRAPHICS_WRAP_QUAD_H
+#endif  // LOVE_GRAPHICS_WRAP_QUAD_H

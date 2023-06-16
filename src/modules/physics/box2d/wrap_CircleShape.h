@@ -22,9 +22,9 @@
 #define LOVE_PHYSICS_BOX2D_WRAP_CIRCLE_SHAPE_H
 
 // LOVE
+#include "CircleShape.h"
 #include "common/runtime.h"
 #include "wrap_Shape.h"
-#include "CircleShape.h"
 
 namespace love
 {
@@ -36,8 +36,8 @@ namespace box2d
 CircleShape *luax_checkcircleshape(lua_State *L, int idx);
 extern "C" int luaopen_circleshape(lua_State *L);
 
-} // box2d
-} // physics
-} // love
+}  // namespace box2d
+}  // namespace physics
+}  // namespace love
 
-#endif // LOVE_PHYSICS_BOX2D_WRAP_CIRCLE_SHAPE_H
+#endif  // LOVE_PHYSICS_BOX2D_WRAP_CIRCLE_SHAPE_H

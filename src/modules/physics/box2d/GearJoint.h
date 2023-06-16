@@ -45,37 +45,36 @@ namespace box2d
  **/
 class GearJoint : public Joint
 {
-public:
+ public:
+  static love::Type type;
 
-	static love::Type type;
+  /**
+   * Creates a GearJoint connecting joint1 to joint2.
+   **/
+  GearJoint(Joint *joint1, Joint *joint2, float ratio, bool collideConnected);
 
-	/**
-	 * Creates a GearJoint connecting joint1 to joint2.
-	 **/
-	GearJoint(Joint *joint1, Joint *joint2, float ratio, bool collideConnected);
+  virtual ~GearJoint();
 
-	virtual ~GearJoint();
+  /**
+   * Sets the ratio.
+   **/
+  void setRatio(float ratio);
 
-	/**
-	 * Sets the ratio.
-	 **/
-	void setRatio(float ratio);
+  /**
+   * Gets the ratio.
+   **/
+  float getRatio() const;
 
-	/**
-	 * Gets the ratio.
-	 **/
-	float getRatio() const;
+  Joint *getJointA() const;
+  Joint *getJointB() const;
 
-	Joint *getJointA() const;
-	Joint *getJointB() const;
-
-private:
-	// The Box2D GearJoint object.
-	b2GearJoint *joint;
+ private:
+  // The Box2D GearJoint object.
+  b2GearJoint *joint;
 };
 
-} // box2d
-} // physics
-} // love
+}  // namespace box2d
+}  // namespace physics
+}  // namespace love
 
-#endif // LOVE_PHYSICS_BOX2D_GEAR_JOINT_H
+#endif  // LOVE_PHYSICS_BOX2D_GEAR_JOINT_H

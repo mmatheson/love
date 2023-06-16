@@ -22,8 +22,8 @@
 #define LOVE_VIDEO_VIDEOSTREAM_H
 
 // LOVE
-#include "common/Stream.h"
 #include "audio/Source.h"
+#include "common/Stream.h"
 #include "thread/threads.h"
 
 namespace love
@@ -33,102 +33,101 @@ namespace video
 
 class VideoStream : public Stream
 {
-public:
+ public:
+  static love::Type type;
 
-	static love::Type type;
+  virtual ~VideoStream() {}
 
-	virtual ~VideoStream() {}
+  virtual int getWidth() const = 0;
+  virtual int getHeight() const = 0;
+  virtual const std::string &getFilename() const = 0;
 
-	virtual int getWidth() const = 0;
-	virtual int getHeight() const = 0;
-	virtual const std::string &getFilename() const = 0;
+  // Playback api
+  virtual void play();
+  virtual void pause();
+  virtual void seek(double offset);
+  virtual double tell() const;
+  virtual bool isPlaying() const;
 
-	// Playback api
-	virtual void play();
-	virtual void pause();
-	virtual void seek(double offset);
-	virtual double tell() const;
-	virtual bool isPlaying() const;
+  class FrameSync;
+  class DeltaSync;
 
-	class FrameSync;
-	class DeltaSync;
+  // The stream now owns the sync, do not reuse or free
+  virtual void setSync(FrameSync *frameSync);
+  virtual FrameSync *getSync() const;
 
-	// The stream now owns the sync, do not reuse or free
-	virtual void setSync(FrameSync *frameSync);
-	virtual FrameSync *getSync() const;
+  // Data structures
+  struct Frame
+  {
+    Frame();
+    ~Frame();
 
-	// Data structures
-	struct Frame
-	{
-		Frame();
-		~Frame();
+    int yw, yh;
+    unsigned char *yplane;
 
-		int yw, yh;
-		unsigned char *yplane;
+    int cw, ch;
+    unsigned char *cbplane;
+    unsigned char *crplane;
+  };
 
-		int cw, ch;
-		unsigned char *cbplane;
-		unsigned char *crplane;
-	};
+  class FrameSync : public Object
+  {
+   public:
+    virtual double getPosition() const = 0;
+    virtual void update(double /*dt*/) {}
+    virtual ~FrameSync() {}
 
-	class FrameSync : public Object
-	{
-	public:
-		virtual double getPosition() const = 0;
-		virtual void update(double /*dt*/) {}
-		virtual ~FrameSync() {}
+    void copyState(const FrameSync *other);
 
-		void copyState(const FrameSync *other);
+    // Playback api
+    virtual void play() = 0;
+    virtual void pause() = 0;
+    virtual void seek(double offset) = 0;
+    virtual double tell() const;
+    virtual bool isPlaying() const = 0;
+  };
 
-		// Playback api
-		virtual void play() = 0;
-		virtual void pause() = 0;
-		virtual void seek(double offset) = 0;
-		virtual double tell() const;
-		virtual bool isPlaying() const = 0;
-	};
+  class DeltaSync : public FrameSync
+  {
+   public:
+    DeltaSync();
+    ~DeltaSync();
 
-	class DeltaSync : public FrameSync
-	{
-	public:
-		DeltaSync();
-		~DeltaSync();
+    virtual double getPosition() const override;
+    virtual void update(double dt) override;
 
-		virtual double getPosition() const override;
-		virtual void update(double dt) override;
+    virtual void play() override;
+    virtual void pause() override;
+    virtual void seek(double time) override;
+    virtual bool isPlaying() const override;
 
-		virtual void play() override;
-		virtual void pause() override;
-		virtual void seek(double time) override;
-		virtual bool isPlaying() const override;
+   private:
+    bool playing;
+    double position;
+    double speed;
+    love::thread::MutexRef mutex;
+  };
 
-	private:
-		bool playing;
-		double position;
-		double speed;
-		love::thread::MutexRef mutex;
-	};
+  class SourceSync : public FrameSync
+  {
+   public:
+    SourceSync(love::audio::Source *source);
 
-	class SourceSync : public FrameSync
-	{
-	public:
-		SourceSync(love::audio::Source *source);
+    virtual double getPosition() const override;
+    virtual void play() override;
+    virtual void pause() override;
+    virtual void seek(double time) override;
+    virtual bool isPlaying() const override;
 
-		virtual double getPosition() const override;
-		virtual void play() override;
-		virtual void pause() override;
-		virtual void seek(double time) override;
-		virtual bool isPlaying() const override;
+   private:
+    StrongRef<love::audio::Source> source;
+  };
 
-	private:
-		StrongRef<love::audio::Source> source;
-	};
-
-protected:
-	StrongRef<FrameSync> frameSync;
+ protected:
+  StrongRef<FrameSync> frameSync;
 };
 
-} // video
-} // love
+}  // namespace video
+}  // namespace love
 
-#endif // LOVE_VIDEO_VIDEOSTREAM_H
+#endif  // LOVE_VIDEO_VIDEOSTREAM_H

@@ -36,56 +36,57 @@ namespace box2d
  **/
 class WeldJoint : public Joint
 {
-public:
+ public:
+  static love::Type type;
 
-	static love::Type type;
+  /**
+   * Creates a new WeldJoint connecting body1 and body2.
+   **/
+  WeldJoint(Body *body1, Body *body2, float xA, float yA, float xB, float yB,
+            bool collideConnected);
 
-	/**
-	 * Creates a new WeldJoint connecting body1 and body2.
-	 **/
-	WeldJoint(Body *body1, Body *body2, float xA, float yA, float xB, float yB, bool collideConnected);
+  WeldJoint(Body *body1, Body *body2, float xA, float yA, float xB, float yB, bool collideConnected,
+            float referenceAngle);
 
-	WeldJoint(Body *body1, Body *body2, float xA, float yA, float xB, float yB, bool collideConnected, float referenceAngle);
+  virtual ~WeldJoint();
 
-	virtual ~WeldJoint();
+  /**
+   * Sets the response speed.
+   **/
+  void setFrequency(float hz);
 
-	/**
-	 * Sets the response speed.
-	 **/
-	void setFrequency(float hz);
+  /**
+   * Gets the response speed.
+   **/
+  float getFrequency() const;
 
-	/**
-	 * Gets the response speed.
-	 **/
-	float getFrequency() const;
+  /**
+   * Sets the damping ratio.
+   * 0 = no damping, 1 = critical damping.
+   **/
+  void setDampingRatio(float d);
 
-	/**
-	 * Sets the damping ratio.
-	 * 0 = no damping, 1 = critical damping.
-	 **/
-	void setDampingRatio(float d);
+  /**
+   * Gets the damping ratio.
+   * 0 = no damping, 1 = critical damping.
+   **/
+  float getDampingRatio() const;
 
-	/**
-	 * Gets the damping ratio.
-	 * 0 = no damping, 1 = critical damping.
-	 **/
-	float getDampingRatio() const;
+  /**
+   * Gets the reference angle.
+   **/
+  float getReferenceAngle() const;
 
-	/**
-	 * Gets the reference angle.
-	 **/
-	float getReferenceAngle() const;
+ private:
+  // The Box2D weld joint object.
+  b2WeldJoint *joint;
 
-private:
-
-	// The Box2D weld joint object.
-	b2WeldJoint *joint;
-
-	void init(b2WeldJointDef &def, Body *body1, Body *body2, float xA, float yA, float xB, float yB, bool collideConnected);
+  void init(b2WeldJointDef &def, Body *body1, Body *body2, float xA, float yA, float xB, float yB,
+            bool collideConnected);
 };
 
-} // box2d
-} // physics
-} // love
+}  // namespace box2d
+}  // namespace physics
+}  // namespace love
 
-#endif // LOVE_PHYSICS_BOX2D_WELD_JOINT_H
+#endif  // LOVE_PHYSICS_BOX2D_WELD_JOINT_H

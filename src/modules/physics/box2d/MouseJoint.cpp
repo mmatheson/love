@@ -21,11 +21,11 @@
 #include "MouseJoint.h"
 
 // Module
-#include "Body.h"
-#include "World.h"
-#include "Physics.h"
-
 #include <float.h>
+
+#include "Body.h"
+#include "Physics.h"
+#include "World.h"
 
 namespace love
 {
@@ -37,83 +37,57 @@ namespace box2d
 love::Type MouseJoint::type("MouseJoint", &Joint::type);
 
 MouseJoint::MouseJoint(Body *body1, float x, float y)
-	: Joint(body1)
-	, joint(NULL)
+    : Joint(body1),
+      joint(NULL)
 {
-	if (body1->getType() == Body::BODY_KINEMATIC)
-		throw love::Exception("Cannot attach a MouseJoint to a kinematic body");
+  if (body1->getType() == Body::BODY_KINEMATIC)
+    throw love::Exception("Cannot attach a MouseJoint to a kinematic body");
 
-	b2MouseJointDef def;
+  b2MouseJointDef def;
 
-	def.bodyA = body1->world->getGroundBody();
-	def.bodyB = body1->body;
-	def.maxForce = 1000.0f * body1->body->GetMass();
-	def.target = Physics::scaleDown(b2Vec2(x,y));
-	joint = (b2MouseJoint *)createJoint(&def);
+  def.bodyA = body1->world->getGroundBody();
+  def.bodyB = body1->body;
+  def.maxForce = 1000.0f * body1->body->GetMass();
+  def.target = Physics::scaleDown(b2Vec2(x, y));
+  joint = (b2MouseJoint *) createJoint(&def);
 }
 
-MouseJoint::~MouseJoint()
-{
-}
+MouseJoint::~MouseJoint() {}
 
-void MouseJoint::setTarget(float x, float y)
-{
-	joint->SetTarget(Physics::scaleDown(b2Vec2(x, y)));
-}
+void MouseJoint::setTarget(float x, float y) { joint->SetTarget(Physics::scaleDown(b2Vec2(x, y))); }
 
 int MouseJoint::getTarget(lua_State *L)
 {
-	lua_pushnumber(L, Physics::scaleUp(joint->GetTarget().x));
-	lua_pushnumber(L, Physics::scaleUp(joint->GetTarget().y));
-	return 2;
+  lua_pushnumber(L, Physics::scaleUp(joint->GetTarget().x));
+  lua_pushnumber(L, Physics::scaleUp(joint->GetTarget().y));
+  return 2;
 }
 
-void MouseJoint::setMaxForce(float force)
-{
-	joint->SetMaxForce(Physics::scaleDown(force));
-}
+void MouseJoint::setMaxForce(float force) { joint->SetMaxForce(Physics::scaleDown(force)); }
 
-float MouseJoint::getMaxForce() const
-{
-	return Physics::scaleUp(joint->GetMaxForce());
-}
+float MouseJoint::getMaxForce() const { return Physics::scaleUp(joint->GetMaxForce()); }
 
 void MouseJoint::setFrequency(float hz)
 {
-	// This is kind of a crappy check. The frequency is used in an internal
-	// box2d calculation whose result must be > FLT_EPSILON, but other variables
-	// go into that calculation...
-	if (hz <= FLT_EPSILON * 2)
-		throw love::Exception("MouseJoint frequency must be a positive number.");
+  // This is kind of a crappy check. The frequency is used in an internal
+  // box2d calculation whose result must be > FLT_EPSILON, but other variables
+  // go into that calculation...
+  if (hz <= FLT_EPSILON * 2)
+    throw love::Exception("MouseJoint frequency must be a positive number.");
 
-	joint->SetFrequency(hz);
+  joint->SetFrequency(hz);
 }
 
-float MouseJoint::getFrequency() const
-{
-	return joint->GetFrequency();
-}
+float MouseJoint::getFrequency() const { return joint->GetFrequency(); }
 
-void MouseJoint::setDampingRatio(float d)
-{
-	joint->SetDampingRatio(d);
-}
+void MouseJoint::setDampingRatio(float d) { joint->SetDampingRatio(d); }
 
-float MouseJoint::getDampingRatio() const
-{
-	return joint->GetDampingRatio();
-}
+float MouseJoint::getDampingRatio() const { return joint->GetDampingRatio(); }
 
-Body *MouseJoint::getBodyA() const
-{
-	return Joint::getBodyB();
-}
+Body *MouseJoint::getBodyA() const { return Joint::getBodyB(); }
 
-Body *MouseJoint::getBodyB() const
-{
-	return nullptr;
-}
+Body *MouseJoint::getBodyB() const { return nullptr; }
 
-} // box2d
-} // physics
-} // love
+}  // namespace box2d
+}  // namespace physics
+}  // namespace love

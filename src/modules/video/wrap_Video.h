@@ -32,7 +32,7 @@ namespace video
 
 extern "C" LOVE_EXPORT int luaopen_love_video(lua_State *L);
 
-} // video
-} // love
+}  // namespace video
+}  // namespace love
 
-#endif // LOVE_VIDEO_WRAP_VIDEO_H
+#endif  // LOVE_VIDEO_WRAP_VIDEO_H
