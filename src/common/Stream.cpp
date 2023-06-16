@@ -26,4 +26,4 @@ namespace love
 
 love::Type Stream::type("Stream", &Object::type);
 
-} // love
+}  // namespace love

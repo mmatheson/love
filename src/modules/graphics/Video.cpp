@@ -21,8 +21,8 @@
 #include "Video.h"
 
 // LOVE
-#include "Shader.h"
 #include "Graphics.h"
+#include "Shader.h"
 
 namespace love
 {
@@ -32,186 +32,160 @@ namespace graphics
 love::Type Video::type("Video", &Drawable::type);
 
 Video::Video(Graphics *gfx, love::video::VideoStream *stream, float dpiscale)
-	: stream(stream)
-	, width(stream->getWidth() / dpiscale)
-	, height(stream->getHeight() / dpiscale)
-	, filter(Texture::defaultFilter)
+    : stream(stream),
+      width(stream->getWidth() / dpiscale),
+      height(stream->getHeight() / dpiscale),
+      filter(Texture::defaultFilter)
 {
-	filter.mipmap = Texture::FILTER_NONE;
+  filter.mipmap = Texture::FILTER_NONE;
 
-	stream->fillBackBuffer();
+  stream->fillBackBuffer();
 
-	for (int i = 0; i < 4; i++)
-		vertices[i].color = Color32(255, 255, 255, 255);
+  for (int i = 0; i < 4; i++) vertices[i].color = Color32(255, 255, 255, 255);
 
-	// Vertices are ordered for use with triangle strips:
-	// 0---2
-	// | / |
-	// 1---3
-	vertices[0].x = 0.0f;
-	vertices[0].y = 0.0f;
-	vertices[1].x = 0.0f;
-	vertices[1].y = (float) height;
-	vertices[2].x = (float) width;
-	vertices[2].y = 0.0f;
-	vertices[3].x = (float) width;
-	vertices[3].y = (float) height;
+  // Vertices are ordered for use with triangle strips:
+  // 0---2
+  // | / |
+  // 1---3
+  vertices[0].x = 0.0f;
+  vertices[0].y = 0.0f;
+  vertices[1].x = 0.0f;
+  vertices[1].y = (float) height;
+  vertices[2].x = (float) width;
+  vertices[2].y = 0.0f;
+  vertices[3].x = (float) width;
+  vertices[3].y = (float) height;
 
-	vertices[0].s = 0.0f;
-	vertices[0].t = 0.0f;
-	vertices[1].s = 0.0f;
-	vertices[1].t = 1.0f;
-	vertices[2].s = 1.0f;
-	vertices[2].t = 0.0f;
-	vertices[3].s = 1.0f;
-	vertices[3].t = 1.0f;
+  vertices[0].s = 0.0f;
+  vertices[0].t = 0.0f;
+  vertices[1].s = 0.0f;
+  vertices[1].t = 1.0f;
+  vertices[2].s = 1.0f;
+  vertices[2].t = 0.0f;
+  vertices[3].s = 1.0f;
+  vertices[3].t = 1.0f;
 
-	// Create the textures using the initial frame data.
-	auto frame = (const love::video::VideoStream::Frame*) stream->getFrontBuffer();
+  // Create the textures using the initial frame data.
+  auto frame = (const love::video::VideoStream::Frame *) stream->getFrontBuffer();
 
-	int widths[3]  = {frame->yw, frame->cw, frame->cw};
-	int heights[3] = {frame->yh, frame->ch, frame->ch};
+  int widths[3] = {frame->yw, frame->cw, frame->cw};
+  int heights[3] = {frame->yh, frame->ch, frame->ch};
 
-	const unsigned char *data[3] = {frame->yplane, frame->cbplane, frame->crplane};
+  const unsigned char *data[3] = {frame->yplane, frame->cbplane, frame->crplane};
 
-	Texture::Wrap wrap; // Clamp wrap mode.
-	Image::Settings settings;
+  Texture::Wrap wrap;  // Clamp wrap mode.
+  Image::Settings settings;
 
-	for (int i = 0; i < 3; i++)
-	{
-		Image *img = gfx->newImage(TEXTURE_2D, PIXELFORMAT_R8, widths[i], heights[i], 1, settings);
+  for (int i = 0; i < 3; i++)
+  {
+    Image *img = gfx->newImage(TEXTURE_2D, PIXELFORMAT_R8, widths[i], heights[i], 1, settings);
 
-		img->setFilter(filter);
-		img->setWrap(wrap);
+    img->setFilter(filter);
+    img->setWrap(wrap);
 
-		size_t bpp = getPixelFormatSize(PIXELFORMAT_R8);
-		size_t size = bpp * widths[i] * heights[i];
+    size_t bpp = getPixelFormatSize(PIXELFORMAT_R8);
+    size_t size = bpp * widths[i] * heights[i];
 
-		Rect rect = {0, 0, widths[i], heights[i]};
-		img->replacePixels(data[i], size, 0, 0, rect, false);
+    Rect rect = {0, 0, widths[i], heights[i]};
+    img->replacePixels(data[i], size, 0, 0, rect, false);
 
-		images[i].set(img, Acquire::NORETAIN);
-	}
+    images[i].set(img, Acquire::NORETAIN);
+  }
 }
 
 Video::~Video()
 {
-	if (source)
-		source->stop();
+  if (source)
+    source->stop();
 }
 
-love::video::VideoStream *Video::getStream()
-{
-	return stream;
-}
+love::video::VideoStream *Video::getStream() { return stream; }
 
 void Video::draw(Graphics *gfx, const Matrix4 &m)
 {
-	update();
+  update();
 
-	const Matrix4 &tm = gfx->getTransform();
-	bool is2D = tm.isAffine2DTransform();
+  const Matrix4 &tm = gfx->getTransform();
+  bool is2D = tm.isAffine2DTransform();
 
-	Matrix4 t(tm, m);
+  Matrix4 t(tm, m);
 
-	Graphics::StreamDrawCommand cmd;
-	cmd.formats[0] = vertex::getSinglePositionFormat(is2D);
-	cmd.formats[1] = vertex::CommonFormat::STf_RGBAub;
-	cmd.indexMode = vertex::TriangleIndexMode::QUADS;
-	cmd.vertexCount = 4;
-	cmd.standardShaderType = Shader::STANDARD_VIDEO;
+  Graphics::StreamDrawCommand cmd;
+  cmd.formats[0] = vertex::getSinglePositionFormat(is2D);
+  cmd.formats[1] = vertex::CommonFormat::STf_RGBAub;
+  cmd.indexMode = vertex::TriangleIndexMode::QUADS;
+  cmd.vertexCount = 4;
+  cmd.standardShaderType = Shader::STANDARD_VIDEO;
 
-	Graphics::StreamVertexData data = gfx->requestStreamDraw(cmd);
+  Graphics::StreamVertexData data = gfx->requestStreamDraw(cmd);
 
-	if (is2D)
-		t.transformXY((Vector2 *) data.stream[0], vertices, 4);
-	else
-		t.transformXY0((Vector3 *) data.stream[0], vertices, 4);
+  if (is2D)
+    t.transformXY((Vector2 *) data.stream[0], vertices, 4);
+  else
+    t.transformXY0((Vector3 *) data.stream[0], vertices, 4);
 
-	vertex::STf_RGBAub *verts = (vertex::STf_RGBAub *) data.stream[1];
+  vertex::STf_RGBAub *verts = (vertex::STf_RGBAub *) data.stream[1];
 
-	Color32 c = toColor32(gfx->getColor());
+  Color32 c = toColor32(gfx->getColor());
 
-	for (int i = 0; i < 4; i++)
-	{
-		verts[i].s = vertices[i].s;
-		verts[i].t = vertices[i].t;
-		verts[i].color = c;
-	}
+  for (int i = 0; i < 4; i++)
+  {
+    verts[i].s = vertices[i].s;
+    verts[i].t = vertices[i].t;
+    verts[i].color = c;
+  }
 
-	if (Shader::current != nullptr)
-		Shader::current->setVideoTextures(images[0], images[1], images[2]);
+  if (Shader::current != nullptr)
+    Shader::current->setVideoTextures(images[0], images[1], images[2]);
 
-	gfx->flushStreamDraws();
+  gfx->flushStreamDraws();
 }
 
 void Video::update()
 {
-	bool bufferschanged = stream->swapBuffers();
-	stream->fillBackBuffer();
+  bool bufferschanged = stream->swapBuffers();
+  stream->fillBackBuffer();
 
-	if (bufferschanged)
-	{
-		auto frame = (const love::video::VideoStream::Frame*) stream->getFrontBuffer();
+  if (bufferschanged)
+  {
+    auto frame = (const love::video::VideoStream::Frame *) stream->getFrontBuffer();
 
-		int widths[3]  = {frame->yw, frame->cw, frame->cw};
-		int heights[3] = {frame->yh, frame->ch, frame->ch};
+    int widths[3] = {frame->yw, frame->cw, frame->cw};
+    int heights[3] = {frame->yh, frame->ch, frame->ch};
 
-		const unsigned char *data[3] = {frame->yplane, frame->cbplane, frame->crplane};
+    const unsigned char *data[3] = {frame->yplane, frame->cbplane, frame->crplane};
 
-		for (int i = 0; i < 3; i++)
-		{
-			size_t bpp = getPixelFormatSize(PIXELFORMAT_R8);
-			size_t size = bpp * widths[i] * heights[i];
+    for (int i = 0; i < 3; i++)
+    {
+      size_t bpp = getPixelFormatSize(PIXELFORMAT_R8);
+      size_t size = bpp * widths[i] * heights[i];
 
-			Rect rect = {0, 0, widths[i], heights[i]};
-			images[i]->replacePixels(data[i], size, 0, 0, rect, false);
-		}
-	}
+      Rect rect = {0, 0, widths[i], heights[i]};
+      images[i]->replacePixels(data[i], size, 0, 0, rect, false);
+    }
+  }
 }
 
-love::audio::Source *Video::getSource()
-{
-	return source;
-}
+love::audio::Source *Video::getSource() { return source; }
 
-void Video::setSource(love::audio::Source *source)
-{
-	this->source = source;
-}
+void Video::setSource(love::audio::Source *source) { this->source = source; }
 
-int Video::getWidth() const
-{
-	return width;
-}
+int Video::getWidth() const { return width; }
 
-int Video::getHeight() const
-{
-	return height;
-}
+int Video::getHeight() const { return height; }
 
-int Video::getPixelWidth() const
-{
-	return stream->getWidth();
-}
+int Video::getPixelWidth() const { return stream->getWidth(); }
 
-int Video::getPixelHeight() const
-{
-	return stream->getHeight();
-}
+int Video::getPixelHeight() const { return stream->getHeight(); }
 
 void Video::setFilter(const Texture::Filter &f)
 {
-	for (const auto &image : images)
-		image->setFilter(f);
+  for (const auto &image : images) image->setFilter(f);
 
-	filter = f;
+  filter = f;
 }
 
-const Texture::Filter &Video::getFilter() const
-{
-	return filter;
-}
+const Texture::Filter &Video::getFilter() const { return filter; }
 
-} // graphics
-} // love
+}  // namespace graphics
+}  // namespace love

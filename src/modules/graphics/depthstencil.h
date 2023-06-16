@@ -20,8 +20,8 @@
 
 #pragma once
 
-#include <vector>
 #include <string>
+#include <vector>
 
 namespace love
 {
@@ -30,26 +30,26 @@ namespace graphics
 
 enum StencilAction
 {
-	STENCIL_REPLACE,
-	STENCIL_INCREMENT,
-	STENCIL_DECREMENT,
-	STENCIL_INCREMENT_WRAP,
-	STENCIL_DECREMENT_WRAP,
-	STENCIL_INVERT,
-	STENCIL_MAX_ENUM
+  STENCIL_REPLACE,
+  STENCIL_INCREMENT,
+  STENCIL_DECREMENT,
+  STENCIL_INCREMENT_WRAP,
+  STENCIL_DECREMENT_WRAP,
+  STENCIL_INVERT,
+  STENCIL_MAX_ENUM
 };
 
 enum CompareMode
 {
-	COMPARE_LESS,
-	COMPARE_LEQUAL,
-	COMPARE_EQUAL,
-	COMPARE_GEQUAL,
-	COMPARE_GREATER,
-	COMPARE_NOTEQUAL,
-	COMPARE_ALWAYS,
-	COMPARE_NEVER,
-	COMPARE_MAX_ENUM
+  COMPARE_LESS,
+  COMPARE_LEQUAL,
+  COMPARE_EQUAL,
+  COMPARE_GEQUAL,
+  COMPARE_GREATER,
+  COMPARE_NOTEQUAL,
+  COMPARE_ALWAYS,
+  COMPARE_NEVER,
+  COMPARE_MAX_ENUM
 };
 
 /**
@@ -70,5 +70,5 @@ bool getConstant(const char *in, CompareMode &out);
 bool getConstant(CompareMode in, const char *&out);
 std::vector<std::string> getConstants(CompareMode);
 
-} // graphics
-} // love
+}  // namespace graphics
+}  // namespace love

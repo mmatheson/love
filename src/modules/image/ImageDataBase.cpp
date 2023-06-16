@@ -26,26 +26,17 @@ namespace image
 {
 
 ImageDataBase::ImageDataBase(PixelFormat format, int width, int height)
-	: format(format)
-	, width(width)
-	, height(height)
+    : format(format),
+      width(width),
+      height(height)
 {
 }
 
-PixelFormat ImageDataBase::getFormat() const
-{
-	return format;
-}
+PixelFormat ImageDataBase::getFormat() const { return format; }
 
-int ImageDataBase::getWidth() const
-{
-	return width;
-}
+int ImageDataBase::getWidth() const { return width; }
 
-int ImageDataBase::getHeight() const
-{
-	return height;
-}
+int ImageDataBase::getHeight() const { return height; }
 
-} // image
-} // love
+}  // namespace image
+}  // namespace love

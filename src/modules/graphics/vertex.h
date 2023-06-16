@@ -21,13 +21,14 @@
 #pragma once
 
 // LOVE
-#include "common/int.h"
 #include "common/Color.h"
+#include "common/int.h"
 
 // C
 #include <stddef.h>
-#include <vector>
+
 #include <string>
+#include <vector>
 
 namespace love
 {
@@ -40,58 +41,58 @@ class Resource;
 // generic vertex attribute indices.
 enum BuiltinVertexAttribute
 {
-	ATTRIB_POS = 0,
-	ATTRIB_TEXCOORD,
-	ATTRIB_COLOR,
-	ATTRIB_CONSTANTCOLOR,
-	ATTRIB_MAX_ENUM
+  ATTRIB_POS = 0,
+  ATTRIB_TEXCOORD,
+  ATTRIB_COLOR,
+  ATTRIB_CONSTANTCOLOR,
+  ATTRIB_MAX_ENUM
 };
 
 enum BuiltinVertexAttributeFlag
 {
-	ATTRIBFLAG_POS = 1 << ATTRIB_POS,
-	ATTRIBFLAG_TEXCOORD = 1 << ATTRIB_TEXCOORD,
-	ATTRIBFLAG_COLOR = 1 << ATTRIB_COLOR,
-	ATTRIBFLAG_CONSTANTCOLOR = 1 << ATTRIB_CONSTANTCOLOR
+  ATTRIBFLAG_POS = 1 << ATTRIB_POS,
+  ATTRIBFLAG_TEXCOORD = 1 << ATTRIB_TEXCOORD,
+  ATTRIBFLAG_COLOR = 1 << ATTRIB_COLOR,
+  ATTRIBFLAG_CONSTANTCOLOR = 1 << ATTRIB_CONSTANTCOLOR
 };
 
 enum BufferType
 {
-	BUFFER_VERTEX = 0,
-	BUFFER_INDEX,
-	BUFFER_MAX_ENUM
+  BUFFER_VERTEX = 0,
+  BUFFER_INDEX,
+  BUFFER_MAX_ENUM
 };
 
 enum IndexDataType
 {
-	INDEX_UINT16,
-	INDEX_UINT32,
-	INDEX_MAX_ENUM
+  INDEX_UINT16,
+  INDEX_UINT32,
+  INDEX_MAX_ENUM
 };
 
 // http://escience.anu.edu.au/lecture/cg/surfaceModeling/image/surfaceModeling015.png
 enum PrimitiveType
 {
-	PRIMITIVE_TRIANGLES,
-	PRIMITIVE_TRIANGLE_STRIP,
-	PRIMITIVE_TRIANGLE_FAN,
-	PRIMITIVE_POINTS,
-	PRIMITIVE_MAX_ENUM
+  PRIMITIVE_TRIANGLES,
+  PRIMITIVE_TRIANGLE_STRIP,
+  PRIMITIVE_TRIANGLE_FAN,
+  PRIMITIVE_POINTS,
+  PRIMITIVE_MAX_ENUM
 };
 
 enum AttributeStep
 {
-	STEP_PER_VERTEX,
-	STEP_PER_INSTANCE,
-	STEP_MAX_ENUM
+  STEP_PER_VERTEX,
+  STEP_PER_INSTANCE,
+  STEP_MAX_ENUM
 };
 
 enum CullMode
 {
-	CULL_NONE,
-	CULL_BACK,
-	CULL_FRONT,
-	CULL_MAX_ENUM
+  CULL_NONE,
+  CULL_BACK,
+  CULL_FRONT,
+  CULL_MAX_ENUM
 };
 
 namespace vertex
@@ -100,189 +101,178 @@ namespace vertex
 // The expected usage pattern of vertex data.
 enum Usage
 {
-	USAGE_STREAM,
-	USAGE_DYNAMIC,
-	USAGE_STATIC,
-	USAGE_MAX_ENUM
+  USAGE_STREAM,
+  USAGE_DYNAMIC,
+  USAGE_STATIC,
+  USAGE_MAX_ENUM
 };
 
 enum DataType
 {
-	DATA_UNORM8,
-	DATA_UNORM16,
-	DATA_FLOAT,
-	DATA_MAX_ENUM
+  DATA_UNORM8,
+  DATA_UNORM16,
+  DATA_FLOAT,
+  DATA_MAX_ENUM
 };
 
 enum Winding
 {
-	WINDING_CW,
-	WINDING_CCW,
-	WINDING_MAX_ENUM
+  WINDING_CW,
+  WINDING_CCW,
+  WINDING_MAX_ENUM
 };
 
 enum class TriangleIndexMode
 {
-	NONE,
-	STRIP,
-	FAN,
-	QUADS,
+  NONE,
+  STRIP,
+  FAN,
+  QUADS,
 };
 
 enum class CommonFormat
 {
-	NONE,
-	XYf,
-	XYZf,
-	RGBAub,
-	STf_RGBAub,
-	STPf_RGBAub,
-	XYf_STf,
-	XYf_STPf,
-	XYf_STf_RGBAub,
-	XYf_STus_RGBAub,
-	XYf_STPf_RGBAub,
+  NONE,
+  XYf,
+  XYZf,
+  RGBAub,
+  STf_RGBAub,
+  STPf_RGBAub,
+  XYf_STf,
+  XYf_STPf,
+  XYf_STf_RGBAub,
+  XYf_STus_RGBAub,
+  XYf_STPf_RGBAub,
 };
 
 struct STf_RGBAub
 {
-	float s, t;
-	Color32 color;
+  float s, t;
+  Color32 color;
 };
 
 struct STPf_RGBAub
 {
-	float s, t, p;
-	Color32 color;
+  float s, t, p;
+  Color32 color;
 };
 
 struct XYf_STf
 {
-	float x, y;
-	float s, t;
+  float x, y;
+  float s, t;
 };
 
 struct XYf_STPf
 {
-	float x, y;
-	float s, t, p;
+  float x, y;
+  float s, t, p;
 };
 
 struct XYf_STf_RGBAub
 {
-	float x, y;
-	float s, t;
-	Color32 color;
+  float x, y;
+  float s, t;
+  Color32 color;
 };
 
 struct XYf_STus_RGBAub
 {
-	float  x, y;
-	uint16 s, t;
-	Color32 color;
+  float x, y;
+  uint16 s, t;
+  Color32 color;
 };
 
 struct XYf_STPf_RGBAub
 {
-	float x, y;
-	float s, t, p;
-	Color32 color;
+  float x, y;
+  float s, t, p;
+  Color32 color;
 };
 
 struct BufferBindings
 {
-	static const uint32 MAX = 32;
+  static const uint32 MAX = 32;
 
-	uint32 useBits = 0;
+  uint32 useBits = 0;
 
-	struct
-	{
-		Resource *buffer;
-		size_t offset;
-	} info[MAX];
+  struct
+  {
+    Resource *buffer;
+    size_t offset;
+  } info[MAX];
 
-	void set(uint32 index, Resource *r, size_t offset)
-	{
-		useBits |= (1u << index);
-		info[index] = {r, offset};
-	}
+  void set(uint32 index, Resource *r, size_t offset)
+  {
+    useBits |= (1u << index);
+    info[index] = {r, offset};
+  }
 
-	void disable(uint32 index) { useBits &= (1u << index); }
-	void clear() { useBits = 0; }
+  void disable(uint32 index) { useBits &= (1u << index); }
+  void clear() { useBits = 0; }
 };
 
 struct AttributeInfo
 {
-	uint8 bufferIndex;
-	DataType type : 4;
-	uint8 components : 4;
-	uint16 offsetFromVertex;
+  uint8 bufferIndex;
+  DataType type : 4;
+  uint8 components : 4;
+  uint16 offsetFromVertex;
 };
 
 struct BufferLayout
 {
-	uint16 stride;
+  uint16 stride;
 };
 
 struct Attributes
 {
-	static const uint32 MAX = 32;
+  static const uint32 MAX = 32;
 
-	uint32 enableBits = 0; // indexed by attribute
-	uint32 instanceBits = 0; // indexed by buffer
+  uint32 enableBits = 0;    // indexed by attribute
+  uint32 instanceBits = 0;  // indexed by buffer
 
-	AttributeInfo attribs[MAX];
-	BufferLayout bufferLayouts[BufferBindings::MAX];
+  AttributeInfo attribs[MAX];
+  BufferLayout bufferLayouts[BufferBindings::MAX];
 
-	Attributes() {}
-	Attributes(CommonFormat format, uint8 bufferindex)
-	{
-		setCommonFormat(format, bufferindex);
-	}
+  Attributes() {}
+  Attributes(CommonFormat format, uint8 bufferindex) { setCommonFormat(format, bufferindex); }
 
-	void set(uint32 index, DataType type, uint8 components, uint16 offsetfromvertex, uint8 bufferindex)
-	{
-		enableBits |= (1u << index);
+  void set(uint32 index, DataType type, uint8 components, uint16 offsetfromvertex,
+           uint8 bufferindex)
+  {
+    enableBits |= (1u << index);
 
-		attribs[index].bufferIndex = bufferindex;
-		attribs[index].type = type;
-		attribs[index].components = components;
-		attribs[index].offsetFromVertex = offsetfromvertex;
-	}
+    attribs[index].bufferIndex = bufferindex;
+    attribs[index].type = type;
+    attribs[index].components = components;
+    attribs[index].offsetFromVertex = offsetfromvertex;
+  }
 
-	void setBufferLayout(uint32 bufferindex, uint16 stride, AttributeStep step = STEP_PER_VERTEX)
-	{
-		uint32 bufferbit = (1u << bufferindex);
+  void setBufferLayout(uint32 bufferindex, uint16 stride, AttributeStep step = STEP_PER_VERTEX)
+  {
+    uint32 bufferbit = (1u << bufferindex);
 
-		if (step == STEP_PER_INSTANCE)
-			instanceBits |= bufferbit;
-		else
-			instanceBits &= ~bufferbit;
+    if (step == STEP_PER_INSTANCE)
+      instanceBits |= bufferbit;
+    else
+      instanceBits &= ~bufferbit;
 
-		bufferLayouts[bufferindex].stride = stride;
-	}
+    bufferLayouts[bufferindex].stride = stride;
+  }
 
-	void disable(uint32 index)
-	{
-		enableBits &= ~(1u << index);
-	}
+  void disable(uint32 index) { enableBits &= ~(1u << index); }
 
-	void clear()
-	{
-		enableBits = 0;
-	}
+  void clear() { enableBits = 0; }
 
-	bool isEnabled(uint32 index) const
-	{
-		return (enableBits & (1u << index)) != 0;
-	}
+  bool isEnabled(uint32 index) const { return (enableBits & (1u << index)) != 0; }
 
-	AttributeStep getBufferStep(uint32 index) const
-	{
-		return (instanceBits & (1u << index)) != 0 ? STEP_PER_INSTANCE : STEP_PER_VERTEX;
-	}
+  AttributeStep getBufferStep(uint32 index) const
+  {
+    return (instanceBits & (1u << index)) != 0 ? STEP_PER_INSTANCE : STEP_PER_VERTEX;
+  }
 
-	void setCommonFormat(CommonFormat format, uint8 bufferindex);
+  void setCommonFormat(CommonFormat format, uint8 bufferindex);
 };
 
 size_t getFormatStride(CommonFormat format);
@@ -293,7 +283,7 @@ int getFormatPositionComponents(CommonFormat format);
 
 inline CommonFormat getSinglePositionFormat(bool is2D)
 {
-	return is2D ? CommonFormat::XYf : CommonFormat::XYZf;
+  return is2D ? CommonFormat::XYf : CommonFormat::XYZf;
 }
 
 size_t getIndexDataSize(IndexDataType type);
@@ -337,9 +327,9 @@ bool getConstant(const char *in, Winding &out);
 bool getConstant(Winding in, const char *&out);
 std::vector<std::string> getConstants(Winding);
 
-} // vertex
+}  // namespace vertex
 
 typedef vertex::XYf_STf_RGBAub Vertex;
 
-} // graphics
-} // love
+}  // namespace graphics
+}  // namespace love

@@ -20,6 +20,7 @@
 
 // LOVE
 #include "wrap_CompressedData.h"
+
 #include "wrap_Data.h"
 
 namespace love
@@ -29,44 +30,44 @@ namespace data
 
 CompressedData *luax_checkcompresseddata(lua_State *L, int idx)
 {
-	return luax_checktype<CompressedData>(L, idx);
+  return luax_checktype<CompressedData>(L, idx);
 }
 
 int w_CompressedData_clone(lua_State *L)
 {
-	CompressedData *t = luax_checkcompresseddata(L, 1), *c = nullptr;
-	luax_catchexcept(L, [&](){ c = t->clone(); });
-	luax_pushtype(L, c);
-	c->release();
-	return 1;
+  CompressedData *t = luax_checkcompresseddata(L, 1), *c = nullptr;
+  luax_catchexcept(L, [&]() { c = t->clone(); });
+  luax_pushtype(L, c);
+  c->release();
+  return 1;
 }
 
 int w_CompressedData_getFormat(lua_State *L)
 {
-	CompressedData *t = luax_checkcompresseddata(L, 1);
+  CompressedData *t = luax_checkcompresseddata(L, 1);
 
-	const char *fname = nullptr;
-	if (!Compressor::getConstant(t->getFormat(), fname))
-		return luax_enumerror(L, "compressed data format", Compressor::getConstants(Compressor::FORMAT_MAX_ENUM), fname);
+  const char *fname = nullptr;
+  if (!Compressor::getConstant(t->getFormat(), fname))
+    return luax_enumerror(L, "compressed data format",
+                          Compressor::getConstants(Compressor::FORMAT_MAX_ENUM), fname);
 
-	lua_pushstring(L, fname);
-	return 1;
+  lua_pushstring(L, fname);
+  return 1;
 }
 
-static const luaL_Reg w_CompressedData_functions[] =
-{
-	{ "clone", w_CompressedData_clone },
-	{ "getFormat", w_CompressedData_getFormat },
-	{ 0, 0 },
+static const luaL_Reg w_CompressedData_functions[] = {
+    {"clone", w_CompressedData_clone},
+    {"getFormat", w_CompressedData_getFormat},
+    {0, 0},
 };
-
 
 extern "C" int luaopen_compresseddata(lua_State *L)
 {
-	int ret = luax_register_type(L, &CompressedData::type, w_Data_functions, w_CompressedData_functions, nullptr);
-	love::data::luax_rundatawrapper(L, CompressedData::type);
-	return ret;
+  int ret = luax_register_type(L, &CompressedData::type, w_Data_functions,
+                               w_CompressedData_functions, nullptr);
+  love::data::luax_rundatawrapper(L, CompressedData::type);
+  return ret;
 }
 
-} // data
-} // love
+}  // namespace data
+}  // namespace love

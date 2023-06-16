@@ -32,134 +32,116 @@ namespace lullaby
 {
 
 ModPlugDecoder::ModPlugDecoder(Data *data, int bufferSize)
-	: Decoder(data, bufferSize)
-	, plug(0)
-	, duration(-2.0)
+    : Decoder(data, bufferSize),
+      plug(0),
+      duration(-2.0)
 {
+  // Set some ModPlug settings.
+  settings.mFlags = MODPLUG_ENABLE_OVERSAMPLING | MODPLUG_ENABLE_NOISE_REDUCTION;
+  settings.mChannels = 2;
+  settings.mBits = 16;
+  settings.mFrequency = sampleRate;
+  settings.mResamplingMode = MODPLUG_RESAMPLE_LINEAR;
 
-	// Set some ModPlug settings.
-	settings.mFlags = MODPLUG_ENABLE_OVERSAMPLING | MODPLUG_ENABLE_NOISE_REDUCTION;
-	settings.mChannels = 2;
-	settings.mBits = 16;
-	settings.mFrequency = sampleRate;
-	settings.mResamplingMode = MODPLUG_RESAMPLE_LINEAR;
+  // fill with modplug defaults (modplug _memsets_, so we could get
+  // garbage settings when the struct is only partially initialized)
+  // This does not exist yet on Windows.
 
-	// fill with modplug defaults (modplug _memsets_, so we could get
-	// garbage settings when the struct is only partially initialized)
-	// This does not exist yet on Windows.
+  settings.mStereoSeparation = 128;
+  settings.mMaxMixChannels = 32;
+  settings.mReverbDepth = 0;
+  settings.mReverbDelay = 0;
+  settings.mBassAmount = 0;
+  settings.mBassRange = 0;
+  settings.mSurroundDepth = 0;
+  settings.mSurroundDelay = 0;
+  settings.mLoopCount = -1;
 
-	settings.mStereoSeparation = 128;
-	settings.mMaxMixChannels = 32;
-	settings.mReverbDepth = 0;
-	settings.mReverbDelay = 0;
-	settings.mBassAmount = 0;
-	settings.mBassRange = 0;
-	settings.mSurroundDepth = 0;
-	settings.mSurroundDelay = 0;
-	settings.mLoopCount = -1;
+  ModPlug_SetSettings(&settings);
 
-	ModPlug_SetSettings(&settings);
+  // Load the module.
+  plug = ModPlug_Load(data->getData(), (int) data->getSize());
 
-	// Load the module.
-	plug = ModPlug_Load(data->getData(), (int) data->getSize());
+  if (plug == 0)
+    throw love::Exception("Could not load file with ModPlug.");
 
-	if (plug == 0)
-		throw love::Exception("Could not load file with ModPlug.");
-
-	// set master volume for delicate ears
-	ModPlug_SetMasterVolume(plug, 128);
+  // set master volume for delicate ears
+  ModPlug_SetMasterVolume(plug, 128);
 }
 
 ModPlugDecoder::~ModPlugDecoder()
 {
-	if (plug != 0)
-		ModPlug_Unload(plug);
+  if (plug != 0)
+    ModPlug_Unload(plug);
 }
 
 bool ModPlugDecoder::accepts(const std::string &ext)
 {
-	static const std::string supported[] =
-	{
-		"699", "abc", "amf", "ams", "dbm", "dmf",
-		"dsm", "far", "it", "j2b", "mdl", "med",
-		"mid", "mod", "mt2", "mtm", "okt", "pat",
-		"psm", "s3m", "stm", "ult", "umx",  "xm",
-		""
-	};
+  static const std::string supported[] = {
+      "699", "abc", "amf", "ams", "dbm", "dmf", "dsm", "far", "it",  "j2b", "mdl", "med", "mid",
+      "mod", "mt2", "mtm", "okt", "pat", "psm", "s3m", "stm", "ult", "umx", "xm",  ""};
 
-	for (int i = 0; !(supported[i].empty()); i++)
-	{
-		if (supported[i].compare(ext) == 0)
-			return true;
-	}
+  for (int i = 0; !(supported[i].empty()); i++)
+  {
+    if (supported[i].compare(ext) == 0)
+      return true;
+  }
 
-	return false;
+  return false;
 }
 
-love::sound::Decoder *ModPlugDecoder::clone()
-{
-	return new ModPlugDecoder(data.get(), bufferSize);
-}
+love::sound::Decoder *ModPlugDecoder::clone() { return new ModPlugDecoder(data.get(), bufferSize); }
 
 int ModPlugDecoder::decode()
 {
-	int r =  ModPlug_Read(plug, buffer, bufferSize);
+  int r = ModPlug_Read(plug, buffer, bufferSize);
 
-	if (r == 0)
-		eof = true;
+  if (r == 0)
+    eof = true;
 
-	return r;
+  return r;
 }
 
 bool ModPlugDecoder::seek(double s)
 {
-	ModPlug_Seek(plug, (int)(s*1000.0));
-	return true;
+  ModPlug_Seek(plug, (int) (s * 1000.0));
+  return true;
 }
 
 bool ModPlugDecoder::rewind()
 {
-	// Let's reload.
-	ModPlug_Unload(plug);
-	plug = ModPlug_Load(data->getData(), (int) data->getSize());
-	ModPlug_SetMasterVolume(plug, 128);
-	eof = false;
-	return (plug != 0);
+  // Let's reload.
+  ModPlug_Unload(plug);
+  plug = ModPlug_Load(data->getData(), (int) data->getSize());
+  ModPlug_SetMasterVolume(plug, 128);
+  eof = false;
+  return (plug != 0);
 }
 
-bool ModPlugDecoder::isSeekable()
-{
-	return true;
-}
+bool ModPlugDecoder::isSeekable() { return true; }
 
-int ModPlugDecoder::getChannelCount() const
-{
-	return 2;
-}
+int ModPlugDecoder::getChannelCount() const { return 2; }
 
-int ModPlugDecoder::getBitDepth() const
-{
-	return 16;
-}
+int ModPlugDecoder::getBitDepth() const { return 16; }
 
 double ModPlugDecoder::getDuration()
 {
-	// Only calculate the duration if we haven't done so already.
-	if (duration == -2.0)
-	{
-		int lengthms = ModPlug_GetLength(plug);
+  // Only calculate the duration if we haven't done so already.
+  if (duration == -2.0)
+  {
+    int lengthms = ModPlug_GetLength(plug);
 
-		if (lengthms < 0)
-			duration = -1.0;
-		else
-			duration = (double) lengthms / 1000.0;
-	}
+    if (lengthms < 0)
+      duration = -1.0;
+    else
+      duration = (double) lengthms / 1000.0;
+  }
 
-	return duration;
+  return duration;
 }
 
-} // lullaby
-} // sound
-} // love
+}  // namespace lullaby
+}  // namespace sound
+}  // namespace love
 
-#endif // LOVE_NO_MODPLUG
+#endif  // LOVE_NO_MODPLUG

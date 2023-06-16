@@ -22,8 +22,8 @@
 
 // Module
 #include "Body.h"
-#include "World.h"
 #include "Physics.h"
+#include "World.h"
 
 namespace love
 {
@@ -34,46 +34,37 @@ namespace box2d
 
 love::Type PulleyJoint::type("PulleyJoint", &Joint::type);
 
-PulleyJoint::PulleyJoint(Body *bodyA, Body *bodyB, b2Vec2 groundAnchorA, b2Vec2 groundAnchorB, b2Vec2 anchorA, b2Vec2 anchorB, float ratio, bool collideConnected)
-	: Joint(bodyA, bodyB)
-	, joint(NULL)
+PulleyJoint::PulleyJoint(Body *bodyA, Body *bodyB, b2Vec2 groundAnchorA, b2Vec2 groundAnchorB,
+                         b2Vec2 anchorA, b2Vec2 anchorB, float ratio, bool collideConnected)
+    : Joint(bodyA, bodyB),
+      joint(NULL)
 {
-	b2PulleyJointDef def;
-	def.Initialize(bodyA->body, bodyB->body, Physics::scaleDown(groundAnchorA), Physics::scaleDown(groundAnchorB), \
-				   Physics::scaleDown(anchorA), Physics::scaleDown(anchorB), ratio);
-	def.collideConnected = collideConnected;
+  b2PulleyJointDef def;
+  def.Initialize(bodyA->body, bodyB->body, Physics::scaleDown(groundAnchorA),
+                 Physics::scaleDown(groundAnchorB), Physics::scaleDown(anchorA),
+                 Physics::scaleDown(anchorB), ratio);
+  def.collideConnected = collideConnected;
 
-	joint = (b2PulleyJoint *)createJoint(&def);
+  joint = (b2PulleyJoint *) createJoint(&def);
 }
 
-PulleyJoint::~PulleyJoint()
-{
-}
+PulleyJoint::~PulleyJoint() {}
 
 int PulleyJoint::getGroundAnchors(lua_State *L)
 {
-	lua_pushnumber(L, Physics::scaleUp(joint->GetGroundAnchorA().x));
-	lua_pushnumber(L, Physics::scaleUp(joint->GetGroundAnchorA().y));
-	lua_pushnumber(L, Physics::scaleUp(joint->GetGroundAnchorB().x));
-	lua_pushnumber(L, Physics::scaleUp(joint->GetGroundAnchorB().y));
-	return 4;
+  lua_pushnumber(L, Physics::scaleUp(joint->GetGroundAnchorA().x));
+  lua_pushnumber(L, Physics::scaleUp(joint->GetGroundAnchorA().y));
+  lua_pushnumber(L, Physics::scaleUp(joint->GetGroundAnchorB().x));
+  lua_pushnumber(L, Physics::scaleUp(joint->GetGroundAnchorB().y));
+  return 4;
 }
 
-float PulleyJoint::getLengthA() const
-{
-	return Physics::scaleUp(joint->GetLengthA());
-}
+float PulleyJoint::getLengthA() const { return Physics::scaleUp(joint->GetLengthA()); }
 
-float PulleyJoint::getLengthB() const
-{
-	return Physics::scaleUp(joint->GetLengthB());
-}
+float PulleyJoint::getLengthB() const { return Physics::scaleUp(joint->GetLengthB()); }
 
-float PulleyJoint::getRatio() const
-{
-	return joint->GetRatio();
-}
+float PulleyJoint::getRatio() const { return joint->GetRatio(); }
 
-} // box2d
-} // physics
-} // love
+}  // namespace box2d
+}  // namespace physics
+}  // namespace love

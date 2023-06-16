@@ -21,9 +21,9 @@
 #ifndef LOVE_AUDIO_WRAP_SOURCE_H
 #define LOVE_AUDIO_WRAP_SOURCE_H
 
-#include "common/runtime.h"
-#include "Source.h"
 #include "Filter.h"
+#include "Source.h"
+#include "common/runtime.h"
 
 namespace love
 {
@@ -33,7 +33,7 @@ namespace audio
 Source *luax_checksource(lua_State *L, int idx);
 extern "C" int luaopen_source(lua_State *L);
 
-} // audio
-} // love
+}  // namespace audio
+}  // namespace love
 
-#endif // LOVE_AUDIO_WRAP_SOURCE_H
+#endif  // LOVE_AUDIO_WRAP_SOURCE_H

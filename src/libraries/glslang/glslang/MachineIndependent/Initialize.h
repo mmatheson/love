@@ -37,13 +37,14 @@
 #ifndef _INITIALIZE_INCLUDED_
 #define _INITIALIZE_INCLUDED_
 
-#include "../Include/ResourceLimits.h"
 #include "../Include/Common.h"
+#include "../Include/ResourceLimits.h"
 #include "../Include/ShHandle.h"
 #include "SymbolTable.h"
 #include "Versions.h"
 
-namespace glslang {
+namespace glslang
+{
 
 //
 // This is made to hold parseable strings for almost all the built-in
@@ -56,22 +57,30 @@ namespace glslang {
 //    commonBuiltins:  intersection of all stages' built-ins, processed just once
 //    stageBuiltins[]: anything a stage needs that's not in commonBuiltins
 //
-class TBuiltInParseables {
-public:
-    POOL_ALLOCATOR_NEW_DELETE(GetThreadPoolAllocator())
-    TBuiltInParseables();
-    virtual ~TBuiltInParseables();
-    virtual void initialize(int version, EProfile, const SpvVersion& spvVersion) = 0;
-    virtual void initialize(const TBuiltInResource& resources, int version, EProfile, const SpvVersion& spvVersion, EShLanguage) = 0;
-    virtual const TString& getCommonString() const { return commonBuiltins; }
-    virtual const TString& getStageString(EShLanguage language) const { return stageBuiltins[language]; }
+class TBuiltInParseables
+{
+ public:
+  POOL_ALLOCATOR_NEW_DELETE(GetThreadPoolAllocator())
+  TBuiltInParseables();
+  virtual ~TBuiltInParseables();
+  virtual void initialize(int version, EProfile, const SpvVersion &spvVersion) = 0;
+  virtual void initialize(const TBuiltInResource &resources, int version, EProfile,
+                          const SpvVersion &spvVersion, EShLanguage) = 0;
+  virtual const TString &getCommonString() const { return commonBuiltins; }
+  virtual const TString &getStageString(EShLanguage language) const
+  {
+    return stageBuiltins[language];
+  }
 
-    virtual void identifyBuiltIns(int version, EProfile profile, const SpvVersion& spvVersion, EShLanguage language, TSymbolTable& symbolTable) = 0;
-    virtual void identifyBuiltIns(int version, EProfile profile, const SpvVersion& spvVersion, EShLanguage language, TSymbolTable& symbolTable, const TBuiltInResource &resources) = 0;
+  virtual void identifyBuiltIns(int version, EProfile profile, const SpvVersion &spvVersion,
+                                EShLanguage language, TSymbolTable &symbolTable) = 0;
+  virtual void identifyBuiltIns(int version, EProfile profile, const SpvVersion &spvVersion,
+                                EShLanguage language, TSymbolTable &symbolTable,
+                                const TBuiltInResource &resources) = 0;
 
-protected:
-    TString commonBuiltins;
-    TString stageBuiltins[EShLangCount];
+ protected:
+  TString commonBuiltins;
+  TString stageBuiltins[EShLangCount];
 };
 
 //
@@ -79,32 +88,37 @@ protected:
 // interface and match other similar code, it is called TBuiltIns, rather
 // than TBuiltInParseablesGlsl.
 //
-class TBuiltIns : public TBuiltInParseables {
-public:
-    POOL_ALLOCATOR_NEW_DELETE(GetThreadPoolAllocator())
-    TBuiltIns();
-    virtual ~TBuiltIns();
-    void initialize(int version, EProfile, const SpvVersion& spvVersion);
-    void initialize(const TBuiltInResource& resources, int version, EProfile, const SpvVersion& spvVersion, EShLanguage);
+class TBuiltIns : public TBuiltInParseables
+{
+ public:
+  POOL_ALLOCATOR_NEW_DELETE(GetThreadPoolAllocator())
+  TBuiltIns();
+  virtual ~TBuiltIns();
+  void initialize(int version, EProfile, const SpvVersion &spvVersion);
+  void initialize(const TBuiltInResource &resources, int version, EProfile,
+                  const SpvVersion &spvVersion, EShLanguage);
 
-    void identifyBuiltIns(int version, EProfile profile, const SpvVersion& spvVersion, EShLanguage language, TSymbolTable& symbolTable);
-    void identifyBuiltIns(int version, EProfile profile, const SpvVersion& spvVersion, EShLanguage language, TSymbolTable& symbolTable, const TBuiltInResource &resources);
+  void identifyBuiltIns(int version, EProfile profile, const SpvVersion &spvVersion,
+                        EShLanguage language, TSymbolTable &symbolTable);
+  void identifyBuiltIns(int version, EProfile profile, const SpvVersion &spvVersion,
+                        EShLanguage language, TSymbolTable &symbolTable,
+                        const TBuiltInResource &resources);
 
-protected:
-    void add2ndGenerationSamplingImaging(int version, EProfile profile, const SpvVersion& spvVersion);
-    void addSubpassSampling(TSampler, const TString& typeName, int version, EProfile profile);
-    void addQueryFunctions(TSampler, const TString& typeName, int version, EProfile profile);
-    void addImageFunctions(TSampler, const TString& typeName, int version, EProfile profile);
-    void addSamplingFunctions(TSampler, const TString& typeName, int version, EProfile profile);
-    void addGatherFunctions(TSampler, const TString& typeName, int version, EProfile profile);
+ protected:
+  void add2ndGenerationSamplingImaging(int version, EProfile profile, const SpvVersion &spvVersion);
+  void addSubpassSampling(TSampler, const TString &typeName, int version, EProfile profile);
+  void addQueryFunctions(TSampler, const TString &typeName, int version, EProfile profile);
+  void addImageFunctions(TSampler, const TString &typeName, int version, EProfile profile);
+  void addSamplingFunctions(TSampler, const TString &typeName, int version, EProfile profile);
+  void addGatherFunctions(TSampler, const TString &typeName, int version, EProfile profile);
 
-    // Helpers for making textual representations of the permutations
-    // of texturing/imaging functions.
-    const char* postfixes[5];
-    const char* prefixes[EbtNumTypes];
-    int dimMap[EsdNumDims];
+  // Helpers for making textual representations of the permutations
+  // of texturing/imaging functions.
+  const char *postfixes[5];
+  const char *prefixes[EbtNumTypes];
+  int dimMap[EsdNumDims];
 };
 
-} // end namespace glslang
+}  // end namespace glslang
 
-#endif // _INITIALIZE_INCLUDED_
+#endif  // _INITIALIZE_INCLUDED_

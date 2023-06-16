@@ -22,8 +22,8 @@
 #define LOVE_FILESYSTEM_WRAP_FILE_DATA_H
 
 // LOVE
-#include "common/runtime.h"
 #include "FileData.h"
+#include "common/runtime.h"
 
 namespace love
 {
@@ -33,7 +33,7 @@ namespace filesystem
 FileData *luax_checkfiledata(lua_State *L, int idx);
 extern "C" int luaopen_filedata(lua_State *L);
 
-} // filesystem
-} // love
+}  // namespace filesystem
+}  // namespace love
 
-#endif // LOVE_FILESYSTEM_WRAP_FILE_DATA_H
+#endif  // LOVE_FILESYSTEM_WRAP_FILE_DATA_H

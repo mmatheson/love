@@ -29,54 +29,53 @@ namespace box2d
 
 PulleyJoint *luax_checkpulleyjoint(lua_State *L, int idx)
 {
-	PulleyJoint *j = luax_checktype<PulleyJoint>(L, idx);
-	if (!j->isValid())
-		luaL_error(L, "Attempt to use destroyed joint.");
-	return j;
+  PulleyJoint *j = luax_checktype<PulleyJoint>(L, idx);
+  if (!j->isValid())
+    luaL_error(L, "Attempt to use destroyed joint.");
+  return j;
 }
 
 int w_PulleyJoint_getGroundAnchors(lua_State *L)
 {
-	PulleyJoint *t = luax_checkpulleyjoint(L, 1);
-	lua_remove(L, 1);
-	return t->getGroundAnchors(L);
+  PulleyJoint *t = luax_checkpulleyjoint(L, 1);
+  lua_remove(L, 1);
+  return t->getGroundAnchors(L);
 }
 
 int w_PulleyJoint_getLengthA(lua_State *L)
 {
-	PulleyJoint *t = luax_checkpulleyjoint(L, 1);
-	lua_pushnumber(L, t->getLengthA());
-	return 1;
+  PulleyJoint *t = luax_checkpulleyjoint(L, 1);
+  lua_pushnumber(L, t->getLengthA());
+  return 1;
 }
 
 int w_PulleyJoint_getLengthB(lua_State *L)
 {
-	PulleyJoint *t = luax_checkpulleyjoint(L, 1);
-	lua_pushnumber(L, t->getLengthB());
-	return 1;
+  PulleyJoint *t = luax_checkpulleyjoint(L, 1);
+  lua_pushnumber(L, t->getLengthB());
+  return 1;
 }
 
 int w_PulleyJoint_getRatio(lua_State *L)
 {
-	PulleyJoint *t = luax_checkpulleyjoint(L, 1);
-	lua_pushnumber(L, t->getRatio());
-	return 1;
+  PulleyJoint *t = luax_checkpulleyjoint(L, 1);
+  lua_pushnumber(L, t->getRatio());
+  return 1;
 }
 
-static const luaL_Reg w_PulleyJoint_functions[] =
-{
-	{ "getGroundAnchors", w_PulleyJoint_getGroundAnchors },
-	{ "getLengthA", w_PulleyJoint_getLengthA },
-	{ "getLengthB", w_PulleyJoint_getLengthB },
-	{ "getRatio", w_PulleyJoint_getRatio },
-	{ 0, 0 }
-};
+static const luaL_Reg w_PulleyJoint_functions[] = {
+    {"getGroundAnchors", w_PulleyJoint_getGroundAnchors},
+    {"getLengthA", w_PulleyJoint_getLengthA},
+    {"getLengthB", w_PulleyJoint_getLengthB},
+    {"getRatio", w_PulleyJoint_getRatio},
+    {0, 0}};
 
 extern "C" int luaopen_pulleyjoint(lua_State *L)
 {
-	return luax_register_type(L, &PulleyJoint::type, w_Joint_functions, w_PulleyJoint_functions, nullptr);
+  return luax_register_type(L, &PulleyJoint::type, w_Joint_functions, w_PulleyJoint_functions,
+                            nullptr);
 }
 
-} // box2d
-} // physics
-} // love
+}  // namespace box2d
+}  // namespace physics
+}  // namespace love

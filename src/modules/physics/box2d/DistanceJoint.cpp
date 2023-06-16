@@ -22,8 +22,8 @@
 
 // Module
 #include "Body.h"
-#include "World.h"
 #include "Physics.h"
+#include "World.h"
 
 namespace love
 {
@@ -32,51 +32,32 @@ namespace physics
 namespace box2d
 {
 
-DistanceJoint::DistanceJoint(Body *body1, Body *body2, float x1, float y1, float x2, float y2, bool collideConnected)
-	: Joint(body1, body2)
-	, joint(NULL)
+DistanceJoint::DistanceJoint(Body *body1, Body *body2, float x1, float y1, float x2, float y2,
+                             bool collideConnected)
+    : Joint(body1, body2),
+      joint(NULL)
 {
-	b2DistanceJointDef def;
-	def.Initialize(body1->body, body2->body, Physics::scaleDown(b2Vec2(x1,y1)), Physics::scaleDown(b2Vec2(x2,y2)));
-	def.collideConnected = collideConnected;
-	joint = (b2DistanceJoint *)createJoint(&def);
+  b2DistanceJointDef def;
+  def.Initialize(body1->body, body2->body, Physics::scaleDown(b2Vec2(x1, y1)),
+                 Physics::scaleDown(b2Vec2(x2, y2)));
+  def.collideConnected = collideConnected;
+  joint = (b2DistanceJoint *) createJoint(&def);
 }
 
-DistanceJoint::~DistanceJoint()
-{
-}
+DistanceJoint::~DistanceJoint() {}
 
-void DistanceJoint::setLength(float length)
-{
-	joint->SetLength(Physics::scaleDown(length));
-}
+void DistanceJoint::setLength(float length) { joint->SetLength(Physics::scaleDown(length)); }
 
-float DistanceJoint::getLength() const
-{
-	return Physics::scaleUp(joint->GetLength());
-}
+float DistanceJoint::getLength() const { return Physics::scaleUp(joint->GetLength()); }
 
-void DistanceJoint::setFrequency(float hz)
-{
-	joint->SetFrequency(hz);
-}
+void DistanceJoint::setFrequency(float hz) { joint->SetFrequency(hz); }
 
-float DistanceJoint::getFrequency() const
-{
-	return joint->GetFrequency();
-}
+float DistanceJoint::getFrequency() const { return joint->GetFrequency(); }
 
-void DistanceJoint::setDampingRatio(float d)
-{
-	joint->SetDampingRatio(d);
-}
+void DistanceJoint::setDampingRatio(float d) { joint->SetDampingRatio(d); }
 
-float DistanceJoint::getDampingRatio() const
-{
-	return joint->GetDampingRatio();
-}
+float DistanceJoint::getDampingRatio() const { return joint->GetDampingRatio(); }
 
-
-} // box2d
-} // physics
-} // love
+}  // namespace box2d
+}  // namespace physics
+}  // namespace love

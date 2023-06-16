@@ -38,28 +38,28 @@ namespace freetype
 
 class Font : public love::font::Font
 {
-public:
+ public:
+  Font();
+  virtual ~Font();
 
-	Font();
-	virtual ~Font();
+  // Implements Font
+  Rasterizer *newRasterizer(love::filesystem::FileData *data) override;
+  Rasterizer *newTrueTypeRasterizer(love::Data *data, int size,
+                                    TrueTypeRasterizer::Hinting hinting) override;
+  Rasterizer *newTrueTypeRasterizer(love::Data *data, int size, float dpiscale,
+                                    TrueTypeRasterizer::Hinting hinting) override;
 
-	// Implements Font
-	Rasterizer *newRasterizer(love::filesystem::FileData *data) override;
-	Rasterizer *newTrueTypeRasterizer(love::Data *data, int size, TrueTypeRasterizer::Hinting hinting) override;
-	Rasterizer *newTrueTypeRasterizer(love::Data *data, int size, float dpiscale, TrueTypeRasterizer::Hinting hinting) override;
+  // Implement Module
+  const char *getName() const override;
 
-	// Implement Module
-	const char *getName() const override;
+ private:
+  // FreeType library
+  FT_Library library;
 
-private:
+};  // Font
 
-	// FreeType library
-	FT_Library library;
+}  // namespace freetype
+}  // namespace font
+}  // namespace love
 
-}; // Font
-
-} // freetype
-} // font
-} // love
-
-#endif // LOVE_FONT_FREETYPE_FONT_H
+#endif  // LOVE_FONT_FREETYPE_FONT_H

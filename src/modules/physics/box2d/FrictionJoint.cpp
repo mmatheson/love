@@ -24,8 +24,8 @@
 
 // Module
 #include "Body.h"
-#include "World.h"
 #include "Physics.h"
+#include "World.h"
 
 namespace love
 {
@@ -36,42 +36,34 @@ namespace box2d
 
 love::Type FrictionJoint::type("FrictionJoint", &Joint::type);
 
-FrictionJoint::FrictionJoint(Body *body1, Body *body2, float xA, float yA, float xB, float yB, bool collideConnected)
-	: Joint(body1, body2)
-	, joint(NULL)
+FrictionJoint::FrictionJoint(Body *body1, Body *body2, float xA, float yA, float xB, float yB,
+                             bool collideConnected)
+    : Joint(body1, body2),
+      joint(NULL)
 {
-	b2FrictionJointDef def;
-	def.Initialize(body1->body, body2->body, Physics::scaleDown(b2Vec2(xA,yA)));
-	def.localAnchorB = body2->body->GetLocalPoint(Physics::scaleDown(b2Vec2(xB, yB)));
-	def.collideConnected = collideConnected;
-	joint = (b2FrictionJoint *)createJoint(&def);
+  b2FrictionJointDef def;
+  def.Initialize(body1->body, body2->body, Physics::scaleDown(b2Vec2(xA, yA)));
+  def.localAnchorB = body2->body->GetLocalPoint(Physics::scaleDown(b2Vec2(xB, yB)));
+  def.collideConnected = collideConnected;
+  joint = (b2FrictionJoint *) createJoint(&def);
 }
 
-FrictionJoint::~FrictionJoint()
-{
-}
+FrictionJoint::~FrictionJoint() {}
 
-void FrictionJoint::setMaxForce(float force)
-{
-	joint->SetMaxForce(Physics::scaleDown(force));
-}
+void FrictionJoint::setMaxForce(float force) { joint->SetMaxForce(Physics::scaleDown(force)); }
 
-float FrictionJoint::getMaxForce() const
-{
-	return Physics::scaleUp(joint->GetMaxForce());
-}
+float FrictionJoint::getMaxForce() const { return Physics::scaleUp(joint->GetMaxForce()); }
 
 void FrictionJoint::setMaxTorque(float torque)
 {
-	joint->SetMaxTorque(Physics::scaleDown(Physics::scaleDown(torque)));
+  joint->SetMaxTorque(Physics::scaleDown(Physics::scaleDown(torque)));
 }
 
 float FrictionJoint::getMaxTorque() const
 {
-	return Physics::scaleUp(Physics::scaleUp(joint->GetMaxTorque()));
+  return Physics::scaleUp(Physics::scaleUp(joint->GetMaxTorque()));
 }
 
-
-} // box2d
-} // physics
-} // love
+}  // namespace box2d
+}  // namespace physics
+}  // namespace love

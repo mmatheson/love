@@ -26,17 +26,15 @@ namespace graphics
 {
 
 Buffer::Buffer(size_t size, BufferType type, vertex::Usage usage, uint32 mapflags)
-	: size(size)
-	, type(type)
-	, usage(usage)
-	, map_flags(mapflags)
-	, is_mapped(false)
+    : size(size),
+      type(type),
+      usage(usage),
+      map_flags(mapflags),
+      is_mapped(false)
 {
 }
 
-Buffer::~Buffer()
-{
-}
+Buffer::~Buffer() {}
 
-} // graphics
-} // love
+}  // namespace graphics
+}  // namespace love

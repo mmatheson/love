@@ -32,66 +32,63 @@ namespace data
 
 class HashFunction
 {
-public:
+ public:
+  enum Function
+  {
+    FUNCTION_MD5,
+    FUNCTION_SHA1,
+    FUNCTION_SHA224,
+    FUNCTION_SHA256,
+    FUNCTION_SHA384,
+    FUNCTION_SHA512,
+    FUNCTION_MAX_ENUM
+  };
 
-	enum Function
-	{
-		FUNCTION_MD5,
-		FUNCTION_SHA1,
-		FUNCTION_SHA224,
-		FUNCTION_SHA256,
-		FUNCTION_SHA384,
-		FUNCTION_SHA512,
-		FUNCTION_MAX_ENUM
-	};
+  struct Value
+  {
+    char data[64];  // Maximum possible size (SHA512).
+    size_t size;
+  };
 
-	struct Value
-	{
-		char data[64]; // Maximum possible size (SHA512).
-		size_t size;
-	};
+  /**
+   * Get a HashFunction instance for the given function.
+   *
+   * @param[in] function The selected hash function.
+   * @return An instance of HashFunction for the given function, or NULL if
+   *         not available.
+   **/
+  static HashFunction *getHashFunction(Function function);
 
-	/**
-	 * Get a HashFunction instance for the given function.
-	 *
-	 * @param[in] function The selected hash function.
-	 * @return An instance of HashFunction for the given function, or NULL if
-	 *         not available.
-	 **/
-	static HashFunction *getHashFunction(Function function);
+  virtual ~HashFunction() {}
 
-	virtual ~HashFunction() {}
+  /**
+   * Hash the input, producing an set of bytes as output.
+   *
+   * @param[in] function The selected hash function.
+   * @param[in] input The input data to hash.
+   * @param[in] length The length of the input data.
+   * @param[out] output The result of the hash function.
+   **/
+  virtual void hash(Function function, const char *input, uint64 length, Value &output) const = 0;
 
-	/**
-	 * Hash the input, producing an set of bytes as output.
-	 *
-	 * @param[in] function The selected hash function.
-	 * @param[in] input The input data to hash.
-	 * @param[in] length The length of the input data.
-	 * @param[out] output The result of the hash function.
-	 **/
-	virtual void hash(Function function, const char *input, uint64 length, Value &output) const = 0;
+  /**
+   * @param[in] function The requested hash function.
+   * @return Whether this HashFunction instance implements the given function.
+   **/
+  virtual bool isSupported(Function function) const = 0;
 
-	/**
-	 * @param[in] function The requested hash function.
-	 * @return Whether this HashFunction instance implements the given function.
-	 **/
-	virtual bool isSupported(Function function) const = 0;
+  static bool getConstant(const char *in, Function &out);
+  static bool getConstant(const Function &in, const char *&out);
+  static std::vector<std::string> getConstants(Function);
 
-	static bool getConstant(const char *in, Function &out);
-	static bool getConstant(const Function &in, const char *&out);
-	static std::vector<std::string> getConstants(Function);
+ protected:
+  HashFunction() {}
 
-protected:
+ private:
+  static StringMap<Function, FUNCTION_MAX_ENUM>::Entry functionEntries[];
+  static StringMap<Function, FUNCTION_MAX_ENUM> functionNames;
 
-	HashFunction() {}
+};  // HashFunction
 
-private:
-
-	static StringMap<Function, FUNCTION_MAX_ENUM>::Entry functionEntries[];
-	static StringMap<Function, FUNCTION_MAX_ENUM> functionNames;
-
-}; // HashFunction
-
-} // data
-} // love
+}  // namespace data
+}  // namespace love

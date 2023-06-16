@@ -40,4 +40,4 @@ float11 float32to11(float f);
 float float10to32(float10 f);
 float10 float32to10(float f);
 
-} // love
+}  // namespace love

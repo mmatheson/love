@@ -38,20 +38,19 @@ namespace magpie
  **/
 class DDSHandler : public FormatHandler
 {
-public:
+ public:
+  virtual ~DDSHandler() {}
 
-	virtual ~DDSHandler() {}
+  // Implements FormatHandler.
+  bool canDecode(Data *data) override;
+  DecodedImage decode(Data *data) override;
+  bool canParseCompressed(Data *data) override;
+  StrongRef<CompressedMemory> parseCompressed(Data *filedata,
+                                              std::vector<StrongRef<CompressedSlice>> &images,
+                                              PixelFormat &format, bool &sRGB) override;
 
-	// Implements FormatHandler.
-	bool canDecode(Data *data) override;
-	DecodedImage decode(Data *data) override;
-	bool canParseCompressed(Data *data) override;
-	StrongRef<CompressedMemory> parseCompressed(Data *filedata,
-	        std::vector<StrongRef<CompressedSlice>> &images,
-	        PixelFormat &format, bool &sRGB) override;
+};  // DDSHandler
 
-}; // DDSHandler
-
-} // magpie
-} // image
-} // love
+}  // namespace magpie
+}  // namespace image
+}  // namespace love

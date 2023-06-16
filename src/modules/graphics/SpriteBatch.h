@@ -27,11 +27,11 @@
 #include <unordered_map>
 
 // LOVE
-#include "common/math.h"
-#include "common/Matrix.h"
-#include "common/Color.h"
 #include "Drawable.h"
 #include "Mesh.h"
+#include "common/Color.h"
+#include "common/Matrix.h"
+#include "common/math.h"
 #include "vertex.h"
 
 namespace love
@@ -47,106 +47,104 @@ class Buffer;
 
 class SpriteBatch : public Drawable
 {
-public:
+ public:
+  static love::Type type;
 
-	static love::Type type;
+  SpriteBatch(Graphics *gfx, Texture *texture, int size, vertex::Usage usage);
+  virtual ~SpriteBatch();
 
-	SpriteBatch(Graphics *gfx, Texture *texture, int size, vertex::Usage usage);
-	virtual ~SpriteBatch();
+  int add(const Matrix4 &m, int index = -1);
+  int add(Quad *quad, const Matrix4 &m, int index = -1);
+  int addLayer(int layer, const Matrix4 &m, int index = -1);
+  int addLayer(int layer, Quad *quad, const Matrix4 &m, int index = -1);
 
-	int add(const Matrix4 &m, int index = -1);
-	int add(Quad *quad, const Matrix4 &m, int index = -1);
-	int addLayer(int layer, const Matrix4 &m, int index = -1);
-	int addLayer(int layer, Quad *quad, const Matrix4 &m, int index = -1);
+  void clear();
 
-	void clear();
+  void flush();
 
-	void flush();
+  void setTexture(Texture *newtexture);
+  Texture *getTexture() const;
 
-	void setTexture(Texture *newtexture);
-	Texture *getTexture() const;
+  /**
+   * Set the current color for this SpriteBatch. The sprites added
+   * after this call will use this color. Note that global color
+   * will not longer apply to the SpriteBatch if this is used.
+   *
+   * @param color The color to use for the following sprites.
+   */
+  void setColor(const Colorf &color);
 
-	/**
-	 * Set the current color for this SpriteBatch. The sprites added
-	 * after this call will use this color. Note that global color
-	 * will not longer apply to the SpriteBatch if this is used.
-	 *
-	 * @param color The color to use for the following sprites.
-	 */
-	void setColor(const Colorf &color);
+  /**
+   * Disable per-sprite colors for this SpriteBatch. The next call to
+   * draw will use the global color for all sprites.
+   */
+  void setColor();
 
-	/**
-	 * Disable per-sprite colors for this SpriteBatch. The next call to
-	 * draw will use the global color for all sprites.
-	 */
-	void setColor();
+  /**
+   * Get the current color for this SpriteBatch.
+   **/
+  Colorf getColor(bool &active) const;
 
-	/**
-	 * Get the current color for this SpriteBatch.
-	 **/
-	Colorf getColor(bool &active) const;
+  /**
+   * Get the number of sprites currently in this SpriteBatch.
+   **/
+  int getCount() const;
 
-	/**
-	 * Get the number of sprites currently in this SpriteBatch.
-	 **/
-	int getCount() const;
+  /**
+   * Get the total number of sprites this SpriteBatch can currently hold.
+   **/
+  int getBufferSize() const;
 
-	/**
-	 * Get the total number of sprites this SpriteBatch can currently hold.
-	 **/
-	int getBufferSize() const;
+  /**
+   * Attaches a specific vertex attribute from a Mesh to this SpriteBatch.
+   * The vertex attribute will be used when drawing the SpriteBatch.
+   **/
+  void attachAttribute(const std::string &name, Mesh *mesh);
 
-	/**
-	 * Attaches a specific vertex attribute from a Mesh to this SpriteBatch.
-	 * The vertex attribute will be used when drawing the SpriteBatch.
-	 **/
-	void attachAttribute(const std::string &name, Mesh *mesh);
+  void setDrawRange(int start, int count);
+  void setDrawRange();
+  bool getDrawRange(int &start, int &count) const;
 
-	void setDrawRange(int start, int count);
-	void setDrawRange();
-	bool getDrawRange(int &start, int &count) const;
+  // Implements Drawable.
+  void draw(Graphics *gfx, const Matrix4 &m) override;
 
-	// Implements Drawable.
-	void draw(Graphics *gfx, const Matrix4 &m) override;
+ private:
+  struct AttachedAttribute
+  {
+    StrongRef<Mesh> mesh;
+    int index;
+  };
 
-private:
+  /**
+   * Sets the total number of sprites this SpriteBatch can hold.
+   * Leaves existing sprite data intact when possible.
+   **/
+  void setBufferSize(int newsize);
 
-	struct AttachedAttribute
-	{
-		StrongRef<Mesh> mesh;
-		int index;
-	};
+  StrongRef<Texture> texture;
 
-	/**
-	 * Sets the total number of sprites this SpriteBatch can hold.
-	 * Leaves existing sprite data intact when possible.
-	 **/
-	void setBufferSize(int newsize);
+  // Max number of sprites in the batch.
+  int size;
 
-	StrongRef<Texture> texture;
+  // The next free element.
+  int next;
 
-	// Max number of sprites in the batch.
-	int size;
+  // Current color. This color, if present, will be applied to the next
+  // added sprite.
+  Color32 color;
+  bool color_active;
 
-	// The next free element.
-	int next;
+  vertex::CommonFormat vertex_format;
+  size_t vertex_stride;
 
-	// Current color. This color, if present, will be applied to the next
-	// added sprite.
-	Color32 color;
-	bool color_active;
+  love::graphics::Buffer *array_buf;
 
-	vertex::CommonFormat vertex_format;
-	size_t vertex_stride;
-	
-	love::graphics::Buffer *array_buf;
+  std::unordered_map<std::string, AttachedAttribute> attached_attributes;
 
-	std::unordered_map<std::string, AttachedAttribute> attached_attributes;
-	
-	int range_start;
-	int range_count;
-	
-}; // SpriteBatch
+  int range_start;
+  int range_count;
 
-} // graphics
-} // love
+};  // SpriteBatch
+
+}  // namespace graphics
+}  // namespace love

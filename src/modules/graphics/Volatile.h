@@ -38,56 +38,54 @@ namespace graphics
  **/
 class Volatile
 {
-private:
+ private:
+  // A list of all Volatile object currently alive.
+  static std::list<Volatile *> all;
 
-	// A list of all Volatile object currently alive.
-	static std::list<Volatile *> all;
+ public:
+  /**
+   * Constructor. Automatically adds \c this into the list
+   * of volatile objects.
+   **/
+  Volatile();
 
-public:
+  /**
+   * Destructor. Removes \c this from the list of volatile
+   * objects.
+   **/
+  virtual ~Volatile();
 
-	/**
-	 * Constructor. Automatically adds \c this into the list
-	 * of volatile objects.
-	 **/
-	Volatile();
+  /**
+   * Loads the part(s) of the object which is destroyed when
+   * the display mode is changed.
+   *
+   * @return True if successful, false on errors.
+   **/
+  virtual bool loadVolatile() = 0;
 
-	/**
-	 * Destructor. Removes \c this from the list of volatile
-	 * objects.
-	 **/
-	virtual ~Volatile();
+  /**
+   * Unloads the part(s) of the objects which would be destroyed
+   * anyway when the display mode is changed.
+   **/
+  virtual void unloadVolatile() = 0;
 
-	/**
-	 * Loads the part(s) of the object which is destroyed when
-	 * the display mode is changed.
-	 *
-	 * @return True if successful, false on errors.
-	 **/
-	virtual bool loadVolatile() = 0;
+  // Static:
 
-	/**
-	 * Unloads the part(s) of the objects which would be destroyed
-	 * anyway when the display mode is changed.
-	 **/
-	virtual void unloadVolatile() = 0;
+  /**
+   * Calls \c loadVolatile() on each element in the list of volatiles.
+   *
+   * @return True if all elements succeeded, false if one or more failed.
+   **/
+  static bool loadAll();
 
-	// Static:
+  /**
+   * Calls \c unloadVolatile() on each element in the list of volatiles.
+   **/
+  static void unloadAll();
 
-	/**
-	 * Calls \c loadVolatile() on each element in the list of volatiles.
-	 *
-	 * @return True if all elements succeeded, false if one or more failed.
-	 **/
-	static bool loadAll();
+};  // Volatile
 
-	/**
-	 * Calls \c unloadVolatile() on each element in the list of volatiles.
-	 **/
-	static void unloadAll();
+}  // namespace graphics
+}  // namespace love
 
-}; // Volatile
-
-} // graphics
-} // love
-
-#endif // LOVE_GRAPHICS_VOLATILE_H
+#endif  // LOVE_GRAPHICS_VOLATILE_H

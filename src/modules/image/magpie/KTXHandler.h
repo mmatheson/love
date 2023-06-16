@@ -35,19 +35,18 @@ namespace magpie
  **/
 class KTXHandler : public FormatHandler
 {
-public:
+ public:
+  virtual ~KTXHandler() {}
 
-	virtual ~KTXHandler() {}
+  // Implements FormatHandler.
+  bool canParseCompressed(Data *data) override;
 
-	// Implements FormatHandler.
-	bool canParseCompressed(Data *data) override;
+  StrongRef<CompressedMemory> parseCompressed(Data *filedata,
+                                              std::vector<StrongRef<CompressedSlice>> &images,
+                                              PixelFormat &format, bool &sRGB) override;
 
-	StrongRef<CompressedMemory> parseCompressed(Data *filedata,
-	        std::vector<StrongRef<CompressedSlice>> &images,
-	        PixelFormat &format, bool &sRGB) override;
+};  // KTXHandler
 
-}; // KTXHandler
-
-} // magpie
-} // image
-} // love
+}  // namespace magpie
+}  // namespace image
+}  // namespace love

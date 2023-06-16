@@ -32,8 +32,7 @@ namespace math
 
 extern "C" LOVE_EXPORT int luaopen_love_math(lua_State *L);
 
-} // random
-} // love
+}  // namespace math
+}  // namespace love
 
-#endif // LOVE_MATH_WRAP_MATH_H
-
+#endif  // LOVE_MATH_WRAP_MATH_H

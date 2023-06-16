@@ -42,52 +42,59 @@
 
 #include "ParseHelper.h"
 
-namespace glslang {
+namespace glslang
+{
 
 class TPpContext;
 class TPpToken;
 class TParserToken;
 
-class TScanContext {
-public:
-    explicit TScanContext(TParseContextBase& pc) :
-        parseContext(pc),
-        afterType(false), afterStruct(false),
-        field(false), afterBuffer(false) { }
-    virtual ~TScanContext() { }
+class TScanContext
+{
+ public:
+  explicit TScanContext(TParseContextBase &pc)
+      : parseContext(pc),
+        afterType(false),
+        afterStruct(false),
+        field(false),
+        afterBuffer(false)
+  {
+  }
+  virtual ~TScanContext() {}
 
-    static void fillInKeywordMap();
-    static void deleteKeywordMap();
+  static void fillInKeywordMap();
+  static void deleteKeywordMap();
 
-    int tokenize(TPpContext*, TParserToken&);
+  int tokenize(TPpContext *, TParserToken &);
 
-protected:
-    TScanContext(TScanContext&);
-    TScanContext& operator=(TScanContext&);
+ protected:
+  TScanContext(TScanContext &);
+  TScanContext &operator=(TScanContext &);
 
-    int tokenizeIdentifier();
-    int identifierOrType();
-    int reservedWord();
-    int identifierOrReserved(bool reserved);
-    int es30ReservedFromGLSL(int version);
-    int nonreservedKeyword(int esVersion, int nonEsVersion);
-    int precisionKeyword();
-    int matNxM();
-    int dMat();
-    int firstGenerationImage(bool inEs310);
-    int secondGenerationImage();
+  int tokenizeIdentifier();
+  int identifierOrType();
+  int reservedWord();
+  int identifierOrReserved(bool reserved);
+  int es30ReservedFromGLSL(int version);
+  int nonreservedKeyword(int esVersion, int nonEsVersion);
+  int precisionKeyword();
+  int matNxM();
+  int dMat();
+  int firstGenerationImage(bool inEs310);
+  int secondGenerationImage();
 
-    TParseContextBase& parseContext;
-    bool afterType;           // true if we've recognized a type, so can only be looking for an identifier
-    bool afterStruct;         // true if we've recognized the STRUCT keyword, so can only be looking for an identifier
-    bool field;               // true if we're on a field, right after a '.'
-    bool afterBuffer;         // true if we've recognized the BUFFER keyword
-    TSourceLoc loc;
-    TParserToken* parserToken;
-    TPpToken* ppToken;
+  TParseContextBase &parseContext;
+  bool afterType;    // true if we've recognized a type, so can only be looking for an identifier
+  bool afterStruct;  // true if we've recognized the STRUCT keyword, so can only be looking for an
+                     // identifier
+  bool field;        // true if we're on a field, right after a '.'
+  bool afterBuffer;  // true if we've recognized the BUFFER keyword
+  TSourceLoc loc;
+  TParserToken *parserToken;
+  TPpToken *ppToken;
 
-    const char* tokenText;
-    int keyword;
+  const char *tokenText;
+  int keyword;
 };
 
-} // end namespace glslang
+}  // end namespace glslang

@@ -23,12 +23,12 @@
 
 // LOVE
 #include "common/Object.h"
-#include "common/runtime.h"
 #include "common/Reference.h"
+#include "common/runtime.h"
 
 // STD
-#include <vector>
 #include <unordered_map>
+#include <vector>
 
 // Box2D
 #include <Box2D/Box2D.h>
@@ -56,262 +56,266 @@ class Joint;
  * The world also controls global parameters, like
  * gravity.
  **/
-class World : public Object, public b2ContactListener, public b2ContactFilter, public b2DestructionListener
+class World : public Object,
+              public b2ContactListener,
+              public b2ContactFilter,
+              public b2DestructionListener
 {
-public:
+ public:
+  // Friends.
+  friend class Joint;
+  friend class DistanceJoint;
+  friend class MouseJoint;
+  friend class Body;
+  friend class Fixture;
 
-	// Friends.
-	friend class Joint;
-	friend class DistanceJoint;
-	friend class MouseJoint;
-	friend class Body;
-	friend class Fixture;
+  static love::Type type;
 
-	static love::Type type;
+  class ContactCallback
+  {
+   public:
+    Reference *ref;
+    lua_State *L;
+    World *world;
+    ContactCallback(World *world);
+    ~ContactCallback();
+    void process(b2Contact *contact, const b2ContactImpulse *impulse = NULL);
+  };
 
-	class ContactCallback
-	{
-	public:
-		Reference *ref;
-		lua_State *L;
-		World *world;
-		ContactCallback(World *world);
-		~ContactCallback();
-		void process(b2Contact *contact, const b2ContactImpulse *impulse = NULL);
-	};
+  class ContactFilter
+  {
+   public:
+    Reference *ref;
+    lua_State *L;
+    ContactFilter();
+    ~ContactFilter();
+    bool process(Fixture *a, Fixture *b);
+  };
 
-	class ContactFilter
-	{
-	public:
-		Reference *ref;
-		lua_State *L;
-		ContactFilter();
-		~ContactFilter();
-		bool process(Fixture *a, Fixture *b);
-	};
+  class QueryCallback : public b2QueryCallback
+  {
+   public:
+    QueryCallback(World *world, lua_State *L, int idx);
+    ~QueryCallback();
+    virtual bool ReportFixture(b2Fixture *fixture);
 
-	class QueryCallback : public b2QueryCallback
-	{
-	public:
-		QueryCallback(World *world, lua_State *L, int idx);
-		~QueryCallback();
-		virtual bool ReportFixture(b2Fixture *fixture);
-	private:
-		World *world;
-		lua_State *L;
-		int funcidx;
-	};
+   private:
+    World *world;
+    lua_State *L;
+    int funcidx;
+  };
 
-	class RayCastCallback : public b2RayCastCallback
-	{
-	public:
-		RayCastCallback(World *world, lua_State *L, int idx);
-		~RayCastCallback();
-		virtual float32 ReportFixture(b2Fixture *fixture, const b2Vec2 &point, const b2Vec2 &normal, float32 fraction);
-	private:
-		World *world;
-		lua_State *L;
-		int funcidx;
-	};
+  class RayCastCallback : public b2RayCastCallback
+  {
+   public:
+    RayCastCallback(World *world, lua_State *L, int idx);
+    ~RayCastCallback();
+    virtual float32 ReportFixture(b2Fixture *fixture, const b2Vec2 &point, const b2Vec2 &normal,
+                                  float32 fraction);
 
-	/**
-	 * Creates a new world.
-	 **/
-	World();
+   private:
+    World *world;
+    lua_State *L;
+    int funcidx;
+  };
 
-	/**
-	 * Creates a new world with the given gravity
-	 * and whether or not the bodies should sleep when appropriate.
-	 * @param gravity The gravity of the World.
-	 * @param sleep True if the bodies should be able to sleep,
-	 * false otherwise.
-	 **/
-	World(b2Vec2 gravity, bool sleep);
+  /**
+   * Creates a new world.
+   **/
+  World();
 
-	virtual ~World();
+  /**
+   * Creates a new world with the given gravity
+   * and whether or not the bodies should sleep when appropriate.
+   * @param gravity The gravity of the World.
+   * @param sleep True if the bodies should be able to sleep,
+   * false otherwise.
+   **/
+  World(b2Vec2 gravity, bool sleep);
 
-	/**
-	 * Updates everything in the world one timestep.
-	 * This is called update() and not step() to conform
-	 * with all other objects in LOVE.
-	 * @param dt The timestep.
-	 **/
-	void update(float dt);
-	void update(float dt, int velocityIterations, int positionIterations);
+  virtual ~World();
 
-	// From b2ContactListener
-	void BeginContact(b2Contact *contact);
-	void EndContact(b2Contact *contact);
-	void PreSolve(b2Contact *contact, const b2Manifold *oldManifold);
-	void PostSolve(b2Contact *contact, const b2ContactImpulse *impulse);
+  /**
+   * Updates everything in the world one timestep.
+   * This is called update() and not step() to conform
+   * with all other objects in LOVE.
+   * @param dt The timestep.
+   **/
+  void update(float dt);
+  void update(float dt, int velocityIterations, int positionIterations);
 
-	// From b2ContactFilter
-	bool ShouldCollide(b2Fixture *fixtureA, b2Fixture *fixtureB);
+  // From b2ContactListener
+  void BeginContact(b2Contact *contact);
+  void EndContact(b2Contact *contact);
+  void PreSolve(b2Contact *contact, const b2Manifold *oldManifold);
+  void PostSolve(b2Contact *contact, const b2ContactImpulse *impulse);
 
-	// From b2DestructionListener
-	void SayGoodbye(b2Fixture *fixture);
-	void SayGoodbye(b2Joint *joint);
+  // From b2ContactFilter
+  bool ShouldCollide(b2Fixture *fixtureA, b2Fixture *fixtureB);
 
-	/**
-	 * Returns true if the Box2D world is alive.
-	 **/
-	bool isValid() const;
+  // From b2DestructionListener
+  void SayGoodbye(b2Fixture *fixture);
+  void SayGoodbye(b2Joint *joint);
 
-	/**
-	 * Receives up to four Lua functions as arguments. Each function is
-	 * collision callback for the four events (in order): begin, end,
-	 * presolve and postsolve. The value "nil" is accepted if one or
-	 * more events are uninteresting.
-	 **/
-	int setCallbacks(lua_State *L);
+  /**
+   * Returns true if the Box2D world is alive.
+   **/
+  bool isValid() const;
 
-	/**
-	 * Returns the functions previously set by setCallbacks.
-	 **/
-	int getCallbacks(lua_State *L);
+  /**
+   * Receives up to four Lua functions as arguments. Each function is
+   * collision callback for the four events (in order): begin, end,
+   * presolve and postsolve. The value "nil" is accepted if one or
+   * more events are uninteresting.
+   **/
+  int setCallbacks(lua_State *L);
 
-	/**
-	 * Updates the Lua thread/coroutine used when callbacks are executed in
-	 * the update method. This should be called in the same Lua function which
-	 * calls update().
-	 **/
-	void setCallbacksL(lua_State *L);
+  /**
+   * Returns the functions previously set by setCallbacks.
+   **/
+  int getCallbacks(lua_State *L);
 
-	/**
-	 * Sets the ContactFilter callback.
-	 **/
-	int setContactFilter(lua_State *L);
+  /**
+   * Updates the Lua thread/coroutine used when callbacks are executed in
+   * the update method. This should be called in the same Lua function which
+   * calls update().
+   **/
+  void setCallbacksL(lua_State *L);
 
-	/**
-	 * Gets the ContactFilter callback.
-	 **/
-	int getContactFilter(lua_State *L);
+  /**
+   * Sets the ContactFilter callback.
+   **/
+  int setContactFilter(lua_State *L);
 
-	/**
-	 * Sets the current gravity of the World.
-	 * @param x Gravity in the x-direction.
-	 * @param y Gravity in the y-direction.
-	 **/
-	void setGravity(float x, float y);
+  /**
+   * Gets the ContactFilter callback.
+   **/
+  int getContactFilter(lua_State *L);
 
-	/**
-	 * Gets the current gravity.
-	 * @returns Gravity in the x-direction.
-	 * @returns Gravity in the y-direction.
-	 **/
-	int getGravity(lua_State *L);
+  /**
+   * Sets the current gravity of the World.
+   * @param x Gravity in the x-direction.
+   * @param y Gravity in the y-direction.
+   **/
+  void setGravity(float x, float y);
 
-	/**
-	 * Translate the world origin.
-	 * @param x The new world origin's x-coordinate relative to the old origin.
-	 * @param y The new world origin's y-coordinate relative to the old origin.
-	 **/
-	void translateOrigin(float x, float y);
+  /**
+   * Gets the current gravity.
+   * @returns Gravity in the x-direction.
+   * @returns Gravity in the y-direction.
+   **/
+  int getGravity(lua_State *L);
 
-	/**
-	 * Sets whether this World allows sleep.
-	 * @param allow True to allow, false to disallow.
-	 **/
-	void setSleepingAllowed(bool allow);
+  /**
+   * Translate the world origin.
+   * @param x The new world origin's x-coordinate relative to the old origin.
+   * @param y The new world origin's y-coordinate relative to the old origin.
+   **/
+  void translateOrigin(float x, float y);
 
-	/**
-	 * Returns whether this World allows sleep.
-	 * @return True if allowed, false if disallowed.
-	 **/
-	bool isSleepingAllowed() const;
+  /**
+   * Sets whether this World allows sleep.
+   * @param allow True to allow, false to disallow.
+   **/
+  void setSleepingAllowed(bool allow);
 
-	/**
-	 * Returns whether this World is currently locked.
-	 * If it's locked, it's in the middle of a timestep.
-	 * @return Whether the World is locked.
-	 **/
-	bool isLocked() const;
+  /**
+   * Returns whether this World allows sleep.
+   * @return True if allowed, false if disallowed.
+   **/
+  bool isSleepingAllowed() const;
 
-	/**
-	 * Get the current body count.
-	 * @return The number of bodies.
-	 **/
-	int getBodyCount() const;
+  /**
+   * Returns whether this World is currently locked.
+   * If it's locked, it's in the middle of a timestep.
+   * @return Whether the World is locked.
+   **/
+  bool isLocked() const;
 
-	/**
-	 * Get the current joint count.
-	 * @return The number of joints.
-	 **/
-	int getJointCount() const;
+  /**
+   * Get the current body count.
+   * @return The number of bodies.
+   **/
+  int getBodyCount() const;
 
-	/**
-	 * Get the current contact count.
-	 * @return The number of contacts.
-	 **/
-	int getContactCount() const;
+  /**
+   * Get the current joint count.
+   * @return The number of joints.
+   **/
+  int getJointCount() const;
 
-	/**
-	 * Get an array of all the Bodies in the World.
-	 * @return An array of Bodies.
-	 **/
-	int getBodies(lua_State *L) const;
+  /**
+   * Get the current contact count.
+   * @return The number of contacts.
+   **/
+  int getContactCount() const;
 
-	/**
-	 * Get an array of all the Joints in the World.
-	 * @return An array of Joints.
-	 **/
-	int getJoints(lua_State *L) const;
+  /**
+   * Get an array of all the Bodies in the World.
+   * @return An array of Bodies.
+   **/
+  int getBodies(lua_State *L) const;
 
-	/**
-	 * Get an array of all the Contacts in the World.
-	 * @return An array of Contacts.
-	 **/
-	int getContacts(lua_State *L);
+  /**
+   * Get an array of all the Joints in the World.
+   * @return An array of Joints.
+   **/
+  int getJoints(lua_State *L) const;
 
-	/**
-	 * Gets the ground body.
-	 * @return The ground body.
-	 **/
-	b2Body *getGroundBody() const;
+  /**
+   * Get an array of all the Contacts in the World.
+   * @return An array of Contacts.
+   **/
+  int getContacts(lua_State *L);
 
-	/**
-	 * Gets all fixtures that overlap a given bounding box.
-	 **/
-	int queryBoundingBox(lua_State *L);
+  /**
+   * Gets the ground body.
+   * @return The ground body.
+   **/
+  b2Body *getGroundBody() const;
 
-	/**
-	 * Raycasts the World for all Fixtures in the path of the ray.
-	 **/
-	int rayCast(lua_State *L);
+  /**
+   * Gets all fixtures that overlap a given bounding box.
+   **/
+  int queryBoundingBox(lua_State *L);
 
-	/**
-	 * Destroy this world.
-	 **/
-	void destroy();
+  /**
+   * Raycasts the World for all Fixtures in the path of the ray.
+   **/
+  int rayCast(lua_State *L);
 
-	void registerObject(void *b2object, love::Object *object);
-	void unregisterObject(void *b2object);
-	love::Object *findObject(void *b2object) const;
+  /**
+   * Destroy this world.
+   **/
+  void destroy();
 
-private:
+  void registerObject(void *b2object, love::Object *object);
+  void unregisterObject(void *b2object);
+  love::Object *findObject(void *b2object) const;
 
-	// Pointer to the Box2D world.
-	b2World *world;
+ private:
+  // Pointer to the Box2D world.
+  b2World *world;
 
-	// Ground body
-	b2Body *groundBody;
+  // Ground body
+  b2Body *groundBody;
 
-	// The list of to be destructed bodies.
-	std::vector<Body *> destructBodies;
-	std::vector<Fixture *> destructFixtures;
-	std::vector<Joint *> destructJoints;
-	bool destructWorld;
+  // The list of to be destructed bodies.
+  std::vector<Body *> destructBodies;
+  std::vector<Fixture *> destructFixtures;
+  std::vector<Joint *> destructJoints;
+  bool destructWorld;
 
-	// Contact callbacks.
-	ContactCallback begin, end, presolve, postsolve;
-	ContactFilter filter;
+  // Contact callbacks.
+  ContactCallback begin, end, presolve, postsolve;
+  ContactFilter filter;
 
-	std::unordered_map<void *, love::Object *> box2dObjectMap;
+  std::unordered_map<void *, love::Object *> box2dObjectMap;
 
-}; // World
+};  // World
 
-} // box2d
-} // physics
-} // love
+}  // namespace box2d
+}  // namespace physics
+}  // namespace love
 
-#endif // LOVE_PHYSICS_BOX2D_WORLD_H
+#endif  // LOVE_PHYSICS_BOX2D_WORLD_H

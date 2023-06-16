@@ -31,5 +31,5 @@ namespace graphics
 Text *luax_checktext(lua_State *L, int idx);
 extern "C" int luaopen_text(lua_State *L);
 
-} // graphics
-} // love
+}  // namespace graphics
+}  // namespace love

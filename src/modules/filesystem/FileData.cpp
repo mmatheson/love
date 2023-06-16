@@ -32,83 +32,65 @@ namespace filesystem
 love::Type FileData::type("FileData", &Data::type);
 
 FileData::FileData(uint64 size, const std::string &filename)
-	: data(nullptr)
-	, size((size_t) size)
-	, filename(filename)
+    : data(nullptr),
+      size((size_t) size),
+      filename(filename)
 {
-	try
-	{
-		data = new char[(size_t) size];
-	}
-	catch (std::bad_alloc &)
-	{
-		throw love::Exception("Out of memory.");
-	}
+  try
+  {
+    data = new char[(size_t) size];
+  }
+  catch (std::bad_alloc &)
+  {
+    throw love::Exception("Out of memory.");
+  }
 
-	size_t dotpos = filename.rfind('.');
+  size_t dotpos = filename.rfind('.');
 
-	if (dotpos != std::string::npos)
-	{
-		extension = filename.substr(dotpos + 1);
-		name = filename.substr(0, dotpos);
-	}
-	else
-		name = filename;
+  if (dotpos != std::string::npos)
+  {
+    extension = filename.substr(dotpos + 1);
+    name = filename.substr(0, dotpos);
+  }
+  else
+    name = filename;
 }
 
 FileData::FileData(const FileData &c)
-	: data(nullptr)
-	, size(c.size)
-	, filename(c.filename)
-	, extension(c.extension)
-	, name(c.name)
+    : data(nullptr),
+      size(c.size),
+      filename(c.filename),
+      extension(c.extension),
+      name(c.name)
 {
-	try
-	{
-		data = new char[(size_t) size];
-	}
-	catch (std::bad_alloc &)
-	{
-		throw love::Exception("Out of memory.");
-	}
-	memcpy(data, c.data, size);
+  try
+  {
+    data = new char[(size_t) size];
+  }
+  catch (std::bad_alloc &)
+  {
+    throw love::Exception("Out of memory.");
+  }
+  memcpy(data, c.data, size);
 }
 
-FileData::~FileData()
-{
-	delete [] data;
-}
+FileData::~FileData() { delete[] data; }
 
-FileData *FileData::clone() const
-{
-	return new FileData(*this);
-}
+FileData *FileData::clone() const { return new FileData(*this); }
 
-void *FileData::getData() const
-{
-	return data;
-}
+void *FileData::getData() const { return data; }
 
 size_t FileData::getSize() const
 {
-	size_t sizemax = std::numeric_limits<size_t>::max();
-	return size > sizemax ? sizemax : (size_t) size;
+  size_t sizemax = std::numeric_limits<size_t>::max();
+  return size > sizemax ? sizemax : (size_t) size;
 }
 
-const std::string &FileData::getFilename() const
-{
-	return filename;
-}
+const std::string &FileData::getFilename() const { return filename; }
 
-const std::string &FileData::getExtension() const
-{
-	return extension;
-}
+const std::string &FileData::getExtension() const { return extension; }
 
-const std::string &FileData::getName() const
-{
-	return name;
-}
+const std::string &FileData::getName() const { return name; }
 
-} // filesystem
-} // love
+}  // namespace filesystem
+}  // namespace love

@@ -24,26 +24,26 @@
 #include "common/config.h"
 
 // OpenAL
-#ifdef LOVE_APPLE_USE_FRAMEWORKS // Frameworks have different include paths.
+#ifdef LOVE_APPLE_USE_FRAMEWORKS  // Frameworks have different include paths.
 #ifdef LOVE_IOS
-#include <OpenAL/alc.h>
 #include <OpenAL/al.h>
+#include <OpenAL/alc.h>
 #else
-#include <OpenAL-Soft/alc.h>
 #include <OpenAL-Soft/al.h>
+#include <OpenAL-Soft/alc.h>
 #include <OpenAL-Soft/alext.h>
 #endif
 #else
-#include <AL/alc.h>
 #include <AL/al.h>
+#include <AL/alc.h>
 #include <AL/alext.h>
 #endif
 
-#include <vector>
 #include <map>
+#include <vector>
 
-#include "audio/Effect.h"
 #include "Audio.h"
+#include "audio/Effect.h"
 
 #ifndef AL_EFFECT_NULL
 #define AL_EFFECT_NULL (0)
@@ -62,28 +62,28 @@ namespace openal
 
 class Effect : public love::audio::Effect
 {
-public:
-	Effect();
-	Effect(const Effect &s);
-	virtual ~Effect();
-	virtual Effect *clone();
-	ALuint getEffect() const;
-	virtual bool setParams(const std::map<Parameter, float> &params);
-	virtual const std::map<Parameter, float> &getParams() const;
+ public:
+  Effect();
+  Effect(const Effect &s);
+  virtual ~Effect();
+  virtual Effect *clone();
+  ALuint getEffect() const;
+  virtual bool setParams(const std::map<Parameter, float> &params);
+  virtual const std::map<Parameter, float> &getParams() const;
 
-private:
-	bool generateEffect();
-	void deleteEffect();
-	float getValue(Parameter in, float def) const;
-	int getValue(Parameter in, int def) const;
+ private:
+  bool generateEffect();
+  void deleteEffect();
+  float getValue(Parameter in, float def) const;
+  int getValue(Parameter in, int def) const;
 
-	ALuint effect = AL_EFFECT_NULL;
-	std::map<Parameter, float> params;
-	//static std::map<Phoneme, ALint> phonemeMap;
+  ALuint effect = AL_EFFECT_NULL;
+  std::map<Parameter, float> params;
+  // static std::map<Phoneme, ALint> phonemeMap;
 };
 
-} //openal
-} //audio
-} //love
+}  // namespace openal
+}  // namespace audio
+}  // namespace love
 
-#endif //LOVE_AUDIO_OPENAL_EFFECTS_H
+#endif  // LOVE_AUDIO_OPENAL_EFFECTS_H

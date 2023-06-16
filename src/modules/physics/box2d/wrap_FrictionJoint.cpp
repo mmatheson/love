@@ -19,6 +19,7 @@
  **/
 
 #include "wrap_FrictionJoint.h"
+
 #include "wrap_Physics.h"
 
 namespace love
@@ -30,56 +31,54 @@ namespace box2d
 
 FrictionJoint *luax_checkfrictionjoint(lua_State *L, int idx)
 {
-	FrictionJoint *j = luax_checktype<FrictionJoint>(L, idx);
-	if (!j->isValid())
-		luaL_error(L, "Attempt to use destroyed joint.");
-	return j;
+  FrictionJoint *j = luax_checktype<FrictionJoint>(L, idx);
+  if (!j->isValid())
+    luaL_error(L, "Attempt to use destroyed joint.");
+  return j;
 }
 
 int w_FrictionJoint_setMaxForce(lua_State *L)
 {
-	FrictionJoint *t = luax_checkfrictionjoint(L, 1);
-	float arg1 = (float)luaL_checknumber(L, 2);
-	luax_catchexcept(L, [&](){ t->setMaxForce(arg1); });
-	return 0;
+  FrictionJoint *t = luax_checkfrictionjoint(L, 1);
+  float arg1 = (float) luaL_checknumber(L, 2);
+  luax_catchexcept(L, [&]() { t->setMaxForce(arg1); });
+  return 0;
 }
 
 int w_FrictionJoint_getMaxForce(lua_State *L)
 {
-	FrictionJoint *t = luax_checkfrictionjoint(L, 1);
-	lua_pushnumber(L, t->getMaxForce());
-	return 1;
+  FrictionJoint *t = luax_checkfrictionjoint(L, 1);
+  lua_pushnumber(L, t->getMaxForce());
+  return 1;
 }
 
 int w_FrictionJoint_setMaxTorque(lua_State *L)
 {
-	FrictionJoint *t = luax_checkfrictionjoint(L, 1);
-	float arg1 = (float)luaL_checknumber(L, 2);
-	luax_catchexcept(L, [&](){ t->setMaxTorque(arg1); });
-	return 0;
+  FrictionJoint *t = luax_checkfrictionjoint(L, 1);
+  float arg1 = (float) luaL_checknumber(L, 2);
+  luax_catchexcept(L, [&]() { t->setMaxTorque(arg1); });
+  return 0;
 }
 
 int w_FrictionJoint_getMaxTorque(lua_State *L)
 {
-	FrictionJoint *t = luax_checkfrictionjoint(L, 1);
-	lua_pushnumber(L, t->getMaxTorque());
-	return 1;
+  FrictionJoint *t = luax_checkfrictionjoint(L, 1);
+  lua_pushnumber(L, t->getMaxTorque());
+  return 1;
 }
 
-static const luaL_Reg w_FrictionJoint_functions[] =
-{
-	{ "setMaxForce", w_FrictionJoint_setMaxForce },
-	{ "getMaxForce", w_FrictionJoint_getMaxForce },
-	{ "setMaxTorque", w_FrictionJoint_setMaxTorque },
-	{ "getMaxTorque", w_FrictionJoint_getMaxTorque },
-	{ 0, 0 }
-};
+static const luaL_Reg w_FrictionJoint_functions[] = {{"setMaxForce", w_FrictionJoint_setMaxForce},
+                                                     {"getMaxForce", w_FrictionJoint_getMaxForce},
+                                                     {"setMaxTorque", w_FrictionJoint_setMaxTorque},
+                                                     {"getMaxTorque", w_FrictionJoint_getMaxTorque},
+                                                     {0, 0}};
 
 extern "C" int luaopen_frictionjoint(lua_State *L)
 {
-	return luax_register_type(L, &FrictionJoint::type, w_Joint_functions, w_FrictionJoint_functions, nullptr);
+  return luax_register_type(L, &FrictionJoint::type, w_Joint_functions, w_FrictionJoint_functions,
+                            nullptr);
 }
 
-} // box2d
-} // physics
-} // love
+}  // namespace box2d
+}  // namespace physics
+}  // namespace love

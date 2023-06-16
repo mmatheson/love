@@ -19,8 +19,9 @@
  **/
 
 // LOVE
-#include "common/config.h"
 #include "wrap_Font.h"
+
+#include "common/config.h"
 
 // C++
 #include <algorithm>
@@ -32,253 +33,248 @@ namespace graphics
 
 void luax_checkcoloredstring(lua_State *L, int idx, std::vector<Font::ColoredString> &strings)
 {
-	Font::ColoredString coloredstr;
-	coloredstr.color = Colorf(1.0f, 1.0f, 1.0f, 1.0f);
+  Font::ColoredString coloredstr;
+  coloredstr.color = Colorf(1.0f, 1.0f, 1.0f, 1.0f);
 
-	if (lua_istable(L, idx))
-	{
-		int len = (int) luax_objlen(L, idx);
+  if (lua_istable(L, idx))
+  {
+    int len = (int) luax_objlen(L, idx);
 
-		for (int i = 1; i <= len; i++)
-		{
-			lua_rawgeti(L, idx, i);
+    for (int i = 1; i <= len; i++)
+    {
+      lua_rawgeti(L, idx, i);
 
-			if (lua_istable(L, -1))
-			{
-				for (int j = 1; j <= 4; j++)
-					lua_rawgeti(L, -j, j);
+      if (lua_istable(L, -1))
+      {
+	for (int j = 1; j <= 4; j++) lua_rawgeti(L, -j, j);
 
-				coloredstr.color.r = (float) luaL_checknumber(L, -4);
-				coloredstr.color.g = (float) luaL_checknumber(L, -3);
-				coloredstr.color.b = (float) luaL_checknumber(L, -2);
-				coloredstr.color.a = (float) luaL_optnumber(L, -1, 1.0);
+	coloredstr.color.r = (float) luaL_checknumber(L, -4);
+	coloredstr.color.g = (float) luaL_checknumber(L, -3);
+	coloredstr.color.b = (float) luaL_checknumber(L, -2);
+	coloredstr.color.a = (float) luaL_optnumber(L, -1, 1.0);
 
-				lua_pop(L, 4);
-			}
-			else
-			{
-				coloredstr.str = luaL_checkstring(L, -1);
-				strings.push_back(coloredstr);
-			}
+	lua_pop(L, 4);
+      }
+      else
+      {
+	coloredstr.str = luaL_checkstring(L, -1);
+	strings.push_back(coloredstr);
+      }
 
-			lua_pop(L, 1);
-		}
-	}
-	else
-	{
-		coloredstr.str = luaL_checkstring(L, idx);
-		strings.push_back(coloredstr);
-	}
+      lua_pop(L, 1);
+    }
+  }
+  else
+  {
+    coloredstr.str = luaL_checkstring(L, idx);
+    strings.push_back(coloredstr);
+  }
 }
 
-Font *luax_checkfont(lua_State *L, int idx)
-{
-	return luax_checktype<Font>(L, idx);
-}
+Font *luax_checkfont(lua_State *L, int idx) { return luax_checktype<Font>(L, idx); }
 
 int w_Font_getHeight(lua_State *L)
 {
-	Font *t = luax_checkfont(L, 1);
-	lua_pushnumber(L, t->getHeight());
-	return 1;
+  Font *t = luax_checkfont(L, 1);
+  lua_pushnumber(L, t->getHeight());
+  return 1;
 }
 
 int w_Font_getWidth(lua_State *L)
 {
-	Font *t = luax_checkfont(L, 1);
-	const char *str = luaL_checkstring(L, 2);
-	luax_catchexcept(L, [&](){ lua_pushinteger(L, t->getWidth(str)); });
-	return 1;
+  Font *t = luax_checkfont(L, 1);
+  const char *str = luaL_checkstring(L, 2);
+  luax_catchexcept(L, [&]() { lua_pushinteger(L, t->getWidth(str)); });
+  return 1;
 }
 
 int w_Font_getWrap(lua_State *L)
 {
-	Font *t = luax_checkfont(L, 1);
+  Font *t = luax_checkfont(L, 1);
 
-	std::vector<Font::ColoredString> text;
-	luax_checkcoloredstring(L, 2, text);
+  std::vector<Font::ColoredString> text;
+  luax_checkcoloredstring(L, 2, text);
 
-	float wrap = (float) luaL_checknumber(L, 3);
-	int max_width = 0;
-	std::vector<std::string> lines;
-	std::vector<int> widths;
+  float wrap = (float) luaL_checknumber(L, 3);
+  int max_width = 0;
+  std::vector<std::string> lines;
+  std::vector<int> widths;
 
-	luax_catchexcept(L, [&]() { t->getWrap(text, wrap, lines, &widths); });
+  luax_catchexcept(L, [&]() { t->getWrap(text, wrap, lines, &widths); });
 
-	for (int width : widths)
-		max_width = std::max(max_width, width);
+  for (int width : widths) max_width = std::max(max_width, width);
 
-	lua_pushinteger(L, max_width);
-	lua_createtable(L, (int) lines.size(), 0);
+  lua_pushinteger(L, max_width);
+  lua_createtable(L, (int) lines.size(), 0);
 
-	for (int i = 0; i < (int) lines.size(); i++)
-	{
-		lua_pushstring(L, lines[i].c_str());
-		lua_rawseti(L, -2, i + 1);
-	}
+  for (int i = 0; i < (int) lines.size(); i++)
+  {
+    lua_pushstring(L, lines[i].c_str());
+    lua_rawseti(L, -2, i + 1);
+  }
 
-	return 2;
+  return 2;
 }
 
 int w_Font_setLineHeight(lua_State *L)
 {
-	Font *t = luax_checkfont(L, 1);
-	float h = (float)luaL_checknumber(L, 2);
-	t->setLineHeight(h);
-	return 0;
+  Font *t = luax_checkfont(L, 1);
+  float h = (float) luaL_checknumber(L, 2);
+  t->setLineHeight(h);
+  return 0;
 }
 
 int w_Font_getLineHeight(lua_State *L)
 {
-	Font *t = luax_checkfont(L, 1);
-	lua_pushnumber(L, t->getLineHeight());
-	return 1;
+  Font *t = luax_checkfont(L, 1);
+  lua_pushnumber(L, t->getLineHeight());
+  return 1;
 }
 
 int w_Font_setFilter(lua_State *L)
 {
-	Font *t = luax_checkfont(L, 1);
-	Texture::Filter f = t->getFilter();
+  Font *t = luax_checkfont(L, 1);
+  Texture::Filter f = t->getFilter();
 
-	const char *minstr = luaL_checkstring(L, 2);
-	const char *magstr = luaL_optstring(L, 3, minstr);
+  const char *minstr = luaL_checkstring(L, 2);
+  const char *magstr = luaL_optstring(L, 3, minstr);
 
-	if (!Texture::getConstant(minstr, f.min))
-		return luax_enumerror(L, "filter mode", Texture::getConstants(f.min), minstr);
-	if (!Texture::getConstant(magstr, f.mag))
-		return luax_enumerror(L, "filter mode", Texture::getConstants(f.mag), magstr);
+  if (!Texture::getConstant(minstr, f.min))
+    return luax_enumerror(L, "filter mode", Texture::getConstants(f.min), minstr);
+  if (!Texture::getConstant(magstr, f.mag))
+    return luax_enumerror(L, "filter mode", Texture::getConstants(f.mag), magstr);
 
-	f.anisotropy = (float) luaL_optnumber(L, 4, 1.0);
+  f.anisotropy = (float) luaL_optnumber(L, 4, 1.0);
 
-	luax_catchexcept(L, [&](){ t->setFilter(f); });
-	return 0;
+  luax_catchexcept(L, [&]() { t->setFilter(f); });
+  return 0;
 }
 
 int w_Font_getFilter(lua_State *L)
 {
-	Font *t = luax_checkfont(L, 1);
-	const Texture::Filter f = t->getFilter();
-	const char *minstr;
-	const char *magstr;
-	Texture::getConstant(f.min, minstr);
-	Texture::getConstant(f.mag, magstr);
-	lua_pushstring(L, minstr);
-	lua_pushstring(L, magstr);
-	lua_pushnumber(L, f.anisotropy);
-	return 3;
+  Font *t = luax_checkfont(L, 1);
+  const Texture::Filter f = t->getFilter();
+  const char *minstr;
+  const char *magstr;
+  Texture::getConstant(f.min, minstr);
+  Texture::getConstant(f.mag, magstr);
+  lua_pushstring(L, minstr);
+  lua_pushstring(L, magstr);
+  lua_pushnumber(L, f.anisotropy);
+  return 3;
 }
 
 int w_Font_getAscent(lua_State *L)
 {
-	Font *t = luax_checkfont(L, 1);
-	lua_pushnumber(L, t->getAscent());
-	return 1;
+  Font *t = luax_checkfont(L, 1);
+  lua_pushnumber(L, t->getAscent());
+  return 1;
 }
 
 int w_Font_getDescent(lua_State *L)
 {
-	Font *t = luax_checkfont(L, 1);
-	lua_pushnumber(L, t->getDescent());
-	return 1;
+  Font *t = luax_checkfont(L, 1);
+  lua_pushnumber(L, t->getDescent());
+  return 1;
 }
 
 int w_Font_getBaseline(lua_State *L)
 {
-	Font *t = luax_checkfont(L, 1);
-	lua_pushnumber(L, t->getBaseline());
-	return 1;
+  Font *t = luax_checkfont(L, 1);
+  lua_pushnumber(L, t->getBaseline());
+  return 1;
 }
 
 int w_Font_hasGlyphs(lua_State *L)
 {
-	Font *t = luax_checkfont(L, 1);
-	bool hasglyph = false;
+  Font *t = luax_checkfont(L, 1);
+  bool hasglyph = false;
 
-	int count = std::max(lua_gettop(L) - 1, 1);
+  int count = std::max(lua_gettop(L) - 1, 1);
 
-	luax_catchexcept(L, [&]() {
-		 for (int i = 2; i < count + 2; i++)
-		 {
-			 if (lua_type(L, i) == LUA_TSTRING)
-				 hasglyph = t->hasGlyphs(luax_checkstring(L, i));
-			 else
-				 hasglyph = t->hasGlyph((uint32) luaL_checknumber(L, i));
+  luax_catchexcept(L,
+                   [&]()
+                   {
+                     for (int i = 2; i < count + 2; i++)
+                     {
+                       if (lua_type(L, i) == LUA_TSTRING)
+	                 hasglyph = t->hasGlyphs(luax_checkstring(L, i));
+                       else
+	                 hasglyph = t->hasGlyph((uint32) luaL_checknumber(L, i));
 
-			 if (!hasglyph)
-				 break;
-		 }
-	});
+                       if (!hasglyph)
+	                 break;
+                     }
+                   });
 
-	luax_pushboolean(L, hasglyph);
-	return 1;
+  luax_pushboolean(L, hasglyph);
+  return 1;
 }
 
 int w_Font_getKerning(lua_State *L)
 {
-	Font *t = luax_checkfont(L, 1);
-	float kerning = 0.0f;
+  Font *t = luax_checkfont(L, 1);
+  float kerning = 0.0f;
 
-	luax_catchexcept(L, [&]() {
-		if (lua_type(L, 2) == LUA_TSTRING)
-		{
-			std::string left = luax_checkstring(L, 2);
-			std::string right = luax_checkstring(L, 3);
-			kerning = t->getKerning(left, right);
-		}
-		else
-		{
-			uint32 left = (uint32) luaL_checknumber(L, 2);
-			uint32 right = (uint32) luaL_checknumber(L, 3);
-			kerning = t->getKerning(left, right);
-		}
-	});
+  luax_catchexcept(L,
+                   [&]()
+                   {
+                     if (lua_type(L, 2) == LUA_TSTRING)
+                     {
+                       std::string left = luax_checkstring(L, 2);
+                       std::string right = luax_checkstring(L, 3);
+                       kerning = t->getKerning(left, right);
+                     }
+                     else
+                     {
+                       uint32 left = (uint32) luaL_checknumber(L, 2);
+                       uint32 right = (uint32) luaL_checknumber(L, 3);
+                       kerning = t->getKerning(left, right);
+                     }
+                   });
 
-	lua_pushnumber(L, kerning);
-	return 1;
+  lua_pushnumber(L, kerning);
+  return 1;
 }
 
 int w_Font_setFallbacks(lua_State *L)
 {
-	Font *t = luax_checkfont(L, 1);
-	std::vector<graphics::Font *> fallbacks;
+  Font *t = luax_checkfont(L, 1);
+  std::vector<graphics::Font *> fallbacks;
 
-	for (int i = 2; i <= lua_gettop(L); i++)
-		fallbacks.push_back(luax_checkfont(L, i));
+  for (int i = 2; i <= lua_gettop(L); i++) fallbacks.push_back(luax_checkfont(L, i));
 
-	luax_catchexcept(L, [&](){ t->setFallbacks(fallbacks); });
-	return 0;
+  luax_catchexcept(L, [&]() { t->setFallbacks(fallbacks); });
+  return 0;
 }
 
 int w_Font_getDPIScale(lua_State *L)
 {
-	Font *t = luax_checkfont(L, 1);
-	lua_pushnumber(L, t->getDPIScale());
-	return 1;
+  Font *t = luax_checkfont(L, 1);
+  lua_pushnumber(L, t->getDPIScale());
+  return 1;
 }
 
-static const luaL_Reg w_Font_functions[] =
-{
-	{ "getHeight", w_Font_getHeight },
-	{ "getWidth", w_Font_getWidth },
-	{ "getWrap", w_Font_getWrap },
-	{ "setLineHeight", w_Font_setLineHeight },
-	{ "getLineHeight", w_Font_getLineHeight },
-	{ "setFilter", w_Font_setFilter },
-	{ "getFilter", w_Font_getFilter },
-	{ "getAscent", w_Font_getAscent },
-	{ "getDescent", w_Font_getDescent },
-	{ "getBaseline", w_Font_getBaseline },
-	{ "hasGlyphs", w_Font_hasGlyphs },
-	{ "getKerning", w_Font_getKerning },
-	{ "setFallbacks", w_Font_setFallbacks },
-	{ "getDPIScale", w_Font_getDPIScale },
-	{ 0, 0 }
-};
+static const luaL_Reg w_Font_functions[] = {{"getHeight", w_Font_getHeight},
+                                            {"getWidth", w_Font_getWidth},
+                                            {"getWrap", w_Font_getWrap},
+                                            {"setLineHeight", w_Font_setLineHeight},
+                                            {"getLineHeight", w_Font_getLineHeight},
+                                            {"setFilter", w_Font_setFilter},
+                                            {"getFilter", w_Font_getFilter},
+                                            {"getAscent", w_Font_getAscent},
+                                            {"getDescent", w_Font_getDescent},
+                                            {"getBaseline", w_Font_getBaseline},
+                                            {"hasGlyphs", w_Font_hasGlyphs},
+                                            {"getKerning", w_Font_getKerning},
+                                            {"setFallbacks", w_Font_setFallbacks},
+                                            {"getDPIScale", w_Font_getDPIScale},
+                                            {0, 0}};
 
 extern "C" int luaopen_font(lua_State *L)
 {
-	return luax_register_type(L, &Font::type, w_Font_functions, nullptr);
+  return luax_register_type(L, &Font::type, w_Font_functions, nullptr);
 }
 
-} // graphics
-} // love
+}  // namespace graphics
+}  // namespace love

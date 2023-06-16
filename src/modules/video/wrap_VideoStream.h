@@ -21,8 +21,8 @@
 #pragma once
 
 // LOVE
-#include "common/runtime.h"
 #include "VideoStream.h"
+#include "common/runtime.h"
 
 namespace love
 {
@@ -31,5 +31,5 @@ namespace video
 
 LOVE_EXPORT int luaopen_videostream(lua_State *L);
 
-} // video
-} // love
+}  // namespace video
+}  // namespace love

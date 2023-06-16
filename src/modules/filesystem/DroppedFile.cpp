@@ -20,16 +20,17 @@
 
 // LOVE
 #include "DroppedFile.h"
+
 #include "common/utf8.h"
 
 // Assume POSIX or Visual Studio.
-#include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/types.h>
 
 #ifdef LOVE_WINDOWS
 #include <wchar.h>
 #else
-#include <unistd.h> // POSIX.
+#include <unistd.h>  // POSIX.
 #endif
 
 namespace love
@@ -40,247 +41,235 @@ namespace filesystem
 love::Type DroppedFile::type("DroppedFile", &File::type);
 
 DroppedFile::DroppedFile(const std::string &filename)
-	: filename(filename)
-	, file(nullptr)
-	, mode(MODE_CLOSED)
-	, bufferMode(BUFFER_NONE)
-	, bufferSize(0)
+    : filename(filename),
+      file(nullptr),
+      mode(MODE_CLOSED),
+      bufferMode(BUFFER_NONE),
+      bufferSize(0)
 {
 }
 
 DroppedFile::~DroppedFile()
 {
-	if (mode != MODE_CLOSED)
-		close();
+  if (mode != MODE_CLOSED)
+    close();
 }
 
 bool DroppedFile::open(Mode newmode)
 {
-	if (newmode == MODE_CLOSED)
-		return true;
+  if (newmode == MODE_CLOSED)
+    return true;
 
-	// File already open?
-	if (file != nullptr)
-		return false;
+  // File already open?
+  if (file != nullptr)
+    return false;
 
 #ifdef LOVE_WINDOWS
-	// make sure non-ASCII filenames work.
-	std::wstring modestr = to_widestr(getModeString(newmode));
-	std::wstring wfilename = to_widestr(filename);
+  // make sure non-ASCII filenames work.
+  std::wstring modestr = to_widestr(getModeString(newmode));
+  std::wstring wfilename = to_widestr(filename);
 
-	file = _wfopen(wfilename.c_str(), modestr.c_str());
+  file = _wfopen(wfilename.c_str(), modestr.c_str());
 #else
-	file = fopen(filename.c_str(), getModeString(newmode));
+  file = fopen(filename.c_str(), getModeString(newmode));
 #endif
 
-	if (newmode == MODE_READ && file == nullptr)
-		throw love::Exception("Could not open file %s. Does not exist.", filename.c_str());
+  if (newmode == MODE_READ && file == nullptr)
+    throw love::Exception("Could not open file %s. Does not exist.", filename.c_str());
 
-	mode = newmode;
+  mode = newmode;
 
-	if (file != nullptr && !setBuffer(bufferMode, bufferSize))
-	{
-		// Revert to buffer defaults if we don't successfully set the buffer.
-		bufferMode = BUFFER_NONE;
-		bufferSize = 0;
-	}
+  if (file != nullptr && !setBuffer(bufferMode, bufferSize))
+  {
+    // Revert to buffer defaults if we don't successfully set the buffer.
+    bufferMode = BUFFER_NONE;
+    bufferSize = 0;
+  }
 
-	return file != nullptr;
+  return file != nullptr;
 }
 
 bool DroppedFile::close()
 {
-	if (file == nullptr || fclose(file) != 0)
-		return false;
+  if (file == nullptr || fclose(file) != 0)
+    return false;
 
-	mode = MODE_CLOSED;
-	file = nullptr;
+  mode = MODE_CLOSED;
+  file = nullptr;
 
-	return true;
+  return true;
 }
 
-bool DroppedFile::isOpen() const
-{
-	return mode != MODE_CLOSED && file != nullptr;
-}
+bool DroppedFile::isOpen() const { return mode != MODE_CLOSED && file != nullptr; }
 
 int64 DroppedFile::getSize()
 {
-	int fd = file ? fileno(file) : -1;
+  int fd = file ? fileno(file) : -1;
 
 #ifdef LOVE_WINDOWS
-	
-	struct _stat64 buf;
 
-	if (fd != -1)
-	{
-		if (_fstat64(fd, &buf) != 0)
-			return -1;
-	}
-	else
-	{
-		// make sure non-ASCII filenames work.
-		std::wstring wfilename = to_widestr(filename);
+  struct _stat64 buf;
 
-		if (_wstat64(wfilename.c_str(), &buf) != 0)
-			return -1;
-	}
+  if (fd != -1)
+  {
+    if (_fstat64(fd, &buf) != 0)
+      return -1;
+  }
+  else
+  {
+    // make sure non-ASCII filenames work.
+    std::wstring wfilename = to_widestr(filename);
 
-	return (int64) buf.st_size;
+    if (_wstat64(wfilename.c_str(), &buf) != 0)
+      return -1;
+  }
+
+  return (int64) buf.st_size;
 
 #else
 
-	// Assume POSIX support...
-	struct stat buf;
+  // Assume POSIX support...
+  struct stat buf;
 
-	if (fd != -1)
-	{
-		if (fstat(fd, &buf) != 0)
-			return -1;
-	}
-	else if (stat(filename.c_str(), &buf) != 0)
-		return -1;
+  if (fd != -1)
+  {
+    if (fstat(fd, &buf) != 0)
+      return -1;
+  }
+  else if (stat(filename.c_str(), &buf) != 0)
+    return -1;
 
-	return (int64) buf.st_size;
+  return (int64) buf.st_size;
 
 #endif
 }
 
 int64 DroppedFile::read(void *dst, int64 size)
 {
-	if (!file || mode != MODE_READ)
-		throw love::Exception("File is not opened for reading.");
+  if (!file || mode != MODE_READ)
+    throw love::Exception("File is not opened for reading.");
 
-	if (size < 0)
-		throw love::Exception("Invalid read size.");
+  if (size < 0)
+    throw love::Exception("Invalid read size.");
 
-	size_t read = fread(dst, 1, (size_t) size, file);
+  size_t read = fread(dst, 1, (size_t) size, file);
 
-	return (int64) read;
+  return (int64) read;
 }
 
 bool DroppedFile::write(const void *data, int64 size)
 {
-	if (!file || (mode != MODE_WRITE && mode != MODE_APPEND))
-		throw love::Exception("File is not opened for writing.");
+  if (!file || (mode != MODE_WRITE && mode != MODE_APPEND))
+    throw love::Exception("File is not opened for writing.");
 
-	if (size < 0)
-		throw love::Exception("Invalid write size.");
+  if (size < 0)
+    throw love::Exception("Invalid write size.");
 
-	int64 written = (int64) fwrite(data, 1, (size_t) size, file);
+  int64 written = (int64) fwrite(data, 1, (size_t) size, file);
 
-	return written == size;
+  return written == size;
 }
 
 bool DroppedFile::flush()
 {
-	if (!file || (mode != MODE_WRITE && mode != MODE_APPEND))
-		throw love::Exception("File is not opened for writing.");
+  if (!file || (mode != MODE_WRITE && mode != MODE_APPEND))
+    throw love::Exception("File is not opened for writing.");
 
-	return fflush(file) == 0;
+  return fflush(file) == 0;
 }
 
-bool DroppedFile::isEOF()
-{
-	return file == nullptr || tell() >= getSize();
-}
+bool DroppedFile::isEOF() { return file == nullptr || tell() >= getSize(); }
 
 int64 DroppedFile::tell()
 {
-	if (file == nullptr)
-		return -1;
+  if (file == nullptr)
+    return -1;
 
 #ifdef LOVE_WINDOWS
-	return (int64) _ftelli64(file);
+  return (int64) _ftelli64(file);
 #else
-	return (int64) ftello(file);
+  return (int64) ftello(file);
 #endif
 }
 
 bool DroppedFile::seek(uint64 pos)
 {
-	if (file == nullptr)
-		return false;
+  if (file == nullptr)
+    return false;
 
 #ifdef LOVE_WINDOWS
-	return _fseeki64(file, (int64) pos, SEEK_SET) == 0;
+  return _fseeki64(file, (int64) pos, SEEK_SET) == 0;
 #else
-	return fseeko(file, (off_t) pos, SEEK_SET) == 0;
+  return fseeko(file, (off_t) pos, SEEK_SET) == 0;
 #endif
 }
 
 bool DroppedFile::setBuffer(BufferMode bufmode, int64 size)
 {
-	if (size < 0)
-		return false;
+  if (size < 0)
+    return false;
 
-	if (bufmode == BUFFER_NONE)
-		size = 0;
+  if (bufmode == BUFFER_NONE)
+    size = 0;
 
-	// If the file isn't open, we'll make sure the buffer values are set in
-	// DroppedFile::open.
-	if (!isOpen())
-	{
-		bufferMode = bufmode;
-		bufferSize = size;
-		return true;
-	}
+  // If the file isn't open, we'll make sure the buffer values are set in
+  // DroppedFile::open.
+  if (!isOpen())
+  {
+    bufferMode = bufmode;
+    bufferSize = size;
+    return true;
+  }
 
-	int vbufmode;
-	switch (bufmode)
-	{
-	case File::BUFFER_NONE:
-	default:
-		vbufmode = _IONBF;
-		break;
-	case File::BUFFER_LINE:
-		vbufmode = _IOLBF;
-		break;
-	case File::BUFFER_FULL:
-		vbufmode = _IOFBF;
-		break;
-	}
+  int vbufmode;
+  switch (bufmode)
+  {
+    case File::BUFFER_NONE:
+    default:
+      vbufmode = _IONBF;
+      break;
+    case File::BUFFER_LINE:
+      vbufmode = _IOLBF;
+      break;
+    case File::BUFFER_FULL:
+      vbufmode = _IOFBF;
+      break;
+  }
 
-	if (setvbuf(file, nullptr, vbufmode, (size_t) size) != 0)
-		return false;
+  if (setvbuf(file, nullptr, vbufmode, (size_t) size) != 0)
+    return false;
 
-	bufferMode = bufmode;
-	bufferSize = size;
+  bufferMode = bufmode;
+  bufferSize = size;
 
-	return true;
+  return true;
 }
 
 File::BufferMode DroppedFile::getBuffer(int64 &size) const
 {
-	size = bufferSize;
-	return bufferMode;
+  size = bufferSize;
+  return bufferMode;
 }
 
-const std::string &DroppedFile::getFilename() const
-{
-	return filename;
-}
+const std::string &DroppedFile::getFilename() const { return filename; }
 
-File::Mode DroppedFile::getMode() const
-{
-	return mode;
-}
+File::Mode DroppedFile::getMode() const { return mode; }
 
 const char *DroppedFile::getModeString(Mode mode)
 {
-	switch (mode)
-	{
-	case File::MODE_CLOSED:
-	default:
-		return "c";
-	case File::MODE_READ:
-		return "rb";
-	case File::MODE_WRITE:
-		return "wb";
-	case File::MODE_APPEND:
-		return "ab";
-	}
+  switch (mode)
+  {
+    case File::MODE_CLOSED:
+    default:
+      return "c";
+    case File::MODE_READ:
+      return "rb";
+    case File::MODE_WRITE:
+      return "wb";
+    case File::MODE_APPEND:
+      return "ab";
+  }
 }
 
-} // filesystem
-} // love
+}  // namespace filesystem
+}  // namespace love

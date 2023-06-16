@@ -20,6 +20,7 @@
 
 // LOVE
 #include "FormatHandler.h"
+
 #include "common/Exception.h"
 
 namespace love
@@ -27,48 +28,38 @@ namespace love
 namespace image
 {
 
-FormatHandler::FormatHandler()
-{
-}
+FormatHandler::FormatHandler() {}
 
-FormatHandler::~FormatHandler()
-{
-}
+FormatHandler::~FormatHandler() {}
 
-bool FormatHandler::canDecode(Data* /*data*/)
-{
-	return false;
-}
+bool FormatHandler::canDecode(Data * /*data*/) { return false; }
 
 bool FormatHandler::canEncode(PixelFormat /*rawFormat*/, EncodedFormat /*encodedFormat*/)
 {
-	return false;
+  return false;
 }
 
-FormatHandler::DecodedImage FormatHandler::decode(Data* /*data*/)
+FormatHandler::DecodedImage FormatHandler::decode(Data * /*data*/)
 {
-	throw love::Exception("Image decoding is not implemented for this format backend.");
+  throw love::Exception("Image decoding is not implemented for this format backend.");
 }
 
-FormatHandler::EncodedImage FormatHandler::encode(const DecodedImage& /*img*/, EncodedFormat /*format*/)
+FormatHandler::EncodedImage FormatHandler::encode(const DecodedImage & /*img*/,
+                                                  EncodedFormat /*format*/)
 {
-	throw love::Exception("Image encoding is not implemented for this format backend.");
+  throw love::Exception("Image encoding is not implemented for this format backend.");
 }
 
-bool FormatHandler::canParseCompressed(Data* /*data*/)
+bool FormatHandler::canParseCompressed(Data * /*data*/) { return false; }
+
+StrongRef<CompressedMemory> FormatHandler::parseCompressed(
+    Data * /*filedata*/, std::vector<StrongRef<CompressedSlice>> & /*images*/,
+    PixelFormat & /*format*/, bool & /*sRGB*/)
 {
-	return false;
+  throw love::Exception("Compressed image parsing is not implemented for this format backend.");
 }
 
-StrongRef<CompressedMemory> FormatHandler::parseCompressed(Data* /*filedata*/, std::vector<StrongRef<CompressedSlice>>& /*images*/, PixelFormat& /*format*/, bool& /*sRGB*/)
-{
-	throw love::Exception("Compressed image parsing is not implemented for this format backend.");
-}
+void FormatHandler::freeRawPixels(unsigned char *mem) { delete[] mem; }
 
-void FormatHandler::freeRawPixels(unsigned char *mem)
-{
-	delete[] mem;
-}
-
-} // image
-} // love
+}  // namespace image
+}  // namespace love

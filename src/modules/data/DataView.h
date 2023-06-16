@@ -32,26 +32,24 @@ namespace data
  **/
 class DataView : public love::Data
 {
-public:
+ public:
+  static love::Type type;
 
-	static love::Type type;
+  DataView(Data *data, size_t offset, size_t size);
+  DataView(const DataView &d);
+  virtual ~DataView();
 
-	DataView(Data *data, size_t offset, size_t size);
-	DataView(const DataView &d);
-	virtual ~DataView();
+  // Implements Data.
+  DataView *clone() const override;
+  void *getData() const override;
+  size_t getSize() const override;
 
-	// Implements Data.
-	DataView *clone() const override;
-	void *getData() const override;
-	size_t getSize() const override;
+ private:
+  StrongRef<Data> data;
+  size_t offset;
+  size_t size;
 
-private:
+};  // DataView
 
-	StrongRef<Data> data;
-	size_t offset;
-	size_t size;
-
-}; // DataView
-
-} // data
-} // love
+}  // namespace data
+}  // namespace love

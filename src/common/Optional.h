@@ -27,24 +27,26 @@ namespace love
 template <typename T>
 struct Optional
 {
-	T value;
-	bool hasValue;
+  T value;
+  bool hasValue;
 
-	Optional()
-		: value(T())
-		, hasValue(false)
-	{}
+  Optional()
+      : value(T()),
+        hasValue(false)
+  {
+  }
 
-	Optional(T val)
-		: value(val)
-		, hasValue(true)
-	{}
+  Optional(T val)
+      : value(val),
+        hasValue(true)
+  {
+  }
 
-	void set(T val)
-	{
-		value = val;
-		hasValue = true;
-	}
+  void set(T val)
+  {
+    value = val;
+    hasValue = true;
+  }
 };
 
 typedef Optional<bool> OptionalBool;
@@ -52,4 +54,4 @@ typedef Optional<float> OptionalFloat;
 typedef Optional<double> OptionalDouble;
 typedef Optional<int> OptionalInt;
 
-} // love
+}  // namespace love

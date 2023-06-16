@@ -22,10 +22,10 @@
 #define LOVE_SOUND_WRAP_SOUND_H
 
 // LOVE
-#include "common/config.h"
 #include "Sound.h"
-#include "wrap_SoundData.h"
+#include "common/config.h"
 #include "wrap_Decoder.h"
+#include "wrap_SoundData.h"
 
 namespace love
 {
@@ -34,7 +34,7 @@ namespace sound
 
 extern "C" LOVE_EXPORT int luaopen_love_sound(lua_State *L);
 
-} // sound
-} // love
+}  // namespace sound
+}  // namespace love
 
-#endif // LOVE_SOUND_WRAP_SOUND_H
+#endif  // LOVE_SOUND_WRAP_SOUND_H

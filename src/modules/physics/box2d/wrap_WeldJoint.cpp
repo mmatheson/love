@@ -29,64 +29,62 @@ namespace box2d
 
 WeldJoint *luax_checkweldjoint(lua_State *L, int idx)
 {
-	WeldJoint *j = luax_checktype<WeldJoint>(L, idx);
-	if (!j->isValid())
-		luaL_error(L, "Attempt to use destroyed joint.");
-	return j;
+  WeldJoint *j = luax_checktype<WeldJoint>(L, idx);
+  if (!j->isValid())
+    luaL_error(L, "Attempt to use destroyed joint.");
+  return j;
 }
 
 int w_WeldJoint_setFrequency(lua_State *L)
 {
-	WeldJoint *t = luax_checkweldjoint(L, 1);
-	float arg1 = (float)luaL_checknumber(L, 2);
-	t->setFrequency(arg1);
-	return 0;
+  WeldJoint *t = luax_checkweldjoint(L, 1);
+  float arg1 = (float) luaL_checknumber(L, 2);
+  t->setFrequency(arg1);
+  return 0;
 }
 
 int w_WeldJoint_getFrequency(lua_State *L)
 {
-	WeldJoint *t = luax_checkweldjoint(L, 1);
-	lua_pushnumber(L, t->getFrequency());
-	return 1;
+  WeldJoint *t = luax_checkweldjoint(L, 1);
+  lua_pushnumber(L, t->getFrequency());
+  return 1;
 }
 
 int w_WeldJoint_setDampingRatio(lua_State *L)
 {
-	WeldJoint *t = luax_checkweldjoint(L, 1);
-	float arg1 = (float)luaL_checknumber(L, 2);
-	t->setDampingRatio(arg1);
-	return 0;
+  WeldJoint *t = luax_checkweldjoint(L, 1);
+  float arg1 = (float) luaL_checknumber(L, 2);
+  t->setDampingRatio(arg1);
+  return 0;
 }
 
 int w_WeldJoint_getDampingRatio(lua_State *L)
 {
-	WeldJoint *t = luax_checkweldjoint(L, 1);
-	lua_pushnumber(L, t->getDampingRatio());
-	return 1;
+  WeldJoint *t = luax_checkweldjoint(L, 1);
+  lua_pushnumber(L, t->getDampingRatio());
+  return 1;
 }
 
 int w_WeldJoint_getReferenceAngle(lua_State *L)
 {
-	WeldJoint *t = luax_checkweldjoint(L, 1);
-	lua_pushnumber(L, t->getReferenceAngle());
-	return 1;
+  WeldJoint *t = luax_checkweldjoint(L, 1);
+  lua_pushnumber(L, t->getReferenceAngle());
+  return 1;
 }
 
-static const luaL_Reg w_WeldJoint_functions[] =
-{
-	{ "setFrequency", w_WeldJoint_setFrequency },
-	{ "getFrequency", w_WeldJoint_getFrequency },
-	{ "setDampingRatio", w_WeldJoint_setDampingRatio },
-	{ "getDampingRatio", w_WeldJoint_getDampingRatio },
-	{ "getReferenceAngle", w_WeldJoint_getReferenceAngle },
-	{ 0, 0 }
-};
+static const luaL_Reg w_WeldJoint_functions[] = {
+    {"setFrequency", w_WeldJoint_setFrequency},
+    {"getFrequency", w_WeldJoint_getFrequency},
+    {"setDampingRatio", w_WeldJoint_setDampingRatio},
+    {"getDampingRatio", w_WeldJoint_getDampingRatio},
+    {"getReferenceAngle", w_WeldJoint_getReferenceAngle},
+    {0, 0}};
 
 extern "C" int luaopen_weldjoint(lua_State *L)
 {
-	return luax_register_type(L, &WeldJoint::type, w_Joint_functions, w_WeldJoint_functions, nullptr);
+  return luax_register_type(L, &WeldJoint::type, w_Joint_functions, w_WeldJoint_functions, nullptr);
 }
 
-} // box2d
-} // physics
-} // love
+}  // namespace box2d
+}  // namespace physics
+}  // namespace love

@@ -31,5 +31,5 @@ namespace graphics
 
 int luaopen_video(lua_State *L);
 
-} // graphics
-} // love
+}  // namespace graphics
+}  // namespace love

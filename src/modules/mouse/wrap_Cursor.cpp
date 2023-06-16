@@ -26,43 +26,39 @@ namespace love
 namespace mouse
 {
 
-Cursor *luax_checkcursor(lua_State *L, int idx)
-{
-	return luax_checktype<Cursor>(L, idx);
-}
+Cursor *luax_checkcursor(lua_State *L, int idx) { return luax_checktype<Cursor>(L, idx); }
 
 int w_Cursor_getType(lua_State *L)
 {
-	Cursor *cursor = luax_checkcursor(L, 1);
+  Cursor *cursor = luax_checkcursor(L, 1);
 
-	Cursor::CursorType ctype = cursor->getType();
-	const char *typestr = nullptr;
+  Cursor::CursorType ctype = cursor->getType();
+  const char *typestr = nullptr;
 
-	if (ctype == Cursor::CURSORTYPE_IMAGE)
-		mouse::Cursor::getConstant(ctype, typestr);
-	else if (ctype == Cursor::CURSORTYPE_SYSTEM)
-	{
-		Cursor::SystemCursor systype = cursor->getSystemType();
-		mouse::Cursor::getConstant(systype, typestr);
-	}
+  if (ctype == Cursor::CURSORTYPE_IMAGE)
+    mouse::Cursor::getConstant(ctype, typestr);
+  else if (ctype == Cursor::CURSORTYPE_SYSTEM)
+  {
+    Cursor::SystemCursor systype = cursor->getSystemType();
+    mouse::Cursor::getConstant(systype, typestr);
+  }
 
-	if (!typestr)
-		return luaL_error(L, "Unknown cursor type.");
+  if (!typestr)
+    return luaL_error(L, "Unknown cursor type.");
 
-	lua_pushstring(L, typestr);
-	return 1;
+  lua_pushstring(L, typestr);
+  return 1;
 }
 
-static const luaL_Reg w_Cursor_functions[] =
-{
-	{ "getType", w_Cursor_getType },
-	{ 0, 0 },
+static const luaL_Reg w_Cursor_functions[] = {
+    {"getType", w_Cursor_getType},
+    {0, 0},
 };
 
 extern "C" int luaopen_cursor(lua_State *L)
 {
-	return luax_register_type(L, &Cursor::type, w_Cursor_functions, nullptr);
+  return luax_register_type(L, &Cursor::type, w_Cursor_functions, nullptr);
 }
 
-} // mouse
-} // love
+}  // namespace mouse
+}  // namespace love

@@ -21,13 +21,14 @@
 #pragma once
 
 // LOVE
-#include "common/config.h"
 #include "common/Vector.h"
+#include "common/config.h"
 #include "graphics/vertex.h"
 
 // C++
-#include <vector>
 #include <string.h>
+
+#include <vector>
 
 namespace love
 {
@@ -42,63 +43,63 @@ class Graphics;
  **/
 class Polyline
 {
-public:
+ public:
+  Polyline(vertex::TriangleIndexMode mode = vertex::TriangleIndexMode::STRIP)
+      : vertices(nullptr),
+        overdraw(nullptr),
+        vertex_count(0),
+        overdraw_vertex_count(0),
+        triangle_mode(mode),
+        overdraw_vertex_start(0)
+  {
+  }
 
-	Polyline(vertex::TriangleIndexMode mode = vertex::TriangleIndexMode::STRIP)
-		: vertices(nullptr)
-		, overdraw(nullptr)
-		, vertex_count(0)
-		, overdraw_vertex_count(0)
-		, triangle_mode(mode)
-		, overdraw_vertex_start(0)
-	{}
+  virtual ~Polyline();
 
-	virtual ~Polyline();
+  /**
+   * @param vertices      Vertices defining the core line segments
+   * @param count         Number of vertices
+   * @param size_hint     Expected number of vertices of the rendering sleeve around the core line.
+   * @param halfwidth     linewidth / 2.
+   * @param pixel_size    Dimension of one pixel on the screen in world coordinates.
+   * @param draw_overdraw Fake antialias the line.
+   */
+  void render(const Vector2 *vertices, size_t count, size_t size_hint, float halfwidth,
+              float pixel_size, bool draw_overdraw);
 
-	/**
-	 * @param vertices      Vertices defining the core line segments
-	 * @param count         Number of vertices
-	 * @param size_hint     Expected number of vertices of the rendering sleeve around the core line.
-	 * @param halfwidth     linewidth / 2.
-	 * @param pixel_size    Dimension of one pixel on the screen in world coordinates.
-	 * @param draw_overdraw Fake antialias the line.
-	 */
-	void render(const Vector2 *vertices, size_t count, size_t size_hint, float halfwidth, float pixel_size, bool draw_overdraw);
+  /** Draws the line on the screen
+   */
+  void draw(love::graphics::Graphics *gfx);
 
-	/** Draws the line on the screen
-	 */
-	void draw(love::graphics::Graphics *gfx);
+ protected:
+  virtual void calc_overdraw_vertex_count(bool is_looping);
+  virtual void render_overdraw(const std::vector<Vector2> &normals, float pixel_size,
+                               bool is_looping);
+  virtual void fill_color_array(Color32 constant_color, Color32 *colors, int count);
 
-protected:
+  /** Calculate line boundary points.
+   *
+   * @param[out]    anchors       Anchor points defining the core line.
+   * @param[out]    normals       Normals defining the edge of the sleeve.
+   * @param[in,out] segment       Direction of segment pq (updated to the segment qr).
+   * @param[in,out] segmentLength Length of segment pq (updated to the segment qr).
+   * @param[in,out] segmentNormal Normal on the segment pq (updated to the segment qr).
+   * @param[in]     pointA        Current point on the line (q).
+   * @param[in]     pointB        Next point on the line (r).
+   * @param[in]     halfWidth     Half line width (see Polyline.render()).
+   */
+  virtual void renderEdge(std::vector<Vector2> &anchors, std::vector<Vector2> &normals,
+                          Vector2 &segment, float &segmentLength, Vector2 &segmentNormal,
+                          const Vector2 &pointA, const Vector2 &pointB, float halfWidth) = 0;
 
-	virtual void calc_overdraw_vertex_count(bool is_looping);
-	virtual void render_overdraw(const std::vector<Vector2> &normals, float pixel_size, bool is_looping);
-	virtual void fill_color_array(Color32 constant_color, Color32 *colors, int count);
+  Vector2 *vertices;
+  Vector2 *overdraw;
+  size_t vertex_count;
+  size_t overdraw_vertex_count;
+  vertex::TriangleIndexMode triangle_mode;
+  size_t overdraw_vertex_start;
 
-	/** Calculate line boundary points.
-	 *
-	 * @param[out]    anchors       Anchor points defining the core line.
-	 * @param[out]    normals       Normals defining the edge of the sleeve.
-	 * @param[in,out] segment       Direction of segment pq (updated to the segment qr).
-	 * @param[in,out] segmentLength Length of segment pq (updated to the segment qr).
-	 * @param[in,out] segmentNormal Normal on the segment pq (updated to the segment qr).
-	 * @param[in]     pointA        Current point on the line (q).
-	 * @param[in]     pointB        Next point on the line (r).
-	 * @param[in]     halfWidth     Half line width (see Polyline.render()).
-	 */
-	virtual void renderEdge(std::vector<Vector2> &anchors, std::vector<Vector2> &normals,
-	                        Vector2 &segment, float &segmentLength, Vector2 &segmentNormal,
-	                        const Vector2 &pointA, const Vector2 &pointB, float halfWidth) = 0;
-
-	Vector2 *vertices;
-	Vector2 *overdraw;
-	size_t vertex_count;
-	size_t overdraw_vertex_count;
-	vertex::TriangleIndexMode triangle_mode;
-	size_t overdraw_vertex_start;
-
-}; // Polyline
-
+};  // Polyline
 
 /**
  * A Polyline whose segments are not connected.
@@ -106,40 +107,38 @@ protected:
  */
 class NoneJoinPolyline : public Polyline
 {
-public:
+ public:
+  NoneJoinPolyline()
+      : Polyline(vertex::TriangleIndexMode::QUADS)
+  {
+  }
 
-	NoneJoinPolyline()
-		: Polyline(vertex::TriangleIndexMode::QUADS)
-	{}
+  void render(const Vector2 *vertices, size_t count, float halfwidth, float pixel_size,
+              bool draw_overdraw)
+  {
+    Polyline::render(vertices, count, 4 * count - 4, halfwidth, pixel_size, draw_overdraw);
 
-	void render(const Vector2 *vertices, size_t count, float halfwidth, float pixel_size, bool draw_overdraw)
-	{
-		Polyline::render(vertices, count, 4 * count - 4, halfwidth, pixel_size, draw_overdraw);
+    // discard the first and last two vertices. (these are redundant)
+    for (size_t i = 0; i < vertex_count - 4; ++i) this->vertices[i] = this->vertices[i + 2];
 
-		// discard the first and last two vertices. (these are redundant)
-		for (size_t i = 0; i < vertex_count - 4; ++i)
-			this->vertices[i] = this->vertices[i+2];
+    // The last quad is now garbage, so zero it out to make sure it doesn't
+    // get rasterized. These vertices are in between the core line vertices
+    // and the overdraw vertices in the combined vertex array, so they still
+    // get "rendered" since we draw everything with one draw call.
+    memset(&this->vertices[vertex_count - 4], 0, sizeof(love::Vector2) * 4);
 
-		// The last quad is now garbage, so zero it out to make sure it doesn't
-		// get rasterized. These vertices are in between the core line vertices
-		// and the overdraw vertices in the combined vertex array, so they still
-		// get "rendered" since we draw everything with one draw call.
-		memset(&this->vertices[vertex_count - 4], 0, sizeof(love::Vector2) * 4);
+    vertex_count -= 4;
+  }
 
-		vertex_count -= 4;
-	}
+ protected:
+  void calc_overdraw_vertex_count(bool is_looping) override;
+  void render_overdraw(const std::vector<Vector2> &normals, float pixel_size,
+                       bool is_looping) override;
+  void fill_color_array(Color32 constant_color, Color32 *colors, int count) override;
+  void renderEdge(std::vector<Vector2> &anchors, std::vector<Vector2> &normals, Vector2 &s,
+                  float &len_s, Vector2 &ns, const Vector2 &q, const Vector2 &r, float hw) override;
 
-protected:
-
-	void calc_overdraw_vertex_count(bool is_looping) override;
-	void render_overdraw(const std::vector<Vector2> &normals, float pixel_size, bool is_looping) override;
-	void fill_color_array(Color32 constant_color, Color32 *colors, int count) override;
-	void renderEdge(std::vector<Vector2> &anchors, std::vector<Vector2> &normals,
-	                Vector2 &s, float &len_s, Vector2 &ns, const Vector2 &q,
-	                const Vector2 &r, float hw) override;
-
-}; // NoneJoinPolyline
-
+};  // NoneJoinPolyline
 
 /**
  * A Polyline whose segments are connected by a sharp edge.
@@ -147,21 +146,18 @@ protected:
  */
 class MiterJoinPolyline : public Polyline
 {
-public:
+ public:
+  void render(const Vector2 *vertices, size_t count, float halfwidth, float pixel_size,
+              bool draw_overdraw)
+  {
+    Polyline::render(vertices, count, 2 * count, halfwidth, pixel_size, draw_overdraw);
+  }
 
-	void render(const Vector2 *vertices, size_t count, float halfwidth, float pixel_size, bool draw_overdraw)
-	{
-		Polyline::render(vertices, count, 2 * count, halfwidth, pixel_size, draw_overdraw);
-	}
+ protected:
+  void renderEdge(std::vector<Vector2> &anchors, std::vector<Vector2> &normals, Vector2 &s,
+                  float &len_s, Vector2 &ns, const Vector2 &q, const Vector2 &r, float hw) override;
 
-protected:
-
-	void renderEdge(std::vector<Vector2> &anchors, std::vector<Vector2> &normals,
-	                Vector2 &s, float &len_s, Vector2 &ns, const Vector2 &q,
-	                const Vector2 &r, float hw) override;
-
-}; // MiterJoinPolyline
-
+};  // MiterJoinPolyline
 
 /**
  * A Polyline whose segments are connected by a flat edge.
@@ -169,20 +165,18 @@ protected:
  */
 class BevelJoinPolyline : public Polyline
 {
-public:
+ public:
+  void render(const Vector2 *vertices, size_t count, float halfwidth, float pixel_size,
+              bool draw_overdraw)
+  {
+    Polyline::render(vertices, count, 4 * count - 4, halfwidth, pixel_size, draw_overdraw);
+  }
 
-	void render(const Vector2 *vertices, size_t count, float halfwidth, float pixel_size, bool draw_overdraw)
-	{
-		Polyline::render(vertices, count, 4 * count - 4, halfwidth, pixel_size, draw_overdraw);
-	}
+ protected:
+  void renderEdge(std::vector<Vector2> &anchors, std::vector<Vector2> &normals, Vector2 &s,
+                  float &len_s, Vector2 &ns, const Vector2 &q, const Vector2 &r, float hw) override;
 
-protected:
+};  // BevelJoinPolyline
 
-	void renderEdge(std::vector<Vector2> &anchors, std::vector<Vector2> &normals,
-	                Vector2 &s, float &len_s, Vector2 &ns, const Vector2 &q,
-	                const Vector2 &r, float hw) override;
-
-}; // BevelJoinPolyline
-
-} // graphics
-} // love
+}  // namespace graphics
+}  // namespace love

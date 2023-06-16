@@ -32,43 +32,43 @@ namespace love
 
 class Type
 {
-public:
-	static const uint32 MAX_TYPES = 128;
+ public:
+  static const uint32 MAX_TYPES = 128;
 
-	Type(const char *name, Type *parent);
-	Type(const Type&) = delete;
+  Type(const char *name, Type *parent);
+  Type(const Type &) = delete;
 
-	static Type *byName(const char *name);
+  static Type *byName(const char *name);
 
-	void init();
-	uint32 getId();
-	const char *getName() const;
+  void init();
+  uint32 getId();
+  const char *getName() const;
 
-	bool isa(const uint32 &other)
-	{
-		if (!inited)
-			init();
-		return bits[other];
-	}
+  bool isa(const uint32 &other)
+  {
+    if (!inited)
+      init();
+    return bits[other];
+  }
 
-	bool isa(const Type &other)
-	{
-		if (!inited)
-			init();
-		// Note that if this type implements the other
-		// calling init above will also have inited
-		// the other.
-		return bits[other.id];
-	}
+  bool isa(const Type &other)
+  {
+    if (!inited)
+      init();
+    // Note that if this type implements the other
+    // calling init above will also have inited
+    // the other.
+    return bits[other.id];
+  }
 
-private:
-	const char * const name;
-	Type * const parent;
-	uint32 id;
-	bool inited;
-	std::bitset<MAX_TYPES> bits;
+ private:
+  const char *const name;
+  Type *const parent;
+  uint32 id;
+  bool inited;
+  std::bitset<MAX_TYPES> bits;
 };
 
-} // love
+}  // namespace love
 
-#endif // LOVE_TYPES_H
+#endif  // LOVE_TYPES_H

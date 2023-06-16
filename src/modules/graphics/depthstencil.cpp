@@ -19,6 +19,7 @@
  **/
 
 #include "depthstencil.h"
+
 #include "common/StringMap.h"
 
 namespace love
@@ -28,76 +29,53 @@ namespace graphics
 
 CompareMode getReversedCompareMode(CompareMode mode)
 {
-	switch (mode)
-	{
-	case COMPARE_LESS:
-		return COMPARE_GREATER;
-	case COMPARE_LEQUAL:
-		return COMPARE_GEQUAL;
-	case COMPARE_GEQUAL:
-		return COMPARE_LEQUAL;
-	case COMPARE_GREATER:
-		return COMPARE_LESS;
-	default:
-		return mode;
-	}
+  switch (mode)
+  {
+    case COMPARE_LESS:
+      return COMPARE_GREATER;
+    case COMPARE_LEQUAL:
+      return COMPARE_GEQUAL;
+    case COMPARE_GEQUAL:
+      return COMPARE_LEQUAL;
+    case COMPARE_GREATER:
+      return COMPARE_LESS;
+    default:
+      return mode;
+  }
 }
 
-static StringMap<StencilAction, STENCIL_MAX_ENUM>::Entry stencilActionEntries[] =
-{
-	{ "replace",       STENCIL_REPLACE        },
-	{ "increment",     STENCIL_INCREMENT      },
-	{ "decrement",     STENCIL_DECREMENT      },
-	{ "incrementwrap", STENCIL_INCREMENT_WRAP },
-	{ "decrementwrap", STENCIL_DECREMENT_WRAP },
-	{ "invert",        STENCIL_INVERT         },
+static StringMap<StencilAction, STENCIL_MAX_ENUM>::Entry stencilActionEntries[] = {
+    {"replace", STENCIL_REPLACE},
+    {"increment", STENCIL_INCREMENT},
+    {"decrement", STENCIL_DECREMENT},
+    {"incrementwrap", STENCIL_INCREMENT_WRAP},
+    {"decrementwrap", STENCIL_DECREMENT_WRAP},
+    {"invert", STENCIL_INVERT},
 };
 
-static StringMap<StencilAction, STENCIL_MAX_ENUM> stencilActions(stencilActionEntries, sizeof(stencilActionEntries));
+static StringMap<StencilAction, STENCIL_MAX_ENUM> stencilActions(stencilActionEntries,
+                                                                 sizeof(stencilActionEntries));
 
-static StringMap<CompareMode, COMPARE_MAX_ENUM>::Entry compareModeEntries[] =
-{
-	{ "less",     COMPARE_LESS     },
-	{ "lequal",   COMPARE_LEQUAL   },
-	{ "equal",    COMPARE_EQUAL    },
-	{ "gequal",   COMPARE_GEQUAL   },
-	{ "greater",  COMPARE_GREATER  },
-	{ "notequal", COMPARE_NOTEQUAL },
-	{ "always",   COMPARE_ALWAYS   },
-	{ "never",    COMPARE_NEVER    },
+static StringMap<CompareMode, COMPARE_MAX_ENUM>::Entry compareModeEntries[] = {
+    {"less", COMPARE_LESS},     {"lequal", COMPARE_LEQUAL},   {"equal", COMPARE_EQUAL},
+    {"gequal", COMPARE_GEQUAL}, {"greater", COMPARE_GREATER}, {"notequal", COMPARE_NOTEQUAL},
+    {"always", COMPARE_ALWAYS}, {"never", COMPARE_NEVER},
 };
 
-static StringMap<CompareMode, COMPARE_MAX_ENUM> compareModes(compareModeEntries, sizeof(compareModeEntries));
+static StringMap<CompareMode, COMPARE_MAX_ENUM> compareModes(compareModeEntries,
+                                                             sizeof(compareModeEntries));
 
-bool getConstant(const char *in, StencilAction &out)
-{
-	return stencilActions.find(in, out);
-}
+bool getConstant(const char *in, StencilAction &out) { return stencilActions.find(in, out); }
 
-bool getConstant(StencilAction in, const char *&out)
-{
-	return stencilActions.find(in, out);
-}
+bool getConstant(StencilAction in, const char *&out) { return stencilActions.find(in, out); }
 
-std::vector<std::string> getConstants(StencilAction)
-{
-	return stencilActions.getNames();
-}
+std::vector<std::string> getConstants(StencilAction) { return stencilActions.getNames(); }
 
-bool getConstant(const char *in, CompareMode &out)
-{
-	return compareModes.find(in, out);
-}
+bool getConstant(const char *in, CompareMode &out) { return compareModes.find(in, out); }
 
-bool getConstant(CompareMode in, const char *&out)
-{
-	return compareModes.find(in, out);
-}
+bool getConstant(CompareMode in, const char *&out) { return compareModes.find(in, out); }
 
-std::vector<std::string> getConstants(CompareMode)
-{
-	return compareModes.getNames();
-}
+std::vector<std::string> getConstants(CompareMode) { return compareModes.getNames(); }
 
-} // graphics
-} // love
+}  // namespace graphics
+}  // namespace love

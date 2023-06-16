@@ -21,10 +21,10 @@
 #pragma once
 
 // LOVE
-#include "common/Object.h"
 #include "common/Matrix.h"
-#include "common/Vector.h"
+#include "common/Object.h"
 #include "common/StringMap.h"
+#include "common/Vector.h"
 
 namespace love
 {
@@ -33,68 +33,66 @@ namespace math
 
 class Transform : public Object
 {
-public:
+ public:
+  enum MatrixLayout
+  {
+    MATRIX_ROW_MAJOR,
+    MATRIX_COLUMN_MAJOR,
+    MATRIX_MAX_ENUM
+  };
 
-	enum MatrixLayout
-	{
-		MATRIX_ROW_MAJOR,
-		MATRIX_COLUMN_MAJOR,
-		MATRIX_MAX_ENUM
-	};
+  static love::Type type;
 
-	static love::Type type;
+  Transform();
+  Transform(const Matrix4 &m);
+  Transform(float x, float y, float a, float sx, float sy, float ox, float oy, float kx, float ky);
 
-	Transform();
-	Transform(const Matrix4 &m);
-	Transform(float x, float y, float a, float sx, float sy, float ox, float oy, float kx, float ky);
+  virtual ~Transform();
 
-	virtual ~Transform();
+  Transform *clone();
+  Transform *inverse();
 
-	Transform *clone();
-	Transform *inverse();
+  void apply(Transform *other);
 
-	void apply(Transform *other);
+  void translate(float x, float y);
+  void rotate(float angle);
+  void scale(float x, float y);
+  void shear(float x, float y);
 
-	void translate(float x, float y);
-	void rotate(float angle);
-	void scale(float x, float y);
-	void shear(float x, float y);
+  void reset();
+  void setTransformation(float x, float y, float a, float sx, float sy, float ox, float oy,
+                         float kx, float ky);
 
-	void reset();
-	void setTransformation(float x, float y, float a, float sx, float sy, float ox, float oy, float kx, float ky);
+  love::Vector2 transformPoint(love::Vector2 p) const;
+  love::Vector2 inverseTransformPoint(love::Vector2 p);
 
-	love::Vector2 transformPoint(love::Vector2 p) const;
-	love::Vector2 inverseTransformPoint(love::Vector2 p);
+  const Matrix4 &getMatrix() const;
+  void setMatrix(const Matrix4 &m);
 
-	const Matrix4 &getMatrix() const;
-	void setMatrix(const Matrix4 &m);
+  static bool getConstant(const char *in, MatrixLayout &out);
+  static bool getConstant(MatrixLayout in, const char *&out);
+  static std::vector<std::string> getConstants(MatrixLayout);
 
-	static bool getConstant(const char *in, MatrixLayout &out);
-	static bool getConstant(MatrixLayout in, const char *&out);
-	static std::vector<std::string> getConstants(MatrixLayout);
+ private:
+  inline const Matrix4 &getInverseMatrix()
+  {
+    if (inverseDirty)
+    {
+      inverseDirty = false;
+      inverseMatrix = matrix.inverse();
+    }
 
-private:
+    return inverseMatrix;
+  }
 
-	inline const Matrix4 &getInverseMatrix()
-	{
-		if (inverseDirty)
-		{
-			inverseDirty = false;
-			inverseMatrix = matrix.inverse();
-		}
+  Matrix4 matrix;
+  bool inverseDirty;
+  Matrix4 inverseMatrix;
 
-		return inverseMatrix;
-	}
-	
-	Matrix4 matrix;
-	bool inverseDirty;
-	Matrix4 inverseMatrix;
+  static StringMap<MatrixLayout, MATRIX_MAX_ENUM>::Entry matrixLayoutEntries[];
+  static StringMap<MatrixLayout, MATRIX_MAX_ENUM> matrixLayouts;
 
-	static StringMap<MatrixLayout, MATRIX_MAX_ENUM>::Entry matrixLayoutEntries[];
-	static StringMap<MatrixLayout, MATRIX_MAX_ENUM> matrixLayouts;
+};  // Transform
 
-}; // Transform
-
-
-} // math
-} // love
+}  // namespace math
+}  // namespace love

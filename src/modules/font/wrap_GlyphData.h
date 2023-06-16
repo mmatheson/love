@@ -22,10 +22,9 @@
 #define LOVE_FONT_WRAP_GLYPH_DATA_H
 
 // LOVE
+#include "GlyphData.h"
 #include "common/runtime.h"
 #include "data/wrap_Data.h"
-
-#include "GlyphData.h"
 
 namespace love
 {
@@ -35,7 +34,7 @@ namespace font
 GlyphData *luax_checkglyphdata(lua_State *L, int idx);
 extern "C" int luaopen_glyphdata(lua_State *L);
 
-} // font
-} // love
+}  // namespace font
+}  // namespace love
 
-#endif // LOVE_FONT_WRAP_GLYPH_DATA_H
+#endif  // LOVE_FONT_WRAP_GLYPH_DATA_H

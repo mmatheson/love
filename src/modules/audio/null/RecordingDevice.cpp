@@ -19,6 +19,7 @@
  **/
 
 #include "RecordingDevice.h"
+
 #include "Audio.h"
 
 namespace love
@@ -30,63 +31,30 @@ namespace null
 
 const char *RecordingDevice::name = "null";
 
-RecordingDevice::RecordingDevice(const char *)
-{
-}
+RecordingDevice::RecordingDevice(const char *) {}
 
-RecordingDevice::~RecordingDevice()
-{
-}
+RecordingDevice::~RecordingDevice() {}
 
-bool RecordingDevice::start(int, int, int, int)
-{
-	return false;
-}
+bool RecordingDevice::start(int, int, int, int) { return false; }
 
-void RecordingDevice::stop()
-{
-}
+void RecordingDevice::stop() {}
 
-love::sound::SoundData *RecordingDevice::getData()
-{
-	return nullptr;
-}
+love::sound::SoundData *RecordingDevice::getData() { return nullptr; }
 
-int RecordingDevice::getSampleCount() const
-{
-	return 0;
-}
+int RecordingDevice::getSampleCount() const { return 0; }
 
-int RecordingDevice::getMaxSamples() const
-{
-	return 0;
-}
+int RecordingDevice::getMaxSamples() const { return 0; }
 
-int RecordingDevice::getSampleRate() const
-{
-	return 0;
-}
+int RecordingDevice::getSampleRate() const { return 0; }
 
-int RecordingDevice::getBitDepth() const
-{
-	return 0;
-}
+int RecordingDevice::getBitDepth() const { return 0; }
 
-int RecordingDevice::getChannelCount() const
-{
-	return 0;
-}
+int RecordingDevice::getChannelCount() const { return 0; }
 
-const char *RecordingDevice::getName() const
-{
-	return name;
-}
+const char *RecordingDevice::getName() const { return name; }
 
-bool RecordingDevice::isRecording() const
-{
-	return false;
-}
+bool RecordingDevice::isRecording() const { return false; }
 
-} //null
-} //audio
-} //love
+}  // namespace null
+}  // namespace audio
+}  // namespace love

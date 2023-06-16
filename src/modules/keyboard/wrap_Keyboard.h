@@ -22,8 +22,8 @@
 #define LOVE_KEYBOARD_WRAP_KEYBOARD_H
 
 // LOVE
-#include "common/runtime.h"
 #include "Keyboard.h"
+#include "common/runtime.h"
 
 namespace love
 {
@@ -32,7 +32,7 @@ namespace keyboard
 
 extern "C" LOVE_EXPORT int luaopen_love_keyboard(lua_State *L);
 
-} // keyboard
-} // love
+}  // namespace keyboard
+}  // namespace love
 
-#endif // LOVE_KEYBOARD_WRAP_KEYBOARD_H
+#endif  // LOVE_KEYBOARD_WRAP_KEYBOARD_H

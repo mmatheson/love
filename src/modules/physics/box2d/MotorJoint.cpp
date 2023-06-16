@@ -22,8 +22,8 @@
 
 // Module
 #include "Body.h"
-#include "World.h"
 #include "Physics.h"
+#include "World.h"
 
 namespace love
 {
@@ -35,84 +35,64 @@ namespace box2d
 love::Type MotorJoint::type("MotorJoint", &Joint::type);
 
 MotorJoint::MotorJoint(Body *body1, Body *body2)
-	: Joint(body1, body2)
-	, joint(NULL)
+    : Joint(body1, body2),
+      joint(NULL)
 {
-	b2MotorJointDef def;
+  b2MotorJointDef def;
 
-	def.Initialize(body1->body, body2->body);
-	joint = (b2MotorJoint *) createJoint(&def);
+  def.Initialize(body1->body, body2->body);
+  joint = (b2MotorJoint *) createJoint(&def);
 }
 
 MotorJoint::MotorJoint(Body *body1, Body *body2, float correctionFactor, bool collideConnected)
-	: Joint(body1, body2)
-	, joint(NULL)
+    : Joint(body1, body2),
+      joint(NULL)
 {
-	b2MotorJointDef def;
+  b2MotorJointDef def;
 
-	def.Initialize(body1->body, body2->body);
-	def.correctionFactor = correctionFactor;
-	def.collideConnected = collideConnected;
+  def.Initialize(body1->body, body2->body);
+  def.correctionFactor = correctionFactor;
+  def.collideConnected = collideConnected;
 
-	joint = (b2MotorJoint *) createJoint(&def);
+  joint = (b2MotorJoint *) createJoint(&def);
 }
 
-MotorJoint::~MotorJoint()
-{
-}
+MotorJoint::~MotorJoint() {}
 
 void MotorJoint::setLinearOffset(float x, float y)
 {
-	joint->SetLinearOffset(Physics::scaleDown(b2Vec2(x, y)));
+  joint->SetLinearOffset(Physics::scaleDown(b2Vec2(x, y)));
 }
 
 int MotorJoint::getLinearOffset(lua_State *L) const
 {
-	lua_pushnumber(L, Physics::scaleUp(joint->GetLinearOffset().x));
-	lua_pushnumber(L, Physics::scaleUp(joint->GetLinearOffset().y));
-	return 2;
+  lua_pushnumber(L, Physics::scaleUp(joint->GetLinearOffset().x));
+  lua_pushnumber(L, Physics::scaleUp(joint->GetLinearOffset().y));
+  return 2;
 }
 
-void MotorJoint::setAngularOffset(float angularOffset)
-{
-	joint->SetAngularOffset(angularOffset);
-}
+void MotorJoint::setAngularOffset(float angularOffset) { joint->SetAngularOffset(angularOffset); }
 
-float MotorJoint::getAngularOffset() const
-{
-	return joint->GetAngularOffset();
-}
+float MotorJoint::getAngularOffset() const { return joint->GetAngularOffset(); }
 
-void MotorJoint::setMaxForce(float force)
-{
-	joint->SetMaxForce(Physics::scaleDown(force));
-}
+void MotorJoint::setMaxForce(float force) { joint->SetMaxForce(Physics::scaleDown(force)); }
 
-float MotorJoint::getMaxForce() const
-{
-	return Physics::scaleUp(joint->GetMaxForce());
-}
+float MotorJoint::getMaxForce() const { return Physics::scaleUp(joint->GetMaxForce()); }
 
 void MotorJoint::setMaxTorque(float torque)
 {
-	joint->SetMaxTorque(Physics::scaleDown(Physics::scaleDown(torque)));
+  joint->SetMaxTorque(Physics::scaleDown(Physics::scaleDown(torque)));
 }
 
 float MotorJoint::getMaxTorque() const
 {
-	return Physics::scaleUp(Physics::scaleUp(joint->GetMaxTorque()));
+  return Physics::scaleUp(Physics::scaleUp(joint->GetMaxTorque()));
 }
 
-void MotorJoint::setCorrectionFactor(float factor)
-{
-	joint->SetCorrectionFactor(factor);
-}
+void MotorJoint::setCorrectionFactor(float factor) { joint->SetCorrectionFactor(factor); }
 
-float MotorJoint::getCorrectionFactor() const
-{
-	return joint->GetCorrectionFactor();
-}
+float MotorJoint::getCorrectionFactor() const { return joint->GetCorrectionFactor(); }
 
-} // box2d
-} // physics
-} // love
+}  // namespace box2d
+}  // namespace physics
+}  // namespace love

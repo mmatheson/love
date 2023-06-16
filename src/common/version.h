@@ -30,9 +30,9 @@ static const int VERSION_MAJOR = 11;
 static const int VERSION_MINOR = 5;
 static const int VERSION_REV = 0;
 static const char *VERSION = LOVE_VERSION_STRING;
-static const char *VERSION_COMPATIBILITY[] =  { VERSION, "11.0", "11.1", "11.2", "11.3", "11.4", 0 };
+static const char *VERSION_COMPATIBILITY[] = {VERSION, "11.0", "11.1", "11.2", "11.3", "11.4", 0};
 static const char *VERSION_CODENAME = "Mysterious Mysteries";
 
-} // love
+}  // namespace love
 
-#endif // LOVE_VERSION_H
+#endif  // LOVE_VERSION_H

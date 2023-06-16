@@ -21,10 +21,10 @@
 #pragma once
 
 // LOVE
-#include "common/Object.h"
-#include "common/Data.h"
-#include "common/pixelformat.h"
 #include "CompressedSlice.h"
+#include "common/Data.h"
+#include "common/Object.h"
+#include "common/pixelformat.h"
 
 namespace love
 {
@@ -37,86 +37,85 @@ namespace image
  **/
 class FormatHandler : public love::Object
 {
-public:
+ public:
+  enum EncodedFormat
+  {
+    ENCODED_TGA,
+    ENCODED_PNG,
+    ENCODED_MAX_ENUM
+  };
 
-	enum EncodedFormat
-	{
-		ENCODED_TGA,
-		ENCODED_PNG,
-		ENCODED_MAX_ENUM
-	};
+  // Raw RGBA pixel data.
+  struct DecodedImage
+  {
+    PixelFormat format = PIXELFORMAT_RGBA8;
+    int width = 0;
+    int height = 0;
+    size_t size = 0;
+    unsigned char *data = nullptr;
+  };
 
-	// Raw RGBA pixel data.
-	struct DecodedImage
-	{
-		PixelFormat format = PIXELFORMAT_RGBA8;
-		int width   = 0;
-		int height  = 0;
-		size_t size = 0;
-		unsigned char *data = nullptr;
-	};
+  // Pixel data encoded in a particular format.
+  struct EncodedImage
+  {
+    size_t size = 0;
+    unsigned char *data = nullptr;
+  };
 
-	// Pixel data encoded in a particular format.
-	struct EncodedImage
-	{
-		size_t size = 0;
-		unsigned char *data = nullptr;
-	};
+  /**
+   * The default constructor is called when the Image module is initialized.
+   **/
+  FormatHandler();
+  virtual ~FormatHandler();
 
-	/**
-	 * The default constructor is called when the Image module is initialized.
-	 **/
-	FormatHandler();
-	virtual ~FormatHandler();
+  /**
+   * Whether this format handler can decode the given Data into raw pixels.
+   **/
+  virtual bool canDecode(Data *data);
 
-	/**
-	 * Whether this format handler can decode the given Data into raw pixels.
-	 **/
-	virtual bool canDecode(Data *data);
+  /**
+   * Whether this format handler can encode raw pixels to a particular format.
+   **/
+  virtual bool canEncode(PixelFormat rawFormat, EncodedFormat encodedFormat);
 
-	/**
-	 * Whether this format handler can encode raw pixels to a particular format.
-	 **/
-	virtual bool canEncode(PixelFormat rawFormat, EncodedFormat encodedFormat);
+  /**
+   * Decodes an image from its encoded form into raw pixel data.
+   **/
+  virtual DecodedImage decode(Data *data);
 
-	/**
-	 * Decodes an image from its encoded form into raw pixel data.
-	 **/
-	virtual DecodedImage decode(Data *data);
+  /**
+   * Encodes an image from raw pixel data into a particular format.
+   **/
+  virtual EncodedImage encode(const DecodedImage &img, EncodedFormat format);
 
-	/**
-	 * Encodes an image from raw pixel data into a particular format.
-	 **/
-	virtual EncodedImage encode(const DecodedImage &img, EncodedFormat format);
+  /**
+   * Whether this format handler can parse the given Data into a
+   * CompressedImageData object.
+   **/
+  virtual bool canParseCompressed(Data *data);
 
-	/**
-	 * Whether this format handler can parse the given Data into a
-	 * CompressedImageData object.
-	 **/
-	virtual bool canParseCompressed(Data *data);
+  /**
+   * Parses compressed image data into a list of sub-images and returns a
+   * single block of memory containing all the images.
+   *
+   * @param[in] filedata The data to parse.
+   * @param[out] images The list of sub-images generated. Byte data is a
+   *             pointer to the returned data.
+   * @param[out] format The format of the Compressed Data.
+   * @param[out] sRGB Whether the texture is sRGB-encoded.
+   *
+   * @return The single block of memory containing the parsed images.
+   **/
+  virtual StrongRef<CompressedMemory> parseCompressed(
+      Data *filedata, std::vector<StrongRef<CompressedSlice>> &images, PixelFormat &format,
+      bool &sRGB);
 
-	/**
-	 * Parses compressed image data into a list of sub-images and returns a
-	 * single block of memory containing all the images.
-	 *
-	 * @param[in] filedata The data to parse.
-	 * @param[out] images The list of sub-images generated. Byte data is a
-	 *             pointer to the returned data.
-	 * @param[out] format The format of the Compressed Data.
-	 * @param[out] sRGB Whether the texture is sRGB-encoded.
-	 *
-	 * @return The single block of memory containing the parsed images.
-	 **/
-	virtual StrongRef<CompressedMemory> parseCompressed(Data *filedata,
-	        std::vector<StrongRef<CompressedSlice>> &images,
-	        PixelFormat &format, bool &sRGB);
+  /**
+   * Frees raw pixel memory allocated by the format handler.
+   **/
+  virtual void freeRawPixels(unsigned char *mem);
 
-	/**
-	 * Frees raw pixel memory allocated by the format handler.
-	 **/
-	virtual void freeRawPixels(unsigned char *mem);
+};  // FormatHandler
 
-}; // FormatHandler
-
-} // image
-} // love
+}  // namespace image
+}  // namespace love

@@ -21,9 +21,8 @@
 #include "common/config.h"
 
 // LOVE
-#include "wrap_Touch.h"
-
 #include "sdl/Touch.h"
+#include "wrap_Touch.h"
 
 namespace love
 {
@@ -34,83 +33,80 @@ namespace touch
 
 int64 luax_checktouchid(lua_State *L, int idx)
 {
-	if (!lua_islightuserdata(L, idx))
-		return luax_typerror(L, idx, "touch id");
+  if (!lua_islightuserdata(L, idx))
+    return luax_typerror(L, idx, "touch id");
 
-	return (int64) (intptr_t) lua_touserdata(L, 1);
+  return (int64) (intptr_t) lua_touserdata(L, 1);
 }
 
 int w_getTouches(lua_State *L)
 {
-	const std::vector<Touch::TouchInfo> &touches = instance()->getTouches();
+  const std::vector<Touch::TouchInfo> &touches = instance()->getTouches();
 
-	lua_createtable(L, (int) touches.size(), 0);
+  lua_createtable(L, (int) touches.size(), 0);
 
-	for (size_t i = 0; i < touches.size(); i++)
-	{
-		// This is a bit hackish and we lose the higher 32 bits of the id on
-		// 32-bit systems, but SDL only ever gives id's that at most use as many
-		// bits as can fit in a pointer (for now.)
-		// We use lightuserdata instead of a lua_Number (double) because doubles
-		// can't represent all possible id values on 64-bit systems.
-		lua_pushlightuserdata(L, (void *) (intptr_t) touches[i].id);
-		lua_rawseti(L, -2, (int) i + 1);
-	}
+  for (size_t i = 0; i < touches.size(); i++)
+  {
+    // This is a bit hackish and we lose the higher 32 bits of the id on
+    // 32-bit systems, but SDL only ever gives id's that at most use as many
+    // bits as can fit in a pointer (for now.)
+    // We use lightuserdata instead of a lua_Number (double) because doubles
+    // can't represent all possible id values on 64-bit systems.
+    lua_pushlightuserdata(L, (void *) (intptr_t) touches[i].id);
+    lua_rawseti(L, -2, (int) i + 1);
+  }
 
-	return 1;
+  return 1;
 }
 
 int w_getPosition(lua_State *L)
 {
-	int64 id = luax_checktouchid(L, 1);
+  int64 id = luax_checktouchid(L, 1);
 
-	Touch::TouchInfo touch = {};
-	luax_catchexcept(L, [&]() { touch = instance()->getTouch(id); });
+  Touch::TouchInfo touch = {};
+  luax_catchexcept(L, [&]() { touch = instance()->getTouch(id); });
 
-	lua_pushnumber(L, touch.x);
-	lua_pushnumber(L, touch.y);
+  lua_pushnumber(L, touch.x);
+  lua_pushnumber(L, touch.y);
 
-	return 2;
+  return 2;
 }
 
 int w_getPressure(lua_State *L)
 {
-	int64 id = luax_checktouchid(L, 1);
+  int64 id = luax_checktouchid(L, 1);
 
-	Touch::TouchInfo touch = {};
-	luax_catchexcept(L, [&](){ touch = instance()->getTouch(id); });
+  Touch::TouchInfo touch = {};
+  luax_catchexcept(L, [&]() { touch = instance()->getTouch(id); });
 
-	lua_pushnumber(L, touch.pressure);
-	return 1;
+  lua_pushnumber(L, touch.pressure);
+  return 1;
 }
 
-static const luaL_Reg functions[] =
-{
-	{ "getTouches", w_getTouches },
-	{ "getPosition", w_getPosition },
-	{ "getPressure", w_getPressure },
-	{ 0, 0 }
-};
+static const luaL_Reg functions[] = {{"getTouches", w_getTouches},
+                                     {"getPosition", w_getPosition},
+                                     {"getPressure", w_getPressure},
+                                     {0, 0}};
 
 extern "C" int luaopen_love_touch(lua_State *L)
 {
-	Touch *instance = instance();
-	if (instance == nullptr)
-	{
-		luax_catchexcept(L, [&](){ instance = new love::touch::sdl::Touch(); });
-	}
-	else
-		instance->retain();
+  Touch *instance = instance();
+  if (instance == nullptr)
+  {
+    luax_catchexcept(L, [&]() { instance = new love::touch::sdl::Touch(); });
+  }
+  else
+    instance->retain();
 
-	WrappedModule w;
-	w.module = instance;
-	w.name = "touch";
-	w.type = &Module::type;
-	w.functions = functions;
-	w.types = nullptr;
+  WrappedModule w;
+  w.module = instance;
+  w.name = "touch";
+  w.type = &Module::type;
+  w.functions = functions;
+  w.types = nullptr;
 
-	return luax_register_module(L, w);
+  return luax_register_module(L, w);
 }
 
-} // touch
-} // love
+}  // namespace touch
+}  // namespace love

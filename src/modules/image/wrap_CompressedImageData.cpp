@@ -19,6 +19,7 @@
  **/
 
 #include "wrap_CompressedImageData.h"
+
 #include "data/wrap_Data.h"
 
 namespace love
@@ -28,98 +29,99 @@ namespace image
 
 CompressedImageData *luax_checkcompressedimagedata(lua_State *L, int idx)
 {
-	return luax_checktype<CompressedImageData>(L, idx);
+  return luax_checktype<CompressedImageData>(L, idx);
 }
 
 int w_CompressedImageData_clone(lua_State *L)
 {
-	CompressedImageData *t = luax_checkcompressedimagedata(L, 1), *c = nullptr;
-	luax_catchexcept(L, [&](){ c = t->clone(); }); 
-	luax_pushtype(L, c);
-	c->release();
-	return 1;
+  CompressedImageData *t = luax_checkcompressedimagedata(L, 1), *c = nullptr;
+  luax_catchexcept(L, [&]() { c = t->clone(); });
+  luax_pushtype(L, c);
+  c->release();
+  return 1;
 }
 
 int w_CompressedImageData_getWidth(lua_State *L)
 {
-	CompressedImageData *t = luax_checkcompressedimagedata(L, 1);
-	int miplevel = (int) luaL_optinteger(L, 2, 1);
-	int width = 0;
+  CompressedImageData *t = luax_checkcompressedimagedata(L, 1);
+  int miplevel = (int) luaL_optinteger(L, 2, 1);
+  int width = 0;
 
-	luax_catchexcept(L, [&](){ width = t->getWidth(miplevel - 1); });
+  luax_catchexcept(L, [&]() { width = t->getWidth(miplevel - 1); });
 
-	lua_pushinteger(L, width);
-	return 1;
+  lua_pushinteger(L, width);
+  return 1;
 }
 
 int w_CompressedImageData_getHeight(lua_State *L)
 {
-	CompressedImageData *t = luax_checkcompressedimagedata(L, 1);
-	int miplevel = (int) luaL_optinteger(L, 2, 1);
-	int height = 0;
+  CompressedImageData *t = luax_checkcompressedimagedata(L, 1);
+  int miplevel = (int) luaL_optinteger(L, 2, 1);
+  int height = 0;
 
-	luax_catchexcept(L, [&](){ height = t->getHeight(miplevel - 1); });
+  luax_catchexcept(L, [&]() { height = t->getHeight(miplevel - 1); });
 
-	lua_pushinteger(L, height);
-	return 1;
+  lua_pushinteger(L, height);
+  return 1;
 }
 
 int w_CompressedImageData_getDimensions(lua_State *L)
 {
-	CompressedImageData *t = luax_checkcompressedimagedata(L, 1);
-	int miplevel = (int) luaL_optinteger(L, 2, 1);
-	int width = 0, height = 0;
+  CompressedImageData *t = luax_checkcompressedimagedata(L, 1);
+  int miplevel = (int) luaL_optinteger(L, 2, 1);
+  int width = 0, height = 0;
 
-	luax_catchexcept(L, [&]()
-	{
-		width = t->getWidth(miplevel - 1);
-		height = t->getHeight(miplevel - 1);
-	});
+  luax_catchexcept(L,
+                   [&]()
+                   {
+                     width = t->getWidth(miplevel - 1);
+                     height = t->getHeight(miplevel - 1);
+                   });
 
-	lua_pushinteger(L, width);
-	lua_pushinteger(L, height);
-	return 2;
+  lua_pushinteger(L, width);
+  lua_pushinteger(L, height);
+  return 2;
 }
 
 int w_CompressedImageData_getMipmapCount(lua_State *L)
 {
-	CompressedImageData *t = luax_checkcompressedimagedata(L, 1);
-	lua_pushinteger(L, t->getMipmapCount());
-	return 1;
+  CompressedImageData *t = luax_checkcompressedimagedata(L, 1);
+  lua_pushinteger(L, t->getMipmapCount());
+  return 1;
 }
 
 int w_CompressedImageData_getFormat(lua_State *L)
 {
-	CompressedImageData *t = luax_checkcompressedimagedata(L, 1);
+  CompressedImageData *t = luax_checkcompressedimagedata(L, 1);
 
-	PixelFormat format = t->getFormat();
-	const char *str;
+  PixelFormat format = t->getFormat();
+  const char *str;
 
-	if (getConstant(format, str))
-		lua_pushstring(L, str);
-	else
-		lua_pushstring(L, "unknown");
+  if (getConstant(format, str))
+    lua_pushstring(L, str);
+  else
+    lua_pushstring(L, "unknown");
 
-	return 1;
+  return 1;
 }
 
-static const luaL_Reg w_CompressedImageData_functions[] =
-{
-	{ "clone", w_CompressedImageData_clone },
-	{ "getWidth", w_CompressedImageData_getWidth },
-	{ "getHeight", w_CompressedImageData_getHeight },
-	{ "getDimensions", w_CompressedImageData_getDimensions },
-	{ "getMipmapCount", w_CompressedImageData_getMipmapCount },
-	{ "getFormat", w_CompressedImageData_getFormat },
-	{ 0, 0 },
+static const luaL_Reg w_CompressedImageData_functions[] = {
+    {"clone", w_CompressedImageData_clone},
+    {"getWidth", w_CompressedImageData_getWidth},
+    {"getHeight", w_CompressedImageData_getHeight},
+    {"getDimensions", w_CompressedImageData_getDimensions},
+    {"getMipmapCount", w_CompressedImageData_getMipmapCount},
+    {"getFormat", w_CompressedImageData_getFormat},
+    {0, 0},
 };
 
 extern "C" int luaopen_compressedimagedata(lua_State *L)
 {
-	int ret = luax_register_type(L, &CompressedImageData::type, data::w_Data_functions, w_CompressedImageData_functions, nullptr);
-	love::data::luax_rundatawrapper(L, CompressedImageData::type);
-	return ret;
+  int ret = luax_register_type(L, &CompressedImageData::type, data::w_Data_functions,
+                               w_CompressedImageData_functions, nullptr);
+  love::data::luax_rundatawrapper(L, CompressedImageData::type);
+  return ret;
 }
 
-} // image
-} // love
+}  // namespace image
+}  // namespace love

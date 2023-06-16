@@ -27,36 +27,23 @@ namespace physics
 
 love::Type Joint::type("Joint", &Object::type);
 
-Joint::~Joint()
-{
-}
+Joint::~Joint() {}
 
-bool Joint::getConstant(const char *in, Type &out)
-{
-	return types.find(in, out);
-}
+bool Joint::getConstant(const char *in, Type &out) { return types.find(in, out); }
 
-bool Joint::getConstant(Type in, const char  *&out)
-{
-	return types.find(in, out);
-}
+bool Joint::getConstant(Type in, const char *&out) { return types.find(in, out); }
 
-StringMap<Joint::Type, Joint::JOINT_MAX_ENUM>::Entry Joint::typeEntries[] =
-{
-	{"distance", Joint::JOINT_DISTANCE},
-	{"revolute", Joint::JOINT_REVOLUTE},
-	{"prismatic", Joint::JOINT_PRISMATIC},
-	{"mouse", Joint::JOINT_MOUSE},
-	{"pulley", Joint::JOINT_PULLEY},
-	{"gear", Joint::JOINT_GEAR},
-	{"friction", Joint::JOINT_FRICTION},
-	{"weld", Joint::JOINT_WELD},
-	{"wheel", Joint::JOINT_WHEEL},
-	{"rope", Joint::JOINT_ROPE},
-	{"motor", Joint::JOINT_MOTOR},
+StringMap<Joint::Type, Joint::JOINT_MAX_ENUM>::Entry Joint::typeEntries[] = {
+    {"distance", Joint::JOINT_DISTANCE},   {"revolute", Joint::JOINT_REVOLUTE},
+    {"prismatic", Joint::JOINT_PRISMATIC}, {"mouse", Joint::JOINT_MOUSE},
+    {"pulley", Joint::JOINT_PULLEY},       {"gear", Joint::JOINT_GEAR},
+    {"friction", Joint::JOINT_FRICTION},   {"weld", Joint::JOINT_WELD},
+    {"wheel", Joint::JOINT_WHEEL},         {"rope", Joint::JOINT_ROPE},
+    {"motor", Joint::JOINT_MOTOR},
 };
 
-StringMap<Joint::Type, Joint::JOINT_MAX_ENUM> Joint::types(Joint::typeEntries, sizeof(Joint::typeEntries));
+StringMap<Joint::Type, Joint::JOINT_MAX_ENUM> Joint::types(Joint::typeEntries,
+                                                           sizeof(Joint::typeEntries));
 
-} // physics
-} // love
+}  // namespace physics
+}  // namespace love

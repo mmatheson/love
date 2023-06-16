@@ -22,11 +22,11 @@
 #define LOVE_IMAGE_IMAGE_H
 
 // LOVE
-#include "common/config.h"
-#include "common/Module.h"
-#include "filesystem/File.h"
-#include "ImageData.h"
 #include "CompressedImageData.h"
+#include "ImageData.h"
+#include "common/Module.h"
+#include "common/config.h"
+#include "filesystem/File.h"
 
 // C++
 #include <list>
@@ -45,71 +45,69 @@ namespace image
  **/
 class Image : public Module
 {
-public:
+ public:
+  static love::Type type;
 
-	static love::Type type;
+  Image();
+  virtual ~Image();
 
-	Image();
-	virtual ~Image();
+  // Implements Module.
+  ModuleType getModuleType() const override { return M_IMAGE; }
+  const char *getName() const override;
 
-	// Implements Module.
-	ModuleType getModuleType() const override { return M_IMAGE; }
-	const char *getName() const override;
+  /**
+   * Creates new ImageData from FileData.
+   * @param data The FileData containing the encoded image data.
+   * @return The new ImageData.
+   **/
+  ImageData *newImageData(Data *data);
 
-	/**
-	 * Creates new ImageData from FileData.
-	 * @param data The FileData containing the encoded image data.
-	 * @return The new ImageData.
-	 **/
-	ImageData *newImageData(Data *data);
+  /**
+   * Creates empty ImageData with the given size.
+   * @param width The width of the ImageData.
+   * @param height The height of the ImageData.
+   * @return The new ImageData.
+   **/
+  ImageData *newImageData(int width, int height, PixelFormat format = PIXELFORMAT_RGBA8);
 
-	/**
-	 * Creates empty ImageData with the given size.
-	 * @param width The width of the ImageData.
-	 * @param height The height of the ImageData.
-	 * @return The new ImageData.
-	 **/
-	ImageData *newImageData(int width, int height, PixelFormat format = PIXELFORMAT_RGBA8);
+  /**
+   * Creates empty ImageData with the given size.
+   * @param width The width of the ImageData.
+   * @param height The height of the ImageData.
+   * @param data The data to load into the ImageData.
+   * @param own Whether the new ImageData should take ownership of the data or
+   *        copy it.
+   * @return The new ImageData.
+   **/
+  ImageData *newImageData(int width, int height, PixelFormat format, void *data, bool own = false);
 
-	/**
-	 * Creates empty ImageData with the given size.
-	 * @param width The width of the ImageData.
-	 * @param height The height of the ImageData.
-	 * @param data The data to load into the ImageData.
-	 * @param own Whether the new ImageData should take ownership of the data or
-	 *        copy it.
-	 * @return The new ImageData.
-	 **/
-	ImageData *newImageData(int width, int height, PixelFormat format, void *data, bool own = false);
+  /**
+   * Creates new CompressedImageData from FileData.
+   * @param data The FileData containing the compressed image data.
+   * @return The new CompressedImageData.
+   **/
+  CompressedImageData *newCompressedData(Data *data);
 
-	/**
-	 * Creates new CompressedImageData from FileData.
-	 * @param data The FileData containing the compressed image data.
-	 * @return The new CompressedImageData.
-	 **/
-	CompressedImageData *newCompressedData(Data *data);
+  /**
+   * Determines whether a FileData is Compressed image data or not.
+   * @param data The FileData to test.
+   **/
+  bool isCompressed(Data *data);
 
-	/**
-	 * Determines whether a FileData is Compressed image data or not.
-	 * @param data The FileData to test.
-	 **/
-	bool isCompressed(Data *data);
+  std::vector<StrongRef<ImageData>> newCubeFaces(ImageData *src);
+  std::vector<StrongRef<ImageData>> newVolumeLayers(ImageData *src);
 
-	std::vector<StrongRef<ImageData>> newCubeFaces(ImageData *src);
-	std::vector<StrongRef<ImageData>> newVolumeLayers(ImageData *src);
+  const std::list<FormatHandler *> &getFormatHandlers() const;
 
-	const std::list<FormatHandler *> &getFormatHandlers() const;
+ private:
+  ImageData *newPastedImageData(ImageData *src, int sx, int sy, int w, int h);
 
-private:
+  // Image format handlers we can use for decoding and encoding ImageData.
+  std::list<FormatHandler *> formatHandlers;
 
-	ImageData *newPastedImageData(ImageData *src, int sx, int sy, int w, int h);
+};  // Image
 
-	// Image format handlers we can use for decoding and encoding ImageData.
-	std::list<FormatHandler *> formatHandlers;
+}  // namespace image
+}  // namespace love
 
-}; // Image
-
-} // image
-} // love
-
-#endif // LOVE_IMAGE_IMAGE_H
+#endif  // LOVE_IMAGE_IMAGE_H

@@ -23,8 +23,8 @@
 
 // LOVE
 #include "common/Object.h"
-#include "common/math.h"
 #include "common/Vector.h"
+#include "common/math.h"
 
 namespace love
 {
@@ -33,46 +33,44 @@ namespace graphics
 
 class Quad : public Object
 {
-public:
+ public:
+  static love::Type type;
 
-	static love::Type type;
+  struct Viewport
+  {
+    double x, y;
+    double w, h;
+  };
 
-	struct Viewport
-	{
-		double x, y;
-		double w, h;
-	};
+  Quad(const Viewport &v, double sw, double sh);
+  virtual ~Quad();
 
-	Quad(const Viewport &v, double sw, double sh);
-	virtual ~Quad();
+  void refresh(const Viewport &v, double sw, double sh);
+  void setViewport(const Viewport &v);
+  Viewport getViewport() const;
 
-	void refresh(const Viewport &v, double sw, double sh);
-	void setViewport(const Viewport &v);
-	Viewport getViewport() const;
+  double getTextureWidth() const;
+  double getTextureHeight() const;
 
-	double getTextureWidth() const;
-	double getTextureHeight() const;
+  const Vector2 *getVertexPositions() const { return vertexPositions; }
+  const Vector2 *getVertexTexCoords() const { return vertexTexCoords; }
 
-	const Vector2 *getVertexPositions() const { return vertexPositions; }
-	const Vector2 *getVertexTexCoords() const { return vertexTexCoords; }
+  void setLayer(int layer);
+  int getLayer() const;
 
-	void setLayer(int layer);
-	int getLayer() const;
+ private:
+  Vector2 vertexPositions[4];
+  Vector2 vertexTexCoords[4];
 
-private:
+  int arrayLayer;
 
-	Vector2 vertexPositions[4];
-	Vector2 vertexTexCoords[4];
+  Viewport viewport;
+  double sw;
+  double sh;
 
-	int arrayLayer;
+};  // Quad
 
-	Viewport viewport;
-	double sw;
-	double sh;
+}  // namespace graphics
+}  // namespace love
 
-}; // Quad
-
-} // graphics
-} // love
-
-#endif // LOVE_GRAPHICS_QUAD_H
+#endif  // LOVE_GRAPHICS_QUAD_H

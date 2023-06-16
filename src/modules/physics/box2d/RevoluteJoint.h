@@ -37,122 +37,123 @@ namespace box2d
  **/
 class RevoluteJoint : public Joint
 {
-public:
+ public:
+  static love::Type type;
 
-	static love::Type type;
+  /**
+   * Creates a new RevoluteJoint connecting body1 and body2.
+   **/
+  RevoluteJoint(Body *body1, Body *body2, float xA, float yA, float xB, float yB,
+                bool collideConnected);
 
-	/**
-	 * Creates a new RevoluteJoint connecting body1 and body2.
-	 **/
-	RevoluteJoint(Body *body1, Body *body2, float xA, float yA, float xB, float yB, bool collideConnected);
+  RevoluteJoint(Body *body1, Body *body2, float xA, float yA, float xB, float yB,
+                bool collideConnected, float referenceAngle);
 
-	RevoluteJoint(Body *body1, Body *body2, float xA, float yA, float xB, float yB, bool collideConnected, float referenceAngle);
+  virtual ~RevoluteJoint();
 
-	virtual ~RevoluteJoint();
+  /**
+   * Get the current joint angle in degrees.
+   **/
+  float getJointAngle() const;
 
-	/**
-	 * Get the current joint angle in degrees.
-	 **/
-	float getJointAngle() const;
+  /**
+   * Get the current joint angle speed in degrees per second.
+   **/
+  float getJointSpeed() const;
 
-	/**
-	 * Get the current joint angle speed in degrees per second.
-	 **/
-	float getJointSpeed() const;
+  /**
+   * Enable/disable the joint motor.
+   **/
+  void setMotorEnabled(bool enable);
 
-	/**
-	 * Enable/disable the joint motor.
-	 **/
-	void setMotorEnabled(bool enable);
+  /**
+   * Checks whether the motor is enabled.
+   **/
+  bool isMotorEnabled() const;
 
-	/**
-	 * Checks whether the motor is enabled.
-	 **/
-	bool isMotorEnabled() const;
+  /**
+   * Set the maximum motor torque, usually in N-m.
+   **/
+  void setMaxMotorTorque(float torque);
 
-	/**
-	 * Set the maximum motor torque, usually in N-m.
-	 **/
-	void setMaxMotorTorque(float torque);
+  /**
+   * Sets the motor speed in radians per second.
+   **/
+  void setMotorSpeed(float speed);
 
-	/**
-	 * Sets the motor speed in radians per second.
-	 **/
-	void setMotorSpeed(float speed);
+  /**
+   * Gets the motor speed in radians per second.
+   **/
+  float getMotorSpeed() const;
 
-	/**
-	 * Gets the motor speed in radians per second.
-	 **/
-	float getMotorSpeed() const;
+  /**
+   * Get the current motor torque, usually in N-m.
+   * @param inv_dt The inverse timestep.
+   **/
+  float getMotorTorque(float inv_dt) const;
 
-	/**
-	 * Get the current motor torque, usually in N-m.
-	 * @param inv_dt The inverse timestep.
-	 **/
-	float getMotorTorque(float inv_dt) const;
+  /**
+   * Get the maximum motor torque, usually in N-m.
+   **/
+  float getMaxMotorTorque() const;
 
-	/**
-	 * Get the maximum motor torque, usually in N-m.
-	 **/
-	float getMaxMotorTorque() const;
+  /**
+   * Enable/disable the joint limit.
+   **/
+  void setLimitsEnabled(bool enable);
 
-	/**
-	 * Enable/disable the joint limit.
-	 **/
-	void setLimitsEnabled(bool enable);
+  /**
+   * Checks whether limits are enabled.
+   **/
+  bool areLimitsEnabled() const;
 
-	/**
-	 * Checks whether limits are enabled.
-	 **/
-	bool areLimitsEnabled() const;
+  /**
+   * Sets the upper limit in degrees.
+   **/
+  void setUpperLimit(float limit);
 
-	/**
-	 * Sets the upper limit in degrees.
-	 **/
-	void setUpperLimit(float limit);
+  /**
+   * Sets the lower limit in degrees.
+   **/
+  void setLowerLimit(float limit);
 
-	/**
-	 * Sets the lower limit in degrees.
-	 **/
-	void setLowerLimit(float limit);
+  /**
+   * Sets the limits in degrees.
+   **/
+  void setLimits(float lower, float upper);
 
-	/**
-	 * Sets the limits in degrees.
-	 **/
-	void setLimits(float lower, float upper);
+  /**
+   * Gets the lower limit in degrees.
+   **/
+  float getLowerLimit() const;
 
-	/**
-	 * Gets the lower limit in degrees.
-	 **/
-	float getLowerLimit() const;
+  /**
+   * Gets the upper limit in degrees.
+   **/
+  float getUpperLimit() const;
 
-	/**
-	 * Gets the upper limit in degrees.
-	 **/
-	float getUpperLimit() const;
+  /**
+   * Gets the limits in degrees.
+   * @returns The lower limit.
+   * @returns The upper limit.
+   **/
+  int getLimits(lua_State *L);
 
-	/**
-	 * Gets the limits in degrees.
-	 * @returns The lower limit.
-	 * @returns The upper limit.
-	 **/
-	int getLimits(lua_State *L);
+  /**
+   * Gets the reference angle.
+   **/
+  float getReferenceAngle() const;
 
-	/**
-	 * Gets the reference angle.
-	 **/
-	float getReferenceAngle() const;
+ private:
+  // The Box2D revolute joint object.
+  b2RevoluteJoint *joint;
 
-private:
-
-	// The Box2D revolute joint object.
-	b2RevoluteJoint *joint;
-
-	void init(b2RevoluteJointDef &def, Body *body1, Body *body2, float xA, float yA, float xB, float yB, bool collideConnected);
+  void init(b2RevoluteJointDef &def, Body *body1, Body *body2, float xA, float yA, float xB,
+            float yB, bool collideConnected);
 };
 
-} // box2d
-} // physics
-} // love
+}  // namespace box2d
+}  // namespace physics
+}  // namespace love
 
-#endif // LOVE_PHYSICS_BOX2D_REVOLUTE_JOINT_H
+#endif  // LOVE_PHYSICS_BOX2D_REVOLUTE_JOINT_H

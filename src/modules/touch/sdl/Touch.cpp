@@ -19,9 +19,10 @@
  **/
 
 // LOVE
-#include "common/config.h"
-#include "common/Exception.h"
 #include "Touch.h"
+
+#include "common/Exception.h"
+#include "common/config.h"
 
 // C++
 #include <algorithm>
@@ -33,57 +34,48 @@ namespace touch
 namespace sdl
 {
 
-const std::vector<Touch::TouchInfo> &Touch::getTouches() const
-{
-	return touches;
-}
+const std::vector<Touch::TouchInfo> &Touch::getTouches() const { return touches; }
 
 const Touch::TouchInfo &Touch::getTouch(int64 id) const
 {
-	for (const auto &touch : touches)
-	{
-		if (touch.id == id)
-			return touch;
-	}
+  for (const auto &touch : touches)
+  {
+    if (touch.id == id)
+      return touch;
+  }
 
-	throw love::Exception("Invalid active touch ID: %d", id);
+  throw love::Exception("Invalid active touch ID: %d", id);
 }
 
-const char *Touch::getName() const
-{
-	return "love.touch.sdl";
-}
+const char *Touch::getName() const { return "love.touch.sdl"; }
 
 void Touch::onEvent(Uint32 eventtype, const TouchInfo &info)
 {
-	auto compare = [&](const TouchInfo &touch) -> bool
-	{
-		return touch.id == info.id;
-	};
+  auto compare = [&](const TouchInfo &touch) -> bool { return touch.id == info.id; };
 
-	switch (eventtype)
-	{
-	case SDL_FINGERDOWN:
-		touches.erase(std::remove_if(touches.begin(), touches.end(), compare), touches.end());
-		touches.push_back(info);
-		break;
-	case SDL_FINGERMOTION:
-	{
-		for (TouchInfo &touch : touches)
-		{
-			if (touch.id == info.id)
-				touch = info;
-		}
-		break;
-	}
-	case SDL_FINGERUP:
-		touches.erase(std::remove_if(touches.begin(), touches.end(), compare), touches.end());
-		break;
-	default:
-		break;
-	}
+  switch (eventtype)
+  {
+    case SDL_FINGERDOWN:
+      touches.erase(std::remove_if(touches.begin(), touches.end(), compare), touches.end());
+      touches.push_back(info);
+      break;
+    case SDL_FINGERMOTION:
+    {
+      for (TouchInfo &touch : touches)
+      {
+	if (touch.id == info.id)
+	  touch = info;
+      }
+      break;
+    }
+    case SDL_FINGERUP:
+      touches.erase(std::remove_if(touches.begin(), touches.end(), compare), touches.end());
+      break;
+    default:
+      break;
+  }
 }
 
-} // sdl
-} // touch
-} // love
+}  // namespace sdl
+}  // namespace touch
+}  // namespace love

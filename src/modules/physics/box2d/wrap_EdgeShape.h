@@ -22,9 +22,9 @@
 #define LOVE_PHYSICS_BOX2D_WRAP_EDGE_SHAPE_H
 
 // LOVE
+#include "EdgeShape.h"
 #include "common/runtime.h"
 #include "wrap_Shape.h"
-#include "EdgeShape.h"
 
 namespace love
 {
@@ -36,8 +36,8 @@ namespace box2d
 EdgeShape *luax_checkedgeshape(lua_State *L, int idx);
 extern "C" int luaopen_edgeshape(lua_State *L);
 
-} // box2d
-} // physics
-} // love
+}  // namespace box2d
+}  // namespace physics
+}  // namespace love
 
-#endif // LOVE_PHYSICS_BOX2D_WRAP_EDGE_SHAPE_H
+#endif  // LOVE_PHYSICS_BOX2D_WRAP_EDGE_SHAPE_H

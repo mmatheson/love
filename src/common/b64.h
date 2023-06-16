@@ -18,9 +18,9 @@
  * 3. This notice may not be removed or altered from any source distribution.
  **/
 
-#include "config.h"
-
 #include <stddef.h>
+
+#include "config.h"
 
 #ifndef LOVE_B64_H
 #define LOVE_B64_H
@@ -50,6 +50,6 @@ char *b64_encode(const char *src, size_t srclen, size_t linelen, size_t &dstlen)
  */
 char *b64_decode(const char *src, size_t srclen, size_t &dstlen);
 
-} // love
+}  // namespace love
 
-#endif // LOVE_B64_H
+#endif  // LOVE_B64_H

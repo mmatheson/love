@@ -38,157 +38,155 @@ namespace physfs
 {
 
 File::File(const std::string &filename)
-	: filename(filename)
-	, file(nullptr)
-	, mode(MODE_CLOSED)
-	, bufferMode(BUFFER_NONE)
-	, bufferSize(0)
+    : filename(filename),
+      file(nullptr),
+      mode(MODE_CLOSED),
+      bufferMode(BUFFER_NONE),
+      bufferSize(0)
 {
 }
 
 File::~File()
 {
-	if (mode != MODE_CLOSED)
-		close();
+  if (mode != MODE_CLOSED)
+    close();
 }
 
 bool File::open(Mode mode)
 {
-	if (mode == MODE_CLOSED)
-		return true;
+  if (mode == MODE_CLOSED)
+    return true;
 
-	if (!PHYSFS_isInit())
-		throw love::Exception("PhysFS is not initialized.");
+  if (!PHYSFS_isInit())
+    throw love::Exception("PhysFS is not initialized.");
 
-	// File must exist if read mode.
-	if ((mode == MODE_READ) && !PHYSFS_exists(filename.c_str()))
-		throw love::Exception("Could not open file %s. Does not exist.", filename.c_str());
+  // File must exist if read mode.
+  if ((mode == MODE_READ) && !PHYSFS_exists(filename.c_str()))
+    throw love::Exception("Could not open file %s. Does not exist.", filename.c_str());
 
-	// Check whether the write directory is set.
-	if ((mode == MODE_APPEND || mode == MODE_WRITE) && (PHYSFS_getWriteDir() == nullptr) && !hack_setupWriteDirectory())
-		throw love::Exception("Could not set write directory.");
+  // Check whether the write directory is set.
+  if ((mode == MODE_APPEND || mode == MODE_WRITE) && (PHYSFS_getWriteDir() == nullptr) &&
+      !hack_setupWriteDirectory())
+    throw love::Exception("Could not set write directory.");
 
-	// File already open?
-	if (file != nullptr)
-		return false;
+  // File already open?
+  if (file != nullptr)
+    return false;
 
-	PHYSFS_getLastErrorCode();
-	PHYSFS_File *handle = nullptr;
+  PHYSFS_getLastErrorCode();
+  PHYSFS_File *handle = nullptr;
 
-	switch (mode)
-	{
-	case MODE_READ:
-		handle = PHYSFS_openRead(filename.c_str());
-		break;
-	case MODE_APPEND:
-		handle = PHYSFS_openAppend(filename.c_str());
-		break;
-	case MODE_WRITE:
-		handle = PHYSFS_openWrite(filename.c_str());
-		break;
-	default:
-		break;
-	}
+  switch (mode)
+  {
+    case MODE_READ:
+      handle = PHYSFS_openRead(filename.c_str());
+      break;
+    case MODE_APPEND:
+      handle = PHYSFS_openAppend(filename.c_str());
+      break;
+    case MODE_WRITE:
+      handle = PHYSFS_openWrite(filename.c_str());
+      break;
+    default:
+      break;
+  }
 
-	if (handle == nullptr)
-	{
-		const char *err = PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
-		if (err == nullptr)
-			err = "unknown error";
-		throw love::Exception("Could not open file %s (%s)", filename.c_str(), err);
-	}
+  if (handle == nullptr)
+  {
+    const char *err = PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
+    if (err == nullptr)
+      err = "unknown error";
+    throw love::Exception("Could not open file %s (%s)", filename.c_str(), err);
+  }
 
-	file = handle;
+  file = handle;
 
-	this->mode = mode;
+  this->mode = mode;
 
-	if (file != nullptr && !setBuffer(bufferMode, bufferSize))
-	{
-		// Revert to buffer defaults if we don't successfully set the buffer.
-		bufferMode = BUFFER_NONE;
-		bufferSize = 0;
-	}
+  if (file != nullptr && !setBuffer(bufferMode, bufferSize))
+  {
+    // Revert to buffer defaults if we don't successfully set the buffer.
+    bufferMode = BUFFER_NONE;
+    bufferSize = 0;
+  }
 
-	return (file != nullptr);
+  return (file != nullptr);
 }
 
 bool File::close()
 {
-	if (file == nullptr || !PHYSFS_close(file))
-		return false;
+  if (file == nullptr || !PHYSFS_close(file))
+    return false;
 
-	mode = MODE_CLOSED;
-	file = nullptr;
+  mode = MODE_CLOSED;
+  file = nullptr;
 
-	return true;
+  return true;
 }
 
-bool File::isOpen() const
-{
-	return mode != MODE_CLOSED && file != nullptr;
-}
+bool File::isOpen() const { return mode != MODE_CLOSED && file != nullptr; }
 
 int64 File::getSize()
 {
-	// If the file is closed, open it to
-	// check the size.
-	if (file == nullptr)
-	{
-		open(MODE_READ);
-		int64 size = (int64) PHYSFS_fileLength(file);
-		close();
-		return size;
-	}
+  // If the file is closed, open it to
+  // check the size.
+  if (file == nullptr)
+  {
+    open(MODE_READ);
+    int64 size = (int64) PHYSFS_fileLength(file);
+    close();
+    return size;
+  }
 
-	return (int64) PHYSFS_fileLength(file);
+  return (int64) PHYSFS_fileLength(file);
 }
 
 int64 File::read(void *dst, int64 size)
 {
-	if (!file || mode != MODE_READ)
-		throw love::Exception("File is not opened for reading.");
+  if (!file || mode != MODE_READ)
+    throw love::Exception("File is not opened for reading.");
 
-	int64 max = (int64)PHYSFS_fileLength(file);
-	size = (size == ALL) ? max : size;
-	size = (size > max) ? max : size;
+  int64 max = (int64) PHYSFS_fileLength(file);
+  size = (size == ALL) ? max : size;
+  size = (size > max) ? max : size;
 
-	if (size < 0)
-		throw love::Exception("Invalid read size.");
+  if (size < 0)
+    throw love::Exception("Invalid read size.");
 
-	return PHYSFS_readBytes(file, dst, (PHYSFS_uint64) size);
+  return PHYSFS_readBytes(file, dst, (PHYSFS_uint64) size);
 }
 
 bool File::write(const void *data, int64 size)
 {
-	if (!file || (mode != MODE_WRITE && mode != MODE_APPEND))
-		throw love::Exception("File is not opened for writing.");
+  if (!file || (mode != MODE_WRITE && mode != MODE_APPEND))
+    throw love::Exception("File is not opened for writing.");
 
-	if (size < 0)
-		throw love::Exception("Invalid write size.");
+  if (size < 0)
+    throw love::Exception("Invalid write size.");
 
-	// Try to write.
-	int64 written = PHYSFS_writeBytes(file, data, (PHYSFS_uint64) size);
+  // Try to write.
+  int64 written = PHYSFS_writeBytes(file, data, (PHYSFS_uint64) size);
 
-	// Check that correct amount of data was written.
-	if (written != size)
-		return false;
+  // Check that correct amount of data was written.
+  if (written != size)
+    return false;
 
-	// Manually flush the buffer in BUFFER_LINE mode if we find a newline.
-	if (bufferMode == BUFFER_LINE && bufferSize > size)
-	{
-		if (memchr(data, '\n', (size_t) size) != nullptr)
-			flush();
-	}
+  // Manually flush the buffer in BUFFER_LINE mode if we find a newline.
+  if (bufferMode == BUFFER_LINE && bufferSize > size)
+  {
+    if (memchr(data, '\n', (size_t) size) != nullptr)
+      flush();
+  }
 
-	return true;
+  return true;
 }
 
 bool File::flush()
 {
-	if (!file || (mode != MODE_WRITE && mode != MODE_APPEND))
-		throw love::Exception("File is not opened for writing.");
+  if (!file || (mode != MODE_WRITE && mode != MODE_APPEND))
+    throw love::Exception("File is not opened for writing.");
 
-	return PHYSFS_flush(file) != 0;
+  return PHYSFS_flush(file) != 0;
 }
 
 #ifdef LOVE_WINDOWS
@@ -197,89 +195,77 @@ bool File::flush()
 // It zigs, we zag.
 inline bool test_eof(File *that, PHYSFS_File *)
 {
-	int64 pos = that->tell();
-	int64 size = that->getSize();
-	return pos == -1 || size == -1 || pos >= size;
+  int64 pos = that->tell();
+  int64 size = that->getSize();
+  return pos == -1 || size == -1 || pos >= size;
 }
 #else
-inline bool test_eof(File *, PHYSFS_File *file)
-{
-	return PHYSFS_eof(file);
-}
+inline bool test_eof(File *, PHYSFS_File *file) { return PHYSFS_eof(file); }
 #endif
 
-bool File::isEOF()
-{
-	return file == nullptr || test_eof(this, file);
-}
+bool File::isEOF() { return file == nullptr || test_eof(this, file); }
 
 int64 File::tell()
 {
-	if (file == nullptr)
-		return -1;
+  if (file == nullptr)
+    return -1;
 
-	return (int64) PHYSFS_tell(file);
+  return (int64) PHYSFS_tell(file);
 }
 
 bool File::seek(uint64 pos)
 {
-	return file != nullptr && PHYSFS_seek(file, (PHYSFS_uint64) pos) != 0;
+  return file != nullptr && PHYSFS_seek(file, (PHYSFS_uint64) pos) != 0;
 }
 
 bool File::setBuffer(BufferMode bufmode, int64 size)
 {
-	if (size < 0)
-		return false;
+  if (size < 0)
+    return false;
 
-	// If the file isn't open, we'll make sure the buffer values are set in
-	// File::open.
-	if (!isOpen())
-	{
-		bufferMode = bufmode;
-		bufferSize = size;
-		return true;
-	}
+  // If the file isn't open, we'll make sure the buffer values are set in
+  // File::open.
+  if (!isOpen())
+  {
+    bufferMode = bufmode;
+    bufferSize = size;
+    return true;
+  }
 
-	int ret = 1;
+  int ret = 1;
 
-	switch (bufmode)
-	{
-	case BUFFER_NONE:
-	default:
-		ret = PHYSFS_setBuffer(file, 0);
-		size = 0;
-		break;
-	case BUFFER_LINE:
-	case BUFFER_FULL:
-		ret = PHYSFS_setBuffer(file, size);
-		break;
-	}
+  switch (bufmode)
+  {
+    case BUFFER_NONE:
+    default:
+      ret = PHYSFS_setBuffer(file, 0);
+      size = 0;
+      break;
+    case BUFFER_LINE:
+    case BUFFER_FULL:
+      ret = PHYSFS_setBuffer(file, size);
+      break;
+  }
 
-	if (ret == 0)
-		return false;
+  if (ret == 0)
+    return false;
 
-	bufferMode = bufmode;
-	bufferSize = size;
+  bufferMode = bufmode;
+  bufferSize = size;
 
-	return true;
+  return true;
 }
 
 File::BufferMode File::getBuffer(int64 &size) const
 {
-	size = bufferSize;
-	return bufferMode;
+  size = bufferSize;
+  return bufferMode;
 }
 
-const std::string &File::getFilename() const
-{
-	return filename;
-}
+const std::string &File::getFilename() const { return filename; }
 
-filesystem::File::Mode File::getMode() const
-{
-	return mode;
-}
+filesystem::File::Mode File::getMode() const { return mode; }
 
-} // physfs
-} // filesystem
-} // love
+}  // namespace physfs
+}  // namespace filesystem
+}  // namespace love

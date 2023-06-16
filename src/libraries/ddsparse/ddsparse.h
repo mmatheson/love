@@ -36,10 +36,10 @@ namespace dds
 // Represents a single mipmap level of a texture.
 struct Image
 {
-	int width = 0;
-	int height = 0;
-	size_t dataSize = 0;
-	const uint8_t *data = nullptr;
+  int width = 0;
+  int height = 0;
+  size_t dataSize = 0;
+  const uint8_t *data = nullptr;
 };
 
 /**
@@ -64,55 +64,54 @@ dxinfo::DXGIFormat getDDSPixelFormat(const void *data, size_t dataSize);
 
 class Parser
 {
-public:
+ public:
+  /**
+   * Constructor.
+   * Attempts to parse byte data as a compressed DDS file.
+   *
+   * @param data     The byte data to parse.
+   * @param dataSize The size in bytes of the data.
+   **/
+  Parser(const void *data, size_t dataSize);
+  Parser(const Parser &other);
+  Parser();
 
-	/**
-	 * Constructor.
-	 * Attempts to parse byte data as a compressed DDS file.
-	 *
-	 * @param data     The byte data to parse.
-	 * @param dataSize The size in bytes of the data.
-	 **/
-	Parser(const void *data, size_t dataSize);
-	Parser(const Parser &other);
-	Parser();
+  Parser &operator=(const Parser &other);
 
-	Parser &operator = (const Parser &other);
+  ~Parser();
 
-	~Parser();
+  /**
+   * Gets the format of this texture.
+   **/
+  dxinfo::DXGIFormat getFormat() const;
 
-	/**
-	 * Gets the format of this texture.
-	 **/
-	dxinfo::DXGIFormat getFormat() const;
+  /**
+   * Gets the data of this texture at a mipmap level. Mipmap level 0
+   * represents the base image.
+   *
+   * @param miplevel The mipmap level to get the data of.
+   * @return Pointer to the image data, or NULL if miplevel is not within the
+   *         range of [0, numMipmaps).
+   **/
+  const Image *getImageData(size_t miplevel = 0) const;
 
-	/**
-	 * Gets the data of this texture at a mipmap level. Mipmap level 0
-	 * represents the base image.
-	 *
-	 * @param miplevel The mipmap level to get the data of.
-	 * @return Pointer to the image data, or NULL if miplevel is not within the
-	 *         range of [0, numMipmaps).
-	 **/
-	const Image *getImageData(size_t miplevel = 0) const;
+  /**
+   * Gets the number of mipmap levels in this texture.
+   * Includes the base mip level.
+   **/
+  size_t getMipmapCount() const;
 
-	/**
-	 * Gets the number of mipmap levels in this texture.
-	 * Includes the base mip level.
-	 **/
-	size_t getMipmapCount() const;
+ private:
+  size_t parseImageSize(dxinfo::DXGIFormat fmt, int width, int height) const;
+  bool parseTexData(const uint8_t *data, size_t dataSize, dxinfo::DXGIFormat fmt, int w, int h,
+                    int nb_mips);
+  bool parseData(const void *data, size_t dataSize);
 
-private:
+  std::vector<Image> texData;
+  dxinfo::DXGIFormat format;
 
-	size_t parseImageSize(dxinfo::DXGIFormat fmt, int width, int height) const;
-	bool parseTexData(const uint8_t *data, size_t dataSize, dxinfo::DXGIFormat fmt, int w, int h, int nb_mips);
-	bool parseData(const void *data, size_t dataSize);
+};  // Parser
 
-	std::vector<Image> texData;
-	dxinfo::DXGIFormat format;
+}  // namespace dds
 
-}; // Parser
-
-} // dds
-
-#endif // DDS_PARSE_H
+#endif  // DDS_PARSE_H

@@ -22,8 +22,8 @@
 #define LOVE_FILESYSTEM_DROPPED_FILE_H
 
 // LOVE
-#include "common/config.h"
 #include "File.h"
+#include "common/config.h"
 
 // C
 #include <cstdio>
@@ -39,47 +39,45 @@ namespace filesystem
  **/
 class DroppedFile : public File
 {
-public:
+ public:
+  static love::Type type;
 
-	static love::Type type;
+  DroppedFile(const std::string &filename);
+  virtual ~DroppedFile();
 
-	DroppedFile(const std::string &filename);
-	virtual ~DroppedFile();
+  // Implements File.
+  using File::read;
+  using File::write;
+  bool open(Mode mode) override;
+  bool close() override;
+  bool isOpen() const override;
+  int64 getSize() override;
+  int64 read(void *dst, int64 size) override;
+  bool write(const void *data, int64 size) override;
+  bool flush() override;
+  bool isEOF() override;
+  int64 tell() override;
+  bool seek(uint64 pos) override;
+  bool setBuffer(BufferMode bufmode, int64 size) override;
+  BufferMode getBuffer(int64 &size) const override;
+  Mode getMode() const override;
+  const std::string &getFilename() const override;
 
-	// Implements File.
-	using File::read;
-	using File::write;
-	bool open(Mode mode) override;
-	bool close() override;
-	bool isOpen() const override;
-	int64 getSize() override;
-	int64 read(void *dst, int64 size) override;
-	bool write(const void *data, int64 size) override;
-	bool flush() override;
-	bool isEOF() override;
-	int64 tell() override;
-	bool seek(uint64 pos) override;
-	bool setBuffer(BufferMode bufmode, int64 size) override;
-	BufferMode getBuffer(int64 &size) const override;
-	Mode getMode() const override;
-	const std::string &getFilename() const override;
+ private:
+  static const char *getModeString(Mode mode);
 
-private:
+  std::string filename;
 
-	static const char *getModeString(Mode mode);
+  FILE *file;
 
-	std::string filename;
+  Mode mode;
 
-	FILE *file;
+  BufferMode bufferMode;
+  int64 bufferSize;
 
-	Mode mode;
+};  // DroppedFile
 
-	BufferMode bufferMode;
-	int64 bufferSize;
+}  // namespace filesystem
+}  // namespace love
 
-}; // DroppedFile
-
-} // filesystem
-} // love
-
-#endif // LOVE_FILESYSTEM_DROPPED_FILE_H
+#endif  // LOVE_FILESYSTEM_DROPPED_FILE_H

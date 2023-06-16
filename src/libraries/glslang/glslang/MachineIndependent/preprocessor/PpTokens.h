@@ -78,102 +78,105 @@ NVIDIA HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef PARSER_H
 #define PARSER_H
 
-namespace glslang {
+namespace glslang
+{
 
 // Multi-character tokens
-enum EFixedAtoms {
-    // single character tokens get their own char value as their token; start here for multi-character tokens
-    PpAtomMaxSingle = 127,
+enum EFixedAtoms
+{
+  // single character tokens get their own char value as their token; start here for multi-character
+  // tokens
+  PpAtomMaxSingle = 127,
 
-    // replace bad character tokens with this, to avoid accidental aliasing with the below
-    PpAtomBadToken,
+  // replace bad character tokens with this, to avoid accidental aliasing with the below
+  PpAtomBadToken,
 
-    // Operators
+  // Operators
 
-    PPAtomAddAssign,
-    PPAtomSubAssign,
-    PPAtomMulAssign,
-    PPAtomDivAssign,
-    PPAtomModAssign,
+  PPAtomAddAssign,
+  PPAtomSubAssign,
+  PPAtomMulAssign,
+  PPAtomDivAssign,
+  PPAtomModAssign,
 
-    PpAtomRight,
-    PpAtomLeft,
+  PpAtomRight,
+  PpAtomLeft,
 
-    PpAtomRightAssign,
-    PpAtomLeftAssign,
-    PpAtomAndAssign,
-    PpAtomOrAssign,
-    PpAtomXorAssign,
+  PpAtomRightAssign,
+  PpAtomLeftAssign,
+  PpAtomAndAssign,
+  PpAtomOrAssign,
+  PpAtomXorAssign,
 
-    PpAtomAnd,
-    PpAtomOr,
-    PpAtomXor,
+  PpAtomAnd,
+  PpAtomOr,
+  PpAtomXor,
 
-    PpAtomEQ,
-    PpAtomNE,
-    PpAtomGE,
-    PpAtomLE,
+  PpAtomEQ,
+  PpAtomNE,
+  PpAtomGE,
+  PpAtomLE,
 
-    PpAtomDecrement,
-    PpAtomIncrement,
+  PpAtomDecrement,
+  PpAtomIncrement,
 
-    PpAtomColonColon,
+  PpAtomColonColon,
 
-    PpAtomPaste,
+  PpAtomPaste,
 
-    // Constants
+  // Constants
 
-    PpAtomConstInt,
-    PpAtomConstUint,
-    PpAtomConstInt64,
-    PpAtomConstUint64,
-    PpAtomConstInt16,
-    PpAtomConstUint16,
-    PpAtomConstFloat,
-    PpAtomConstDouble,
-    PpAtomConstFloat16,
-    PpAtomConstString,
+  PpAtomConstInt,
+  PpAtomConstUint,
+  PpAtomConstInt64,
+  PpAtomConstUint64,
+  PpAtomConstInt16,
+  PpAtomConstUint16,
+  PpAtomConstFloat,
+  PpAtomConstDouble,
+  PpAtomConstFloat16,
+  PpAtomConstString,
 
-    // Identifiers
-    PpAtomIdentifier,
+  // Identifiers
+  PpAtomIdentifier,
 
-    // preprocessor "keywords"
+  // preprocessor "keywords"
 
-    PpAtomDefine,
-    PpAtomUndef,
+  PpAtomDefine,
+  PpAtomUndef,
 
-    PpAtomIf,
-    PpAtomIfdef,
-    PpAtomIfndef,
-    PpAtomElse,
-    PpAtomElif,
-    PpAtomEndif,
+  PpAtomIf,
+  PpAtomIfdef,
+  PpAtomIfndef,
+  PpAtomElse,
+  PpAtomElif,
+  PpAtomEndif,
 
-    PpAtomLine,
-    PpAtomPragma,
-    PpAtomError,
+  PpAtomLine,
+  PpAtomPragma,
+  PpAtomError,
 
-    // #version ...
-    PpAtomVersion,
-    PpAtomCore,
-    PpAtomCompatibility,
-    PpAtomEs,
+  // #version ...
+  PpAtomVersion,
+  PpAtomCore,
+  PpAtomCompatibility,
+  PpAtomEs,
 
-    // #extension
-    PpAtomExtension,
+  // #extension
+  PpAtomExtension,
 
-    // __LINE__, __FILE__, __VERSION__
+  // __LINE__, __FILE__, __VERSION__
 
-    PpAtomLineMacro,
-    PpAtomFileMacro,
-    PpAtomVersionMacro,
+  PpAtomLineMacro,
+  PpAtomFileMacro,
+  PpAtomVersionMacro,
 
-    // #include
-    PpAtomInclude,
+  // #include
+  PpAtomInclude,
 
-    PpAtomLast,
+  PpAtomLast,
 };
 
-} // end namespace glslang
+}  // end namespace glslang
 
 #endif /* not PARSER_H */

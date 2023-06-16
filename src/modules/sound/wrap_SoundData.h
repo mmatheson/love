@@ -22,8 +22,8 @@
 #define LOVE_SOUND_WRAP_SOUND_DATA_H
 
 // LOVE
-#include "common/runtime.h"
 #include "SoundData.h"
+#include "common/runtime.h"
 
 namespace love
 {
@@ -33,7 +33,7 @@ namespace sound
 SoundData *luax_checksounddata(lua_State *L, int idx);
 extern "C" int luaopen_sounddata(lua_State *L);
 
-} // sound
-} // love
+}  // namespace sound
+}  // namespace love
 
-#endif // LOVE_SOUND_WRAP_SOUND_DATA_H
+#endif  // LOVE_SOUND_WRAP_SOUND_DATA_H

@@ -22,8 +22,8 @@
 #define LOVE_EVENT_SDL_EVENT_H
 
 // LOVE
-#include "event/Event.h"
 #include "audio/Source.h"
+#include "event/Event.h"
 
 // SDL
 #include <SDL_events.h>
@@ -40,48 +40,46 @@ namespace sdl
 
 class Event : public love::event::Event
 {
-public:
+ public:
+  // Implements Module.
+  const char *getName() const;
 
-	// Implements Module.
-	const char *getName() const;
+  Event();
+  virtual ~Event();
 
-	Event();
-	virtual ~Event();
+  /**
+   * Pumps the event queue. This function gathers all the pending input information
+   * from devices and places it on the event queue. Normally not needed if you poll
+   * for events.
+   **/
+  void pump();
 
-	/**
-	 * Pumps the event queue. This function gathers all the pending input information
-	 * from devices and places it on the event queue. Normally not needed if you poll
-	 * for events.
-	 **/
-	void pump();
+  /**
+   * Waits for the next event (indefinitely). Useful for creating games where
+   * the screen and game state only needs updating when the user interacts with
+   * the window.
+   **/
+  Message *wait();
 
-	/**
-	 * Waits for the next event (indefinitely). Useful for creating games where
-	 * the screen and game state only needs updating when the user interacts with
-	 * the window.
-	 **/
-	Message *wait();
+  /**
+   * Clears the event queue.
+   */
+  void clear();
 
-	/**
-	 * Clears the event queue.
-	 */
-	void clear();
+ private:
+  void exceptionIfInRenderPass(const char *name);
 
-private:
+  Message *convert(const SDL_Event &e);
+  Message *convertJoystickEvent(const SDL_Event &e) const;
+  Message *convertWindowEvent(const SDL_Event &e);
 
-	void exceptionIfInRenderPass(const char *name);
+  static std::map<SDL_Keycode, love::keyboard::Keyboard::Key> createKeyMap();
+  static std::map<SDL_Keycode, love::keyboard::Keyboard::Key> keys;
 
-	Message *convert(const SDL_Event &e);
-	Message *convertJoystickEvent(const SDL_Event &e) const;
-	Message *convertWindowEvent(const SDL_Event &e);
+};  // Event
 
-	static std::map<SDL_Keycode, love::keyboard::Keyboard::Key> createKeyMap();
-	static std::map<SDL_Keycode, love::keyboard::Keyboard::Key> keys;
+}  // namespace sdl
+}  // namespace event
+}  // namespace love
 
-}; // Event
-
-} // sdl
-} // event
-} // love
-
-#endif // LOVE_EVENT_SDL_EVENT_H
+#endif  // LOVE_EVENT_SDL_EVENT_H

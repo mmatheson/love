@@ -24,25 +24,25 @@
 #include "common/config.h"
 
 // OpenAL
-#ifdef LOVE_APPLE_USE_FRAMEWORKS // Frameworks have different include paths.
+#ifdef LOVE_APPLE_USE_FRAMEWORKS  // Frameworks have different include paths.
 #ifdef LOVE_IOS
-#include <OpenAL/alc.h>
 #include <OpenAL/al.h>
+#include <OpenAL/alc.h>
 #else
-#include <OpenAL-Soft/alc.h>
 #include <OpenAL-Soft/al.h>
+#include <OpenAL-Soft/alc.h>
 #include <OpenAL-Soft/alext.h>
 #endif
 #else
-#include <AL/alc.h>
 #include <AL/al.h>
+#include <AL/alc.h>
 #include <AL/alext.h>
 #endif
 
 #include <vector>
 
-#include "audio/Filter.h"
 #include "Audio.h"
+#include "audio/Filter.h"
 
 #ifndef AL_FILTER_NULL
 #define AL_FILTER_NULL (0)
@@ -57,26 +57,26 @@ namespace openal
 
 class Filter : public love::audio::Filter
 {
-public:
-	Filter();
-	Filter(const Filter &s);
-	virtual ~Filter();
-	virtual Filter *clone();
-	ALuint getFilter() const;
-	virtual bool setParams(const std::map<Parameter, float> &params);
-	virtual const std::map<Parameter, float> &getParams() const;
+ public:
+  Filter();
+  Filter(const Filter &s);
+  virtual ~Filter();
+  virtual Filter *clone();
+  ALuint getFilter() const;
+  virtual bool setParams(const std::map<Parameter, float> &params);
+  virtual const std::map<Parameter, float> &getParams() const;
 
-private:
-	bool generateFilter();
-	void deleteFilter();
-	float getValue(Parameter in, float def) const;
-	int getValue(Parameter in, int def) const;
-	ALuint filter = AL_FILTER_NULL;
-	std::map<Parameter, float> params;
+ private:
+  bool generateFilter();
+  void deleteFilter();
+  float getValue(Parameter in, float def) const;
+  int getValue(Parameter in, int def) const;
+  ALuint filter = AL_FILTER_NULL;
+  std::map<Parameter, float> params;
 };
 
-} //openal
-} //audio
-} //love
+}  // namespace openal
+}  // namespace audio
+}  // namespace love
 
-#endif //LOVE_AUDIO_OPENAL_FILTERS_H
+#endif  // LOVE_AUDIO_OPENAL_FILTERS_H

@@ -19,6 +19,7 @@
  **/
 
 #include "StreamBuffer.h"
+
 #include "common/Exception.h"
 
 namespace love
@@ -27,11 +28,11 @@ namespace graphics
 {
 
 StreamBuffer::StreamBuffer(BufferType mode, size_t size)
-	: bufferSize(size)
-	, frameGPUReadOffset(0)
-	, mode(mode)
+    : bufferSize(size),
+      frameGPUReadOffset(0),
+      mode(mode)
 {
 }
 
-} // graphics
-} // love
+}  // namespace graphics
+}  // namespace love

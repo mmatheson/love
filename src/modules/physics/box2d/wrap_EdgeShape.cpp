@@ -27,87 +27,82 @@ namespace physics
 namespace box2d
 {
 
-EdgeShape *luax_checkedgeshape(lua_State *L, int idx)
-{
-	return luax_checktype<EdgeShape>(L, idx);
-}
+EdgeShape *luax_checkedgeshape(lua_State *L, int idx) { return luax_checktype<EdgeShape>(L, idx); }
 
 int w_EdgeShape_setNextVertex(lua_State *L)
 {
-	EdgeShape *t = luax_checkedgeshape(L, 1);
-	if (lua_isnoneornil(L, 2))
-		t->setNextVertex();
-	else
-	{
-		float x = (float)luaL_checknumber(L, 2);
-		float y = (float)luaL_checknumber(L, 3);
-		t->setNextVertex(x, y);
-	}
-	return 0;
+  EdgeShape *t = luax_checkedgeshape(L, 1);
+  if (lua_isnoneornil(L, 2))
+    t->setNextVertex();
+  else
+  {
+    float x = (float) luaL_checknumber(L, 2);
+    float y = (float) luaL_checknumber(L, 3);
+    t->setNextVertex(x, y);
+  }
+  return 0;
 }
 
 int w_EdgeShape_setPreviousVertex(lua_State *L)
 {
-	EdgeShape *t = luax_checkedgeshape(L, 1);
-	if (lua_isnoneornil(L, 2))
-		t->setPreviousVertex();
-	else
-	{
-		float x = (float)luaL_checknumber(L, 2);
-		float y = (float)luaL_checknumber(L, 3);
-		t->setPreviousVertex(x, y);
-	}
-	return 0;
+  EdgeShape *t = luax_checkedgeshape(L, 1);
+  if (lua_isnoneornil(L, 2))
+    t->setPreviousVertex();
+  else
+  {
+    float x = (float) luaL_checknumber(L, 2);
+    float y = (float) luaL_checknumber(L, 3);
+    t->setPreviousVertex(x, y);
+  }
+  return 0;
 }
 
 int w_EdgeShape_getNextVertex(lua_State *L)
 {
-	EdgeShape *t = luax_checkedgeshape(L, 1);
-	float x, y;
-	if (t->getNextVertex(x, y))
-	{
-		lua_pushnumber(L, x);
-		lua_pushnumber(L, y);
-		return 2;
-	}
-	return 0;
+  EdgeShape *t = luax_checkedgeshape(L, 1);
+  float x, y;
+  if (t->getNextVertex(x, y))
+  {
+    lua_pushnumber(L, x);
+    lua_pushnumber(L, y);
+    return 2;
+  }
+  return 0;
 }
 
 int w_EdgeShape_getPreviousVertex(lua_State *L)
 {
-	EdgeShape *t = luax_checkedgeshape(L, 1);
-	float x, y;
-	if (t->getPreviousVertex(x, y))
-	{
-		lua_pushnumber(L, x);
-		lua_pushnumber(L, y);
-		return 2;
-	}
-	return 0;
+  EdgeShape *t = luax_checkedgeshape(L, 1);
+  float x, y;
+  if (t->getPreviousVertex(x, y))
+  {
+    lua_pushnumber(L, x);
+    lua_pushnumber(L, y);
+    return 2;
+  }
+  return 0;
 }
 
 int w_EdgeShape_getPoints(lua_State *L)
 {
-	EdgeShape *t = luax_checkedgeshape(L, 1);
-	lua_remove(L, 1);
-	return t->getPoints(L);
+  EdgeShape *t = luax_checkedgeshape(L, 1);
+  lua_remove(L, 1);
+  return t->getPoints(L);
 }
 
-static const luaL_Reg w_EdgeShape_functions[] =
-{
-	{ "setNextVertex", w_EdgeShape_setNextVertex },
-	{ "setPreviousVertex", w_EdgeShape_setPreviousVertex },
-	{ "getNextVertex", w_EdgeShape_getNextVertex },
-	{ "getPreviousVertex", w_EdgeShape_getPreviousVertex },
-	{ "getPoints", w_EdgeShape_getPoints },
-	{ 0, 0 }
-};
+static const luaL_Reg w_EdgeShape_functions[] = {
+    {"setNextVertex", w_EdgeShape_setNextVertex},
+    {"setPreviousVertex", w_EdgeShape_setPreviousVertex},
+    {"getNextVertex", w_EdgeShape_getNextVertex},
+    {"getPreviousVertex", w_EdgeShape_getPreviousVertex},
+    {"getPoints", w_EdgeShape_getPoints},
+    {0, 0}};
 
 extern "C" int luaopen_edgeshape(lua_State *L)
 {
-	return luax_register_type(L, &EdgeShape::type, w_Shape_functions, w_EdgeShape_functions, nullptr);
+  return luax_register_type(L, &EdgeShape::type, w_Shape_functions, w_EdgeShape_functions, nullptr);
 }
 
-} // box2d
-} // physics
-} // love
+}  // namespace box2d
+}  // namespace physics
+}  // namespace love

@@ -32,7 +32,7 @@ namespace thread
 LuaThread *luax_checkthread(lua_State *L, int idx);
 extern "C" int luaopen_thread(lua_State *L);
 
-} // thread
-} // love
+}  // namespace thread
+}  // namespace love
 
-#endif // LOVE_THREAD_WRAP_LUATHREAD_H
+#endif  // LOVE_THREAD_WRAP_LUATHREAD_H

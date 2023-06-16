@@ -20,37 +20,37 @@
 
 #pragma once
 
-#include "int.h"
-
 #include <string>
 #include <vector>
+
+#include "int.h"
 
 namespace love
 {
 
 enum APIType
 {
-	API_FUNCTION,
-	API_METHOD,
-	API_FIELD,
-	API_CONSTANT,
+  API_FUNCTION,
+  API_METHOD,
+  API_FIELD,
+  API_CONSTANT,
 };
 
 enum DeprecationType
 {
-	DEPRECATED_NO_REPLACEMENT,
-	DEPRECATED_REPLACED,
-	DEPRECATED_RENAMED,
+  DEPRECATED_NO_REPLACEMENT,
+  DEPRECATED_REPLACED,
+  DEPRECATED_RENAMED,
 };
 
 struct DeprecationInfo
 {
-	DeprecationType type;
-	APIType apiType;
-	int64 uses;
-	std::string name;
-	std::string replacement;
-	std::string where;
+  DeprecationType type;
+  APIType apiType;
+  int64 uses;
+  std::string name;
+  std::string replacement;
+  std::string where;
 };
 
 void initDeprecation();
@@ -63,19 +63,19 @@ std::string getDeprecationNotice(const DeprecationInfo &info, bool usewhere);
 
 struct GetDeprecated
 {
-	GetDeprecated();
-	~GetDeprecated();
+  GetDeprecated();
+  ~GetDeprecated();
 
-	const std::vector<const DeprecationInfo *> &all;
+  const std::vector<const DeprecationInfo *> &all;
 };
 
 struct MarkDeprecated
 {
-	MarkDeprecated(const char *name, APIType api);
-	MarkDeprecated(const char *name, APIType api, DeprecationType type, const char *replacement);
-	~MarkDeprecated();
+  MarkDeprecated(const char *name, APIType api);
+  MarkDeprecated(const char *name, APIType api, DeprecationType type, const char *replacement);
+  ~MarkDeprecated();
 
-	DeprecationInfo *info;
+  DeprecationInfo *info;
 };
 
-} // love
+}  // namespace love

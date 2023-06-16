@@ -22,17 +22,16 @@
 #define LOVE_THREAD_THREADMODULE_H
 
 // STL
-#include <string>
 #include <map>
+#include <string>
 
 // LOVE
+#include "Channel.h"
+#include "LuaThread.h"
+#include "Thread.h"
 #include "common/Data.h"
 #include "common/Module.h"
 #include "common/StringMap.h"
-
-#include "Thread.h"
-#include "Channel.h"
-#include "LuaThread.h"
 #include "threads.h"
 
 namespace love
@@ -41,25 +40,23 @@ namespace thread
 {
 class ThreadModule : public love::Module
 {
-public:
+ public:
+  virtual ~ThreadModule() {}
+  virtual LuaThread *newThread(const std::string &name, love::Data *data);
+  virtual Channel *newChannel();
+  virtual Channel *getChannel(const std::string &name);
 
-	virtual ~ThreadModule() {}
-	virtual LuaThread *newThread(const std::string &name, love::Data *data);
-	virtual Channel *newChannel();
-	virtual Channel *getChannel(const std::string &name);
+  // Implements Module.
+  virtual const char *getName() const;
+  virtual ModuleType getModuleType() const { return M_THREAD; }
 
-	// Implements Module.
-	virtual const char *getName() const;
-	virtual ModuleType getModuleType() const { return M_THREAD; }
+ private:
+  std::map<std::string, StrongRef<Channel>> namedChannels;
+  MutexRef namedChannelMutex;
 
-private:
+};  // ThreadModule
 
-	std::map<std::string, StrongRef<Channel>> namedChannels;
-	MutexRef namedChannelMutex;
+}  // namespace thread
+}  // namespace love
 
-}; // ThreadModule
-
-} // thread
-} // love
-
-#endif // LOVE_THREAD_THREADMODULE_H
+#endif  // LOVE_THREAD_THREADMODULE_H

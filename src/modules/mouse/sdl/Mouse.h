@@ -22,8 +22,8 @@
 #define LOVE_MOUSE_SDL_MOUSE_H
 
 // LOVE
-#include "mouse/Mouse.h"
 #include "Cursor.h"
+#include "mouse/Mouse.h"
 
 // C++
 #include <map>
@@ -37,48 +37,46 @@ namespace sdl
 
 class Mouse : public love::mouse::Mouse
 {
-public:
+ public:
+  // Implements Module.
+  const char *getName() const override;
 
-	// Implements Module.
-	const char *getName() const override;
+  Mouse();
+  virtual ~Mouse();
 
-	Mouse();
-	virtual ~Mouse();
+  love::mouse::Cursor *newCursor(love::image::ImageData *data, int hotx, int hoty) override;
+  love::mouse::Cursor *getSystemCursor(Cursor::SystemCursor cursortype) override;
 
-	love::mouse::Cursor *newCursor(love::image::ImageData *data, int hotx, int hoty) override;
-	love::mouse::Cursor *getSystemCursor(Cursor::SystemCursor cursortype) override;
+  void setCursor(love::mouse::Cursor *cursor) override;
+  void setCursor() override;
 
-	void setCursor(love::mouse::Cursor *cursor) override;
-	void setCursor() override;
+  love::mouse::Cursor *getCursor() const override;
 
-	love::mouse::Cursor *getCursor() const override;
+  bool isCursorSupported() const override;
 
-	bool isCursorSupported() const override;
+  double getX() const override;
+  double getY() const override;
+  void getPosition(double &x, double &y) const override;
+  void setX(double x) override;
+  void setY(double y) override;
+  void setPosition(double x, double y) override;
+  void setVisible(bool visible) override;
+  bool isDown(const std::vector<int> &buttons) const override;
+  bool isVisible() const override;
+  void setGrabbed(bool grab) override;
+  bool isGrabbed() const override;
+  bool setRelativeMode(bool relative) override;
+  bool getRelativeMode() const override;
 
-	double getX() const override;
-	double getY() const override;
-	void getPosition(double &x, double &y) const override;
-	void setX(double x) override;
-	void setY(double y) override;
-	void setPosition(double x, double y) override;
-	void setVisible(bool visible) override;
-	bool isDown(const std::vector<int> &buttons) const override;
-	bool isVisible() const override;
-	void setGrabbed(bool grab) override;
-	bool isGrabbed() const override;
-	bool setRelativeMode(bool relative) override;
-	bool getRelativeMode() const override;
+ private:
+  StrongRef<love::mouse::Cursor> curCursor;
 
-private:
+  std::map<Cursor::SystemCursor, Cursor *> systemCursors;
 
-	StrongRef<love::mouse::Cursor> curCursor;
+};  // Mouse
 
-	std::map<Cursor::SystemCursor, Cursor *> systemCursors;
+}  // namespace sdl
+}  // namespace mouse
+}  // namespace love
 
-}; // Mouse
-
-} // sdl
-} // mouse
-} // love
-
-#endif // LOVE_MOUSE_SDL_MOUSE_H
+#endif  // LOVE_MOUSE_SDL_MOUSE_H

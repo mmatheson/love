@@ -22,8 +22,8 @@
 #define LOVE_MOUSE_SDL_CURSOR_H
 
 // LOVE
-#include "mouse/Cursor.h"
 #include "common/EnumMap.h"
+#include "mouse/Cursor.h"
 
 // SDL
 #include <SDL_mouse.h>
@@ -37,28 +37,26 @@ namespace sdl
 
 class Cursor : public love::mouse::Cursor
 {
-public:
+ public:
+  Cursor(image::ImageData *imageData, int hotx, int hoty);
+  Cursor(SystemCursor cursortype);
+  ~Cursor();
 
-	Cursor(image::ImageData *imageData, int hotx, int hoty);
-	Cursor(SystemCursor cursortype);
-	~Cursor();
+  void *getHandle() const;
+  CursorType getType() const;
+  SystemCursor getSystemType() const;
 
-	void *getHandle() const;
-	CursorType getType() const;
-	SystemCursor getSystemType() const;
+ private:
+  SDL_Cursor *cursor;
+  CursorType type;
+  SystemCursor systemType;
 
-private:
-
-	SDL_Cursor *cursor;
-	CursorType type;
-	SystemCursor systemType;
-
-	static EnumMap<SystemCursor, SDL_SystemCursor, CURSOR_MAX_ENUM>::Entry systemCursorEntries[];
-	static EnumMap<SystemCursor, SDL_SystemCursor, CURSOR_MAX_ENUM> systemCursors;
+  static EnumMap<SystemCursor, SDL_SystemCursor, CURSOR_MAX_ENUM>::Entry systemCursorEntries[];
+  static EnumMap<SystemCursor, SDL_SystemCursor, CURSOR_MAX_ENUM> systemCursors;
 };
 
-} // sdl
-} // mouse
-} // love
+}  // namespace sdl
+}  // namespace mouse
+}  // namespace love
 
-#endif // LOVE_MOUSE_SDL_CURSOR_H
+#endif  // LOVE_MOUSE_SDL_CURSOR_H

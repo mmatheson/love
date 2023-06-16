@@ -22,8 +22,8 @@
 #define LOVE_PHYSICS_BOX2D_CHAIN_SHAPE_H
 
 // Module
-#include "Shape.h"
 #include "EdgeShape.h"
+#include "Shape.h"
 
 namespace love
 {
@@ -37,76 +37,74 @@ namespace box2d
  **/
 class ChainShape : public Shape
 {
-public:
+ public:
+  static love::Type type;
 
-	static love::Type type;
+  /**
+   * Create a new ChainShape from a Box2D chain shape.
+   * @param c The chain shape.
+   **/
+  ChainShape(b2ChainShape *c, bool own = true);
 
-	/**
-	 * Create a new ChainShape from a Box2D chain shape.
-	 * @param c The chain shape.
-	 **/
-	ChainShape(b2ChainShape *c, bool own = true);
+  virtual ~ChainShape();
 
-	virtual ~ChainShape();
+  /**
+   * Establish connectivity to a vertex that follows
+   * the last vertex. Fails if called on a loop.
+   * @param x The x-coordinate of the vertex.
+   * @param y The y-coordinate of the vertex.
+   **/
+  void setNextVertex(float x, float y);
+  void setNextVertex();
 
-	/**
-	 * Establish connectivity to a vertex that follows
-	 * the last vertex. Fails if called on a loop.
-	 * @param x The x-coordinate of the vertex.
-	 * @param y The y-coordinate of the vertex.
-	 **/
-	void setNextVertex(float x, float y);
-	void setNextVertex();
+  /**
+   * Establish connectivity to a vertex that precedes
+   * the first vertex. Fails if called on a loop.
+   * @param x The x-coordinate of the vertex.
+   * @param y The y-coordinate of the vertex.
+   **/
+  void setPreviousVertex(float x, float y);
+  void setPreviousVertex();
 
-	/**
-	 * Establish connectivity to a vertex that precedes
-	 * the first vertex. Fails if called on a loop.
-	 * @param x The x-coordinate of the vertex.
-	 * @param y The y-coordinate of the vertex.
-	 **/
-	void setPreviousVertex(float x, float y);
-	void setPreviousVertex();
+  /**
+   * Gets the vertex that follows the last vertex.
+   **/
+  bool getNextVertex(float &x, float &y) const;
 
-	/**
-	 * Gets the vertex that follows the last vertex.
-	 **/
-	bool getNextVertex(float &x, float &y) const;
+  /**
+   * Gets the vertex that precedes the first vertex.
+   **/
+  bool getPreviousVertex(float &x, float &y) const;
 
-	/**
-	 * Gets the vertex that precedes the first vertex.
-	 **/
-	bool getPreviousVertex(float &x, float &y) const;
+  /**
+   * Returns a child EdgeShape.
+   * @param index The index of the child shape.
+   * @returns The specified child.
+   **/
+  EdgeShape *getChildEdge(int index) const;
 
-	/**
-	 * Returns a child EdgeShape.
-	 * @param index The index of the child shape.
-	 * @returns The specified child.
-	 **/
-	EdgeShape *getChildEdge(int index) const;
+  /**
+   * Returns the number of vertices in the shape.
+   * @returns The number of vertices in the shape.
+   **/
+  int getVertexCount() const;
 
-	/**
-	 * Returns the number of vertices in the shape.
-	 * @returns The number of vertices in the shape.
-	 **/
-	int getVertexCount() const;
+  /**
+   * Returns the vertex at the given index.
+   * @param index The index of the vertex.
+   * @returns The specified vertex.
+   **/
+  b2Vec2 getPoint(int index) const;
 
-	/**
-	 * Returns the vertex at the given index.
-	 * @param index The index of the vertex.
-	 * @returns The specified vertex.
-	 **/
-	b2Vec2 getPoint(int index) const;
-
-	/**
-	 * Returns all of the vertices.
-	 * @returns The vertices the shape comprises.
-	 **/
-	const b2Vec2 *getPoints() const;
-
+  /**
+   * Returns all of the vertices.
+   * @returns The vertices the shape comprises.
+   **/
+  const b2Vec2 *getPoints() const;
 };
 
-} // box2d
-} // physics
-} // love
+}  // namespace box2d
+}  // namespace physics
+}  // namespace love
 
-#endif // LOVE_PHYSICS_BOX2D_CHAIN_SHAPE_H
+#endif  // LOVE_PHYSICS_BOX2D_CHAIN_SHAPE_H

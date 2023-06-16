@@ -22,18 +22,18 @@
 #define LOVE_AUDIO_OPENAL_SOURCE_H
 
 // LOVE
-#include "common/config.h"
-#include "common/Object.h"
-#include "audio/Source.h"
-#include "audio/Filter.h"
-#include "sound/SoundData.h"
-#include "sound/Decoder.h"
 #include "Audio.h"
 #include "Filter.h"
+#include "audio/Filter.h"
+#include "audio/Source.h"
+#include "common/Object.h"
+#include "common/config.h"
+#include "sound/Decoder.h"
+#include "sound/SoundData.h"
 
 // STL
-#include <vector>
 #include <stack>
+#include <vector>
 
 // C
 #include <float.h>
@@ -41,15 +41,15 @@
 // OpenAL
 #ifdef LOVE_APPLE_USE_FRAMEWORKS
 #ifdef LOVE_IOS
-#include <OpenAL/alc.h>
 #include <OpenAL/al.h>
+#include <OpenAL/alc.h>
 #else
-#include <OpenAL-Soft/alc.h>
 #include <OpenAL-Soft/al.h>
+#include <OpenAL-Soft/alc.h>
 #endif
 #else
-#include <AL/alc.h>
 #include <AL/al.h>
+#include <AL/alc.h>
 #endif
 
 namespace love
@@ -72,172 +72,164 @@ class Pool;
 // Basically just a reference-counted non-streaming OpenAL buffer object.
 class StaticDataBuffer : public love::Object
 {
-public:
+ public:
+  StaticDataBuffer(ALenum format, const ALvoid *data, ALsizei size, ALsizei freq);
+  virtual ~StaticDataBuffer();
 
-	StaticDataBuffer(ALenum format, const ALvoid *data, ALsizei size, ALsizei freq);
-	virtual ~StaticDataBuffer();
+  inline ALuint getBuffer() const { return buffer; }
 
-	inline ALuint getBuffer() const
-	{
-		return buffer;
-	}
+  inline ALsizei getSize() const { return size; }
 
-	inline ALsizei getSize() const
-	{
-		return size;
-	}
+ private:
+  ALuint buffer;
+  ALsizei size;
 
-private:
-
-	ALuint buffer;
-	ALsizei size;
-
-}; // StaticDataBuffer
+};  // StaticDataBuffer
 
 class Source : public love::audio::Source
 {
-public:
+ public:
+  Source(Pool *pool, love::sound::SoundData *soundData);
+  Source(Pool *pool, love::sound::Decoder *decoder);
+  Source(Pool *pool, int sampleRate, int bitDepth, int channels, int buffers);
+  Source(const Source &s);
+  virtual ~Source();
 
-	Source(Pool *pool, love::sound::SoundData *soundData);
-	Source(Pool *pool, love::sound::Decoder *decoder);
-	Source(Pool *pool, int sampleRate, int bitDepth, int channels, int buffers);
-	Source(const Source &s);
-	virtual ~Source();
+  virtual love::audio::Source *clone();
+  virtual bool play();
+  virtual void stop();
+  virtual void pause();
+  virtual bool isPlaying() const;
+  virtual bool isFinished() const;
+  virtual bool update();
+  virtual void setPitch(float pitch);
+  virtual float getPitch() const;
+  virtual void setVolume(float volume);
+  virtual float getVolume() const;
+  virtual void seek(double offset, Unit unit);
+  virtual double tell(Unit unit);
+  virtual double getDuration(Unit unit);
+  virtual void setPosition(float *v);
+  virtual void getPosition(float *v) const;
+  virtual void setVelocity(float *v);
+  virtual void getVelocity(float *v) const;
+  virtual void setDirection(float *v);
+  virtual void getDirection(float *v) const;
+  virtual void setCone(float innerAngle, float outerAngle, float outerVolume, float outerHighGain);
+  virtual void getCone(float &innerAngle, float &outerAngle, float &outerVolume,
+                       float &outerHighGain) const;
+  virtual void setRelative(bool enable);
+  virtual bool isRelative() const;
+  void setLooping(bool looping);
+  bool isLooping() const;
+  virtual void setMinVolume(float volume);
+  virtual float getMinVolume() const;
+  virtual void setMaxVolume(float volume);
+  virtual float getMaxVolume() const;
+  virtual void setReferenceDistance(float distance);
+  virtual float getReferenceDistance() const;
+  virtual void setRolloffFactor(float factor);
+  virtual float getRolloffFactor() const;
+  virtual void setMaxDistance(float distance);
+  virtual float getMaxDistance() const;
+  virtual void setAirAbsorptionFactor(float factor);
+  virtual float getAirAbsorptionFactor() const;
+  virtual int getChannelCount() const;
 
-	virtual love::audio::Source *clone();
-	virtual bool play();
-	virtual void stop();
-	virtual void pause();
-	virtual bool isPlaying() const;
-	virtual bool isFinished() const;
-	virtual bool update();
-	virtual void setPitch(float pitch);
-	virtual float getPitch() const;
-	virtual void setVolume(float volume);
-	virtual float getVolume() const;
-	virtual void seek(double offset, Unit unit);
-	virtual double tell(Unit unit);
-	virtual double getDuration(Unit unit);
-	virtual void setPosition(float *v);
-	virtual void getPosition(float *v) const;
-	virtual void setVelocity(float *v);
-	virtual void getVelocity(float *v) const;
-	virtual void setDirection(float *v);
-	virtual void getDirection(float *v) const;
-	virtual void setCone(float innerAngle, float outerAngle, float outerVolume, float outerHighGain);
-	virtual void getCone(float &innerAngle, float &outerAngle, float &outerVolume, float &outerHighGain) const;
-	virtual void setRelative(bool enable);
-	virtual bool isRelative() const;
-	void setLooping(bool looping);
-	bool isLooping() const;
-	virtual void setMinVolume(float volume);
-	virtual float getMinVolume() const;
-	virtual void setMaxVolume(float volume);
-	virtual float getMaxVolume() const;
-	virtual void setReferenceDistance(float distance);
-	virtual float getReferenceDistance() const;
-	virtual void setRolloffFactor(float factor);
-	virtual float getRolloffFactor() const;
-	virtual void setMaxDistance(float distance);
-	virtual float getMaxDistance() const;
-	virtual void setAirAbsorptionFactor(float factor);
-	virtual float getAirAbsorptionFactor() const;
-	virtual int getChannelCount() const;
+  virtual bool setFilter(const std::map<Filter::Parameter, float> &params);
+  virtual bool setFilter();
+  virtual bool getFilter(std::map<Filter::Parameter, float> &params);
 
-	virtual bool setFilter(const std::map<Filter::Parameter, float> &params);
-	virtual bool setFilter();
-	virtual bool getFilter(std::map<Filter::Parameter, float> &params);
+  virtual bool setEffect(const char *effect);
+  virtual bool setEffect(const char *effect, const std::map<Filter::Parameter, float> &params);
+  virtual bool unsetEffect(const char *effect);
+  virtual bool getEffect(const char *effect, std::map<Filter::Parameter, float> &params);
+  virtual bool getActiveEffects(std::vector<std::string> &list) const;
 
-	virtual bool setEffect(const char *effect);
-	virtual bool setEffect(const char *effect, const std::map<Filter::Parameter, float> &params);
-	virtual bool unsetEffect(const char *effect);
-	virtual bool getEffect(const char *effect, std::map<Filter::Parameter, float> &params);
-	virtual bool getActiveEffects(std::vector<std::string> &list) const;
+  virtual int getFreeBufferCount() const;
+  virtual bool queue(void *data, size_t length, int dataSampleRate, int dataBitDepth,
+                     int dataChannels);
 
-	virtual int getFreeBufferCount() const;
-	virtual bool queue(void *data, size_t length, int dataSampleRate, int dataBitDepth, int dataChannels);
+  void prepareAtomic();
+  void teardownAtomic();
 
-	void prepareAtomic();
-	void teardownAtomic();
+  bool playAtomic(ALuint source);
+  void stopAtomic();
+  void pauseAtomic();
+  void resumeAtomic();
 
-	bool playAtomic(ALuint source);
-	void stopAtomic();
-	void pauseAtomic();
-	void resumeAtomic();
+  static bool play(const std::vector<love::audio::Source *> &sources);
+  static void stop(const std::vector<love::audio::Source *> &sources);
+  static void pause(const std::vector<love::audio::Source *> &sources);
 
-	static bool play(const std::vector<love::audio::Source*> &sources);
-	static void stop(const std::vector<love::audio::Source*> &sources);
-	static void pause(const std::vector<love::audio::Source*> &sources);
+  static std::vector<love::audio::Source *> pause(Pool *pool);
+  static void stop(Pool *pool);
 
-	static std::vector<love::audio::Source*> pause(Pool *pool);
-	static void stop(Pool *pool);
+ private:
+  void reset();
 
-private:
+  void setFloatv(float *dst, const float *src) const;
 
-	void reset();
+  int streamAtomic(ALuint buffer, love::sound::Decoder *d);
 
-	void setFloatv(float *dst, const float *src) const;
+  Pool *pool = nullptr;
+  ALuint source = 0;
+  bool valid = false;
 
-	int streamAtomic(ALuint buffer, love::sound::Decoder *d);
+  const static int DEFAULT_BUFFERS = 8;
+  const static int MAX_BUFFERS = 64;
+  std::queue<ALuint> streamBuffers;
+  std::stack<ALuint> unusedBuffers;
 
-	Pool *pool = nullptr;
-	ALuint source = 0;
-	bool valid = false;
+  StrongRef<StaticDataBuffer> staticBuffer;
 
-	const static int DEFAULT_BUFFERS = 8;
-	const static int MAX_BUFFERS = 64;
-	std::queue<ALuint> streamBuffers;
-	std::stack<ALuint> unusedBuffers;
+  float pitch = 1.0f;
+  float volume = 1.0f;
+  float position[3];
+  float velocity[3];
+  float direction[3];
+  bool relative = false;
+  bool looping = false;
+  float minVolume = 0.0f;
+  float maxVolume = 1.0f;
+  float referenceDistance = 1.0f;
+  float rolloffFactor = 1.0f;
+  float absorptionFactor = 0.0f;
+  float maxDistance = MAX_ATTENUATION_DISTANCE;
 
-	StrongRef<StaticDataBuffer> staticBuffer;
+  struct Cone
+  {
+    int innerAngle = 360;  // degrees
+    int outerAngle = 360;  // degrees
+    float outerVolume = 0.0f;
+    float outerHighGain = 1.0f;
+  } cone;
 
-	float pitch = 1.0f;
-	float volume = 1.0f;
-	float position[3];
-	float velocity[3];
-	float direction[3];
-	bool relative = false;
-	bool looping = false;
-	float minVolume = 0.0f;
-	float maxVolume = 1.0f;
-	float referenceDistance = 1.0f;
-	float rolloffFactor = 1.0f;
-	float absorptionFactor = 0.0f;
-	float maxDistance = MAX_ATTENUATION_DISTANCE;
+  int offsetSamples = 0;
 
-	struct Cone
-	{
-		int innerAngle = 360; // degrees
-		int outerAngle = 360; // degrees
-		float outerVolume = 0.0f;
-		float outerHighGain = 1.0f;
-	} cone;
+  int sampleRate = 0;
+  int channels = 0;
+  int bitDepth = 0;
 
-	int offsetSamples = 0;
+  StrongRef<love::sound::Decoder> decoder;
 
-	int sampleRate = 0;
-	int channels = 0;
-	int bitDepth = 0;
+  unsigned int toLoop = 0;
+  ALsizei bufferedBytes = 0;
+  int buffers = 0;
 
-	StrongRef<love::sound::Decoder> decoder;
+  Filter *directfilter = nullptr;
 
-	unsigned int toLoop = 0;
-	ALsizei bufferedBytes = 0;
-	int buffers = 0;
+  struct EffectMapStorage
+  {
+    Filter *filter;
+    ALuint slot, target;
+  };
+  std::map<std::string, EffectMapStorage> effectmap;
+  std::stack<ALuint> slotlist;
+};  // Source
 
-	Filter *directfilter = nullptr;
+}  // namespace openal
+}  // namespace audio
+}  // namespace love
 
-	struct EffectMapStorage
-	{
-		Filter *filter;
-		ALuint slot, target;
-	};
-	std::map<std::string, EffectMapStorage> effectmap;
-	std::stack<ALuint> slotlist;
-}; // Source
-
-} // openal
-} // audio
-} // love
-
-#endif // LOVE_AUDIO_OPENAL_SOURCE_H
+#endif  // LOVE_AUDIO_OPENAL_SOURCE_H

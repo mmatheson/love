@@ -22,11 +22,11 @@
 #define LOVE_AUDIO_WRAP_AUDIO_H
 
 // LOVE
+#include "Audio.h"
 #include "common/config.h"
 #include "common/runtime.h"
-#include "Audio.h"
-#include "wrap_Source.h"
 #include "wrap_RecordingDevice.h"
+#include "wrap_Source.h"
 
 namespace love
 {
@@ -35,7 +35,7 @@ namespace audio
 
 extern "C" LOVE_EXPORT int luaopen_love_audio(lua_State *L);
 
-} // audio
-} // love
+}  // namespace audio
+}  // namespace love
 
-#endif // LOVE_AUDIO_WRAP_AUDIO_H
+#endif  // LOVE_AUDIO_WRAP_AUDIO_H

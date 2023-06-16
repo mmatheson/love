@@ -22,8 +22,8 @@
 #define LOVE_JOYSTICK_WRAP_JOYSTICK_H
 
 // LOVE
-#include "common/config.h"
 #include "Joystick.h"
+#include "common/config.h"
 #include "common/runtime.h"
 
 namespace love
@@ -34,7 +34,7 @@ namespace joystick
 Joystick *luax_checkjoystick(lua_State *L, int idx);
 extern "C" int luaopen_joystick(lua_State *L);
 
-} // joystick
-} // love
+}  // namespace joystick
+}  // namespace love
 
-#endif // LOVE_JOYSTICK_SDL_WRAP_JOYSTICK_H
+#endif  // LOVE_JOYSTICK_SDL_WRAP_JOYSTICK_H

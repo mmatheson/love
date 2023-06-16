@@ -44,20 +44,22 @@
 
 class TInfoSink;
 
-namespace glslang {
+namespace glslang
+{
 
 class TIntermediate;
 
 // I/O mapper
-class TIoMapper {
-public:
-    TIoMapper() {}
-    virtual ~TIoMapper() {}
+class TIoMapper
+{
+ public:
+  TIoMapper() {}
+  virtual ~TIoMapper() {}
 
-    // grow the reflection stage by stage
-    bool addStage(EShLanguage, TIntermediate&, TInfoSink&, TIoMapResolver*);
+  // grow the reflection stage by stage
+  bool addStage(EShLanguage, TIntermediate &, TInfoSink &, TIoMapResolver *);
 };
 
-} // end namespace glslang
+}  // end namespace glslang
 
-#endif // _IOMAPPER_INCLUDED
+#endif  // _IOMAPPER_INCLUDED

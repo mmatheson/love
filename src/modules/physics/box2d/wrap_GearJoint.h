@@ -22,9 +22,9 @@
 #define LOVE_PHYSICS_BOX2D_WRAP_GEAR_JOINT_H
 
 // LOVE
+#include "GearJoint.h"
 #include "common/runtime.h"
 #include "wrap_Joint.h"
-#include "GearJoint.h"
 
 namespace love
 {
@@ -36,8 +36,8 @@ namespace box2d
 GearJoint *luax_checkgearjoint(lua_State *L, int idx);
 extern "C" int luaopen_gearjoint(lua_State *L);
 
-} // box2d
-} // physics
-} // love
+}  // namespace box2d
+}  // namespace physics
+}  // namespace love
 
-#endif // LOVE_PHYSICS_BOX2D_WRAP_GEAR_JOINT_H
+#endif  // LOVE_PHYSICS_BOX2D_WRAP_GEAR_JOINT_H

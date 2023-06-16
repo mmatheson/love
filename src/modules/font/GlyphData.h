@@ -22,10 +22,10 @@
 #define LOVE_FONT_GLYPH_DATA_H
 
 // LOVE
-#include "common/config.h"
 #include "common/Data.h"
 #include "common/Exception.h"
 #include "common/StringMap.h"
+#include "common/config.h"
 #include "common/int.h"
 #include "common/pixelformat.h"
 
@@ -42,11 +42,11 @@ namespace font
  **/
 struct GlyphMetrics
 {
-	int height;
-	int width;
-	int advance;
-	int bearingX;
-	int bearingY;
+  int height;
+  int width;
+  int advance;
+  int bearingX;
+  int bearingY;
 };
 
 /**
@@ -54,106 +54,104 @@ struct GlyphMetrics
  **/
 class GlyphData : public Data
 {
-public:
+ public:
+  static love::Type type;
 
-	static love::Type type;
+  GlyphData(uint32 glyph, GlyphMetrics glyphMetrics, PixelFormat f);
+  GlyphData(const GlyphData &c);
+  virtual ~GlyphData();
 
-	GlyphData(uint32 glyph, GlyphMetrics glyphMetrics, PixelFormat f);
-	GlyphData(const GlyphData &c);
-	virtual ~GlyphData();
+  // Implements Data.
+  GlyphData *clone() const;
+  void *getData() const;
+  size_t getSize() const;
 
-	// Implements Data.
-	GlyphData *clone() const;
-	void *getData() const;
-	size_t getSize() const;
+  /**
+   * Gets the data starting at a specific pixel in the glyph.
+   **/
+  void *getData(int x, int y) const;
 
-	/**
-	 * Gets the data starting at a specific pixel in the glyph.
-	 **/
-	void *getData(int x, int y) const;
+  /**
+   * Gets the size in bytes of each pixel in the glyph.
+   **/
+  size_t getPixelSize() const;
 
-	/**
-	 * Gets the size in bytes of each pixel in the glyph.
-	 **/
-	size_t getPixelSize() const;
+  /**
+   * Gets the height of the glyph.
+   **/
+  virtual int getHeight() const;
 
-	/**
-	 * Gets the height of the glyph.
-	 **/
-	virtual int getHeight() const;
+  /**
+   * Gets the width of the glyph.
+   **/
+  virtual int getWidth() const;
 
-	/**
-	 * Gets the width of the glyph.
-	 **/
-	virtual int getWidth() const;
+  /**
+   * Gets the glyph codepoint itself.
+   **/
+  uint32 getGlyph() const;
 
-	/**
-	 * Gets the glyph codepoint itself.
-	 **/
-	uint32 getGlyph() const;
+  /**
+   * Gets the glyph as a UTF-8 string (instead of a UTF-8 code point.)
+   **/
+  std::string getGlyphString() const;
 
-	/**
-	 * Gets the glyph as a UTF-8 string (instead of a UTF-8 code point.)
-	 **/
-	std::string getGlyphString() const;
+  /**
+   * Gets the advance (the space the glyph takes up) of the glyph.
+   **/
+  int getAdvance() const;
 
-	/**
-	 * Gets the advance (the space the glyph takes up) of the glyph.
-	 **/
-	int getAdvance() const;
+  /**
+   * Gets bearing (the spacing from origin) along the x-axis of the glyph.
+   **/
+  int getBearingX() const;
 
-	/**
-	 * Gets bearing (the spacing from origin) along the x-axis of the glyph.
-	 **/
-	int getBearingX() const;
+  /**
+   * Gets bearing (the spacing from origin) along the y-axis of the glyph.
+   **/
+  int getBearingY() const;
 
-	/**
-	 * Gets bearing (the spacing from origin) along the y-axis of the glyph.
-	 **/
-	int getBearingY() const;
+  /**
+   * Gets the min x value of the glyph.
+   **/
+  int getMinX() const;
 
-	/**
-	 * Gets the min x value of the glyph.
-	 **/
-	int getMinX() const;
+  /**
+   * Gets the min y value of the glyph.
+   **/
+  int getMinY() const;
 
-	/**
-	 * Gets the min y value of the glyph.
-	 **/
-	int getMinY() const;
+  /**
+   * Gets the max x value of the glyph.
+   **/
+  int getMaxX() const;
 
-	/**
-	 * Gets the max x value of the glyph.
-	 **/
-	int getMaxX() const;
+  /**
+   * Gets the max y value of the glyph.
+   **/
+  int getMaxY() const;
 
-	/**
-	 * Gets the max y value of the glyph.
-	 **/
-	int getMaxY() const;
+  /**
+   * Gets the format of the glyph data.
+   **/
+  PixelFormat getFormat() const;
 
-	/**
-	 * Gets the format of the glyph data.
-	 **/
-	PixelFormat getFormat() const;
+ private:
+  // The glyph codepoint itself.
+  uint32 glyph;
 
-private:
+  // Glyph metrics.
+  GlyphMetrics metrics;
 
-	// The glyph codepoint itself.
-	uint32 glyph;
+  // Glyph texture data.
+  uint8 *data;
 
-	// Glyph metrics.
-	GlyphMetrics metrics;
+  // The format the data's in.
+  PixelFormat format;
 
-	// Glyph texture data.
-	uint8 *data;
+};  // GlyphData
 
-	// The format the data's in.
-	PixelFormat format;
+}  // namespace font
+}  // namespace love
 
-}; // GlyphData
-
-} // font
-} // love
-
-#endif // LOVE_FONT_GLYPH_DATA_H
+#endif  // LOVE_FONT_GLYPH_DATA_H

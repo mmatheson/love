@@ -19,10 +19,11 @@
  **/
 
 #include "ByteData.h"
-#include "common/Exception.h"
-#include "common/int.h"
 
 #include <string.h>
+
+#include "common/Exception.h"
+#include "common/int.h"
 
 namespace love
 {
@@ -32,72 +33,60 @@ namespace data
 love::Type ByteData::type("ByteData", &Data::type);
 
 ByteData::ByteData(size_t size)
-	: size(size)
+    : size(size)
 {
-	create();
-	memset(data, 0, size);
+  create();
+  memset(data, 0, size);
 }
 
 ByteData::ByteData(const void *d, size_t size)
-	: size(size)
+    : size(size)
 {
-	create();
-	memcpy(data, d, size);
+  create();
+  memcpy(data, d, size);
 }
 
 ByteData::ByteData(void *d, size_t size, bool own)
-	: size(size)
+    : size(size)
 {
-	if (own)
-		data = (char *) d;
-	else
-	{
-		create();
-		memcpy(data, d, size);
-	}
+  if (own)
+    data = (char *) d;
+  else
+  {
+    create();
+    memcpy(data, d, size);
+  }
 }
 
 ByteData::ByteData(const ByteData &d)
-	: size(d.size)
+    : size(d.size)
 {
-	create();
-	memcpy(data, d.data, size);
+  create();
+  memcpy(data, d.data, size);
 }
 
-ByteData::~ByteData()
-{
-	delete[] data;
-}
+ByteData::~ByteData() { delete[] data; }
 
 void ByteData::create()
 {
-	if (size == 0)
-		throw love::Exception("ByteData size must be greater than 0.");
+  if (size == 0)
+    throw love::Exception("ByteData size must be greater than 0.");
 
-	try
-	{
-		data = new char[size];
-	}
-	catch (std::exception &)
-	{
-		throw love::Exception("Out of memory.");
-	}
+  try
+  {
+    data = new char[size];
+  }
+  catch (std::exception &)
+  {
+    throw love::Exception("Out of memory.");
+  }
 }
 
-ByteData *ByteData::clone() const
-{
-	return new ByteData(*this);
-}
+ByteData *ByteData::clone() const { return new ByteData(*this); }
 
-void *ByteData::getData() const
-{
-	return data;
-}
+void *ByteData::getData() const { return data; }
 
-size_t ByteData::getSize() const
-{
-	return size;
-}
+size_t ByteData::getSize() const { return size; }
 
-} // data
-} // love
+}  // namespace data
+}  // namespace love

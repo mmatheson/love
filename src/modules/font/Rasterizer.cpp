@@ -31,81 +31,61 @@ namespace font
 
 love::Type Rasterizer::type("Rasterizer", &Object::type);
 
-Rasterizer::~Rasterizer()
-{
-}
+Rasterizer::~Rasterizer() {}
 
-int Rasterizer::getHeight() const
-{
-	return metrics.height;
-}
+int Rasterizer::getHeight() const { return metrics.height; }
 
-int Rasterizer::getAdvance() const
-{
-	return metrics.advance;
-}
+int Rasterizer::getAdvance() const { return metrics.advance; }
 
-int Rasterizer::getAscent() const
-{
-	return metrics.ascent;
-}
+int Rasterizer::getAscent() const { return metrics.ascent; }
 
-int Rasterizer::getDescent() const
-{
-	return metrics.descent;
-}
+int Rasterizer::getDescent() const { return metrics.descent; }
 
 GlyphData *Rasterizer::getGlyphData(const std::string &text) const
 {
-	uint32 codepoint = 0;
+  uint32 codepoint = 0;
 
-	try
-	{
-		codepoint = utf8::peek_next(text.begin(), text.end());
-	}
-	catch (utf8::exception &e)
-	{
-		throw love::Exception("UTF-8 decoding error: %s", e.what());
-	}
+  try
+  {
+    codepoint = utf8::peek_next(text.begin(), text.end());
+  }
+  catch (utf8::exception &e)
+  {
+    throw love::Exception("UTF-8 decoding error: %s", e.what());
+  }
 
-	return getGlyphData(codepoint);
+  return getGlyphData(codepoint);
 }
 
 bool Rasterizer::hasGlyphs(const std::string &text) const
 {
-	if (text.size() == 0)
-		return false;
+  if (text.size() == 0)
+    return false;
 
-	try
-	{
-		utf8::iterator<std::string::const_iterator> i(text.begin(), text.begin(), text.end());
-		utf8::iterator<std::string::const_iterator> end(text.end(), text.begin(), text.end());
+  try
+  {
+    utf8::iterator<std::string::const_iterator> i(text.begin(), text.begin(), text.end());
+    utf8::iterator<std::string::const_iterator> end(text.end(), text.begin(), text.end());
 
-		while (i != end)
-		{
-			uint32 codepoint = *i++;
+    while (i != end)
+    {
+      uint32 codepoint = *i++;
 
-			if (!hasGlyph(codepoint))
-				return false;
-		}
-	}
-	catch (utf8::exception &e)
-	{
-		throw love::Exception("UTF-8 decoding error: %s", e.what());
-	}
+      if (!hasGlyph(codepoint))
+	return false;
+    }
+  }
+  catch (utf8::exception &e)
+  {
+    throw love::Exception("UTF-8 decoding error: %s", e.what());
+  }
 
-	return true;
+  return true;
 }
 
-float Rasterizer::getKerning(uint32 /*leftglyph*/, uint32 /*rightglyph*/) const
-{
-	return 0.0f;
-}
+float Rasterizer::getKerning(uint32 /*leftglyph*/, uint32 /*rightglyph*/) const { return 0.0f; }
 
-float Rasterizer::getDPIScale() const
-{
-	return dpiScale;
-}
+float Rasterizer::getDPIScale() const { return dpiScale; }
 
-} // font
-} // love
+}  // namespace font
+}  // namespace love

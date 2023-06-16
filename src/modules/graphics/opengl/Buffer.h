@@ -37,44 +37,43 @@ namespace opengl
 
 class Buffer final : public love::graphics::Buffer, public Volatile
 {
-public:
+ public:
+  Buffer(size_t size, const void *data, BufferType type, vertex::Usage usage, uint32 mapflags);
+  virtual ~Buffer();
 
-	Buffer(size_t size, const void *data, BufferType type, vertex::Usage usage, uint32 mapflags);
-	virtual ~Buffer();
+  void *map() override;
+  void unmap() override;
+  void setMappedRangeModified(size_t offset, size_t size) override;
+  void fill(size_t offset, size_t size, const void *data) override;
+  ptrdiff_t getHandle() const override;
 
-	void *map() override;
-	void unmap() override;
-	void setMappedRangeModified(size_t offset, size_t size) override;
-	void fill(size_t offset, size_t size, const void *data) override;
-	ptrdiff_t getHandle() const override;
+  void copyTo(size_t offset, size_t size, love::graphics::Buffer *other,
+              size_t otheroffset) override;
 
-	void copyTo(size_t offset, size_t size, love::graphics::Buffer *other, size_t otheroffset) override;
+  // Implements Volatile.
+  bool loadVolatile() override;
+  void unloadVolatile() override;
 
-	// Implements Volatile.
-	bool loadVolatile() override;
-	void unloadVolatile() override;
+ private:
+  bool load(bool restore);
+  void unload();
 
-private:
+  void unmapStatic(size_t offset, size_t size);
+  void unmapStream();
 
-	bool load(bool restore);
-	void unload();
+  GLenum target;
 
-	void unmapStatic(size_t offset, size_t size);
-	void unmapStream();
+  // The VBO identifier. Assigned by OpenGL.
+  GLuint vbo;
 
-	GLenum target;
+  // A pointer to mapped memory.
+  char *memory_map;
 
-	// The VBO identifier. Assigned by OpenGL.
-	GLuint vbo;
+  size_t modified_start;
+  size_t modified_end;
 
-	// A pointer to mapped memory.
-	char *memory_map;
+};  // Buffer
 
-	size_t modified_start;
-	size_t modified_end;
-
-}; // Buffer
-
-} // opengl
-} // graphics
-} // love
+}  // namespace opengl
+}  // namespace graphics
+}  // namespace love

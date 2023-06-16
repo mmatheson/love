@@ -18,7 +18,6 @@
  * 3. This notice may not be removed or altered from any source distribution.
  **/
 
-
 #include "FenceSync.h"
 
 namespace love
@@ -28,59 +27,56 @@ namespace graphics
 namespace opengl
 {
 
-FenceSync::~FenceSync()
-{
-	cleanup();
-}
+FenceSync::~FenceSync() { cleanup(); }
 
 bool FenceSync::fence()
 {
-	bool wasActive = sync != 0;
+  bool wasActive = sync != 0;
 
-	if (wasActive)
-		cleanup();
+  if (wasActive)
+    cleanup();
 
-	sync = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
+  sync = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
 
-	return !wasActive;
+  return !wasActive;
 }
 
 bool FenceSync::cpuWait()
 {
-	if (sync == 0)
-		return false;
+  if (sync == 0)
+    return false;
 
-	GLbitfield flags = 0;
-	GLuint64 duration = 0;
+  GLbitfield flags = 0;
+  GLuint64 duration = 0;
 
-	while (true)
-	{
-		GLenum status = glClientWaitSync(sync, flags, duration);
+  while (true)
+  {
+    GLenum status = glClientWaitSync(sync, flags, duration);
 
-		if (status == GL_ALREADY_SIGNALED || status == GL_CONDITION_SATISFIED)
-			break;
+    if (status == GL_ALREADY_SIGNALED || status == GL_CONDITION_SATISFIED)
+      break;
 
-		if (status == GL_WAIT_FAILED)
-			break;
+    if (status == GL_WAIT_FAILED)
+      break;
 
-		flags = GL_SYNC_FLUSH_COMMANDS_BIT;
-		duration = 1000000000; // 1 second in nanoseconds.
-	}
+    flags = GL_SYNC_FLUSH_COMMANDS_BIT;
+    duration = 1000000000;  // 1 second in nanoseconds.
+  }
 
-	cleanup();
+  cleanup();
 
-	return true;
+  return true;
 }
 
 void FenceSync::cleanup()
 {
-	if (sync != 0)
-	{
-		glDeleteSync(sync);
-		sync = 0;
-	}
+  if (sync != 0)
+  {
+    glDeleteSync(sync);
+    sync = 0;
+  }
 }
 
-} // opengl
-} // graphics
-} // love
+}  // namespace opengl
+}  // namespace graphics
+}  // namespace love

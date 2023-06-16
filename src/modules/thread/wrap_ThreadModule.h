@@ -30,9 +30,9 @@ namespace love
 namespace thread
 {
 
-extern "C" LOVE_EXPORT int luaopen_love_thread(lua_State * L);
+extern "C" LOVE_EXPORT int luaopen_love_thread(lua_State *L);
 
-} // thread
-} // love
+}  // namespace thread
+}  // namespace love
 
-#endif // LOVE_THREAD_WRAP_THREADMODULE_H
+#endif  // LOVE_THREAD_WRAP_THREADMODULE_H

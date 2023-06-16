@@ -38,20 +38,19 @@ namespace magpie
  **/
 class STBHandler final : public FormatHandler
 {
-public:
+ public:
+  // Implements FormatHandler.
 
-	// Implements FormatHandler.
+  bool canDecode(Data *data) override;
+  bool canEncode(PixelFormat rawFormat, EncodedFormat encodedFormat) override;
 
-	bool canDecode(Data *data) override;
-	bool canEncode(PixelFormat rawFormat, EncodedFormat encodedFormat) override;
+  DecodedImage decode(Data *data) override;
+  EncodedImage encode(const DecodedImage &img, EncodedFormat format) override;
 
-	DecodedImage decode(Data *data) override;
-	EncodedImage encode(const DecodedImage &img, EncodedFormat format) override;
+  void freeRawPixels(unsigned char *mem) override;
 
-	void freeRawPixels(unsigned char *mem) override;
+};  // STBHandler
 
-}; // STBHandler
-
-} // magpie
-} // image
-} // love
+}  // namespace magpie
+}  // namespace image
+}  // namespace love

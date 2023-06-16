@@ -21,10 +21,10 @@
 #pragma once
 
 // LOVE
+#include "Resource.h"
 #include "common/config.h"
 #include "common/int.h"
 #include "vertex.h"
-#include "Resource.h"
 
 // C
 #include <stddef.h>
@@ -39,113 +39,103 @@ namespace graphics
  **/
 class Buffer : public Resource
 {
-public:
+ public:
+  enum MapFlags
+  {
+    MAP_EXPLICIT_RANGE_MODIFY = (1 << 0),  // see setMappedRangeModified.
+    MAP_READ = (1 << 1),
+  };
 
-	enum MapFlags
-	{
-		MAP_EXPLICIT_RANGE_MODIFY = (1 << 0), // see setMappedRangeModified.
-		MAP_READ = (1 << 1),
-	};
+  Buffer(size_t size, BufferType type, vertex::Usage usage, uint32 mapflags);
+  virtual ~Buffer();
 
-	Buffer(size_t size, BufferType type, vertex::Usage usage, uint32 mapflags);
-	virtual ~Buffer();
+  size_t getSize() const { return size; }
 
-	size_t getSize() const { return size; }
+  BufferType getType() const { return type; }
 
-	BufferType getType() const { return type; }
+  vertex::Usage getUsage() const { return usage; }
 
-	vertex::Usage getUsage() const { return usage; }
+  bool isMapped() const { return is_mapped; }
 
-	bool isMapped() const { return is_mapped; }
+  /**
+   * Map the Buffer to client memory.
+   *
+   * This can be faster for large changes to the buffer. For smaller
+   * changes, see fill().
+   */
+  virtual void *map() = 0;
 
-	/**
-	 * Map the Buffer to client memory.
-	 *
-	 * This can be faster for large changes to the buffer. For smaller
-	 * changes, see fill().
-	 */
-	virtual void *map() = 0;
+  /**
+   * Unmap a previously mapped Buffer. The buffer must be unmapped when used
+   * to draw.
+   */
+  virtual void unmap() = 0;
 
-	/**
-	 * Unmap a previously mapped Buffer. The buffer must be unmapped when used
-	 * to draw.
-	 */
-	virtual void unmap() = 0;
+  /**
+   * Marks a range of mapped data as modified.
+   * NOTE: Buffer::fill calls this internally for you.
+   **/
+  virtual void setMappedRangeModified(size_t offset, size_t size) = 0;
 
-	/**
-	 * Marks a range of mapped data as modified.
-	 * NOTE: Buffer::fill calls this internally for you.
-	 **/
-	virtual void setMappedRangeModified(size_t offset, size_t size) = 0;
+  /**
+   * Fill a portion of the buffer with data and marks the range as modified.
+   *
+   * @param offset The offset in the GLBuffer to store the data.
+   * @param size The size of the incoming data.
+   * @param data Pointer to memory to copy data from.
+   */
+  virtual void fill(size_t offset, size_t size, const void *data) = 0;
 
-	/**
-	 * Fill a portion of the buffer with data and marks the range as modified.
-	 *
-	 * @param offset The offset in the GLBuffer to store the data.
-	 * @param size The size of the incoming data.
-	 * @param data Pointer to memory to copy data from.
-	 */
-	virtual void fill(size_t offset, size_t size, const void *data) = 0;
+  /**
+   * Copy the contents of this Buffer to another Buffer object.
+   **/
+  virtual void copyTo(size_t offset, size_t size, Buffer *other, size_t otheroffset) = 0;
 
-	/**
-	 * Copy the contents of this Buffer to another Buffer object.
-	 **/
-	virtual void copyTo(size_t offset, size_t size, Buffer *other, size_t otheroffset) = 0;
+  uint32 getMapFlags() const { return map_flags; }
 
-	uint32 getMapFlags() const { return map_flags; }
+  class Mapper
+  {
+   public:
+    /**
+     * Memory-maps a Buffer.
+     */
+    Mapper(Buffer &buffer)
+        : buf(buffer)
+    {
+      elems = buf.map();
+    }
 
-	class Mapper
-	{
-	public:
+    /**
+     * unmaps the buffer
+     */
+    ~Mapper() { buf.unmap(); }
 
-		/**
-		 * Memory-maps a Buffer.
-		 */
-		Mapper(Buffer &buffer)
-			: buf(buffer)
-		{
-			elems = buf.map();
-		}
+    /**
+     * Get pointer to memory mapped region
+     */
+    void *get() { return elems; }
 
-		/**
-		 * unmaps the buffer
-		 */
-		~Mapper()
-		{
-			buf.unmap();
-		}
+   private:
+    Buffer &buf;
+    void *elems;
 
-		/**
-		 * Get pointer to memory mapped region
-		 */
-		void *get()
-		{
-			return elems;
-		}
+  };  // Mapper
 
-	private:
+ protected:
+  // The size of the buffer, in bytes.
+  size_t size;
 
-		Buffer &buf;
-		void *elems;
+  // The type of the buffer object.
+  BufferType type;
 
-	}; // Mapper
+  // Usage hint. GL_[DYNAMIC, STATIC, STREAM]_DRAW.
+  vertex::Usage usage;
 
-protected:
+  uint32 map_flags;
 
-	// The size of the buffer, in bytes.
-	size_t size;
+  bool is_mapped;
 
-	// The type of the buffer object.
-	BufferType type;
+};  // Buffer
 
-	// Usage hint. GL_[DYNAMIC, STATIC, STREAM]_DRAW.
-	vertex::Usage usage;
-	
-	uint32 map_flags;
-
-	bool is_mapped;
-	
-}; // Buffer
-
-} // graphics
-} // love
+}  // namespace graphics
+}  // namespace love

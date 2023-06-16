@@ -27,31 +27,25 @@ namespace thread
 
 LuaThread *ThreadModule::newThread(const std::string &name, love::Data *data)
 {
-	return new LuaThread(name, data);
+  return new LuaThread(name, data);
 }
 
-Channel *ThreadModule::newChannel()
-{
-	return new Channel();
-}
+Channel *ThreadModule::newChannel() { return new Channel(); }
 
 Channel *ThreadModule::getChannel(const std::string &name)
 {
-	Lock lock(namedChannelMutex);
+  Lock lock(namedChannelMutex);
 
-	auto it = namedChannels.find(name);
-	if (it != namedChannels.end())
-		return it->second;
+  auto it = namedChannels.find(name);
+  if (it != namedChannels.end())
+    return it->second;
 
-	Channel *c = new Channel();
-	namedChannels[name].set(c, Acquire::NORETAIN);
-	return c;
+  Channel *c = new Channel();
+  namedChannels[name].set(c, Acquire::NORETAIN);
+  return c;
 }
 
-const char *ThreadModule::getName() const
-{
-	return "love.thread.sdl";
-}
+const char *ThreadModule::getName() const { return "love.thread.sdl"; }
 
-} // thread
-} // love
+}  // namespace thread
+}  // namespace love

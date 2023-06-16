@@ -28,65 +28,42 @@ namespace audio
 love::Type Source::type("Source", &Object::type);
 
 Source::Source(Type sourceType)
-	: sourceType(sourceType)
+    : sourceType(sourceType)
 {
 }
 
-Source::~Source()
-{
-}
+Source::~Source() {}
 
-Source::Type Source::getType() const
-{
-	return sourceType;
-}
+Source::Type Source::getType() const { return sourceType; }
 
-bool Source::getConstant(const char *in, Type &out)
-{
-	return types.find(in, out);
-}
+bool Source::getConstant(const char *in, Type &out) { return types.find(in, out); }
 
-bool Source::getConstant(Type in, const char  *&out)
-{
-	return types.find(in, out);
-}
+bool Source::getConstant(Type in, const char *&out) { return types.find(in, out); }
 
-std::vector<std::string> Source::getConstants(Type)
-{
-	return types.getNames();
-}
+std::vector<std::string> Source::getConstants(Type) { return types.getNames(); }
 
-bool Source::getConstant(const char *in, Unit &out)
-{
-	return units.find(in, out);
-}
+bool Source::getConstant(const char *in, Unit &out) { return units.find(in, out); }
 
-bool Source::getConstant(Unit in, const char  *&out)
-{
-	return units.find(in, out);
-}
+bool Source::getConstant(Unit in, const char *&out) { return units.find(in, out); }
 
-std::vector<std::string> Source::getConstants(Unit)
-{
-	return units.getNames();
-}
+std::vector<std::string> Source::getConstants(Unit) { return units.getNames(); }
 
-StringMap<Source::Type, Source::TYPE_MAX_ENUM>::Entry Source::typeEntries[] =
-{
-	{"static", Source::TYPE_STATIC},
-	{"stream", Source::TYPE_STREAM},
-	{"queue",  Source::TYPE_QUEUE},
+StringMap<Source::Type, Source::TYPE_MAX_ENUM>::Entry Source::typeEntries[] = {
+    {"static", Source::TYPE_STATIC},
+    {"stream", Source::TYPE_STREAM},
+    {"queue", Source::TYPE_QUEUE},
 };
 
-StringMap<Source::Type, Source::TYPE_MAX_ENUM> Source::types(Source::typeEntries, sizeof(Source::typeEntries));
+StringMap<Source::Type, Source::TYPE_MAX_ENUM> Source::types(Source::typeEntries,
+                                                             sizeof(Source::typeEntries));
 
-StringMap<Source::Unit, Source::UNIT_MAX_ENUM>::Entry Source::unitEntries[] =
-{
-	{"seconds", Source::UNIT_SECONDS},
-	{"samples", Source::UNIT_SAMPLES},
+StringMap<Source::Unit, Source::UNIT_MAX_ENUM>::Entry Source::unitEntries[] = {
+    {"seconds", Source::UNIT_SECONDS},
+    {"samples", Source::UNIT_SAMPLES},
 };
 
-StringMap<Source::Unit, Source::UNIT_MAX_ENUM> Source::units(Source::unitEntries, sizeof(Source::unitEntries));
+StringMap<Source::Unit, Source::UNIT_MAX_ENUM> Source::units(Source::unitEntries,
+                                                             sizeof(Source::unitEntries));
 
-} // audio
-} // love
+}  // namespace audio
+}  // namespace love

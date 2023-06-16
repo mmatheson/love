@@ -22,9 +22,9 @@
 #define LOVE_JOYSTICK_WRAP_JOYSTICK_MODULE_H
 
 // LOVE
+#include "JoystickModule.h"
 #include "common/config.h"
 #include "common/runtime.h"
-#include "JoystickModule.h"
 
 namespace love
 {
@@ -34,7 +34,7 @@ namespace joystick
 int w_getIndex(lua_State *L);
 extern "C" LOVE_EXPORT int luaopen_love_joystick(lua_State *L);
 
-} // joystick
-} // love
+}  // namespace joystick
+}  // namespace love
 
-#endif // LOVE_JOYSTICK_WRAP_JOYSTICK_MODULE_H
+#endif  // LOVE_JOYSTICK_WRAP_JOYSTICK_MODULE_H

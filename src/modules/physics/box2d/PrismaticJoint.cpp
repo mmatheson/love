@@ -22,8 +22,8 @@
 
 // Module
 #include "Body.h"
-#include "World.h"
 #include "Physics.h"
+#include "World.h"
 
 namespace love
 {
@@ -34,140 +34,111 @@ namespace box2d
 
 love::Type PrismaticJoint::type("PrismaticJoint", &Joint::type);
 
-PrismaticJoint::PrismaticJoint(Body *body1, Body *body2, float xA, float yA, float xB, float yB, float ax, float ay, bool collideConnected)
-	: Joint(body1, body2)
-	, joint(NULL)
+PrismaticJoint::PrismaticJoint(Body *body1, Body *body2, float xA, float yA, float xB, float yB,
+                               float ax, float ay, bool collideConnected)
+    : Joint(body1, body2),
+      joint(NULL)
 {
-	b2PrismaticJointDef def;
-	init(def, body1, body2, xA, yA, xB, yB, ax, ay, collideConnected);
-	joint = (b2PrismaticJoint *)createJoint(&def);
+  b2PrismaticJointDef def;
+  init(def, body1, body2, xA, yA, xB, yB, ax, ay, collideConnected);
+  joint = (b2PrismaticJoint *) createJoint(&def);
 }
 
-PrismaticJoint::PrismaticJoint(Body *body1, Body *body2, float xA, float yA, float xB, float yB, float ax, float ay, bool collideConnected, float referenceAngle)
-	: Joint(body1, body2)
-	, joint(NULL)
+PrismaticJoint::PrismaticJoint(Body *body1, Body *body2, float xA, float yA, float xB, float yB,
+                               float ax, float ay, bool collideConnected, float referenceAngle)
+    : Joint(body1, body2),
+      joint(NULL)
 {
-	b2PrismaticJointDef def;
-	init(def, body1, body2, xA, yA, xB, yB, ax, ay, collideConnected);
-	def.referenceAngle = referenceAngle;
-	joint = (b2PrismaticJoint *)createJoint(&def);
+  b2PrismaticJointDef def;
+  init(def, body1, body2, xA, yA, xB, yB, ax, ay, collideConnected);
+  def.referenceAngle = referenceAngle;
+  joint = (b2PrismaticJoint *) createJoint(&def);
 }
 
-PrismaticJoint::~PrismaticJoint()
-{
-}
+PrismaticJoint::~PrismaticJoint() {}
 
-void PrismaticJoint::init(b2PrismaticJointDef &def, Body *body1, Body *body2, float xA, float yA, float xB, float yB, float ax, float ay, bool collideConnected)
+void PrismaticJoint::init(b2PrismaticJointDef &def, Body *body1, Body *body2, float xA, float yA,
+                          float xB, float yB, float ax, float ay, bool collideConnected)
 {
-	def.Initialize(body1->body, body2->body, Physics::scaleDown(b2Vec2(xA,yA)), b2Vec2(ax,ay));
-	def.localAnchorB = body2->body->GetLocalPoint(Physics::scaleDown(b2Vec2(xB, yB)));
-	def.lowerTranslation = 0.0f;
-	def.upperTranslation = 100.0f;
-	def.enableLimit = true;
-	def.collideConnected = collideConnected;
+  def.Initialize(body1->body, body2->body, Physics::scaleDown(b2Vec2(xA, yA)), b2Vec2(ax, ay));
+  def.localAnchorB = body2->body->GetLocalPoint(Physics::scaleDown(b2Vec2(xB, yB)));
+  def.lowerTranslation = 0.0f;
+  def.upperTranslation = 100.0f;
+  def.enableLimit = true;
+  def.collideConnected = collideConnected;
 }
 
 float PrismaticJoint::getJointTranslation() const
 {
-	return Physics::scaleUp(joint->GetJointTranslation());
+  return Physics::scaleUp(joint->GetJointTranslation());
 }
 
-float PrismaticJoint::getJointSpeed() const
-{
-	return Physics::scaleUp(joint->GetJointSpeed());
-}
+float PrismaticJoint::getJointSpeed() const { return Physics::scaleUp(joint->GetJointSpeed()); }
 
-void PrismaticJoint::setMotorEnabled(bool enable)
-{
-	return joint->EnableMotor(enable);
-}
+void PrismaticJoint::setMotorEnabled(bool enable) { return joint->EnableMotor(enable); }
 
-bool PrismaticJoint::isMotorEnabled() const
-{
-	return joint->IsMotorEnabled();
-}
+bool PrismaticJoint::isMotorEnabled() const { return joint->IsMotorEnabled(); }
 
 void PrismaticJoint::setMaxMotorForce(float force)
 {
-	joint->SetMaxMotorForce(Physics::scaleDown(force));
+  joint->SetMaxMotorForce(Physics::scaleDown(force));
 }
 
-void PrismaticJoint::setMotorSpeed(float speed)
-{
-	joint->SetMotorSpeed(Physics::scaleDown(speed));
-}
+void PrismaticJoint::setMotorSpeed(float speed) { joint->SetMotorSpeed(Physics::scaleDown(speed)); }
 
-float PrismaticJoint::getMotorSpeed() const
-{
-	return Physics::scaleUp(joint->GetMotorSpeed());
-}
+float PrismaticJoint::getMotorSpeed() const { return Physics::scaleUp(joint->GetMotorSpeed()); }
 
 float PrismaticJoint::getMotorForce(float inv_dt) const
 {
-	return Physics::scaleUp(joint->GetMotorForce(inv_dt));
+  return Physics::scaleUp(joint->GetMotorForce(inv_dt));
 }
 
 float PrismaticJoint::getMaxMotorForce() const
 {
-	return Physics::scaleUp(joint->GetMaxMotorForce());
+  return Physics::scaleUp(joint->GetMaxMotorForce());
 }
 
-void PrismaticJoint::setLimitsEnabled(bool enable)
-{
-	joint->EnableLimit(enable);
-}
+void PrismaticJoint::setLimitsEnabled(bool enable) { joint->EnableLimit(enable); }
 
-bool PrismaticJoint::areLimitsEnabled() const
-{
-	return joint->IsLimitEnabled();
-}
+bool PrismaticJoint::areLimitsEnabled() const { return joint->IsLimitEnabled(); }
 
 void PrismaticJoint::setUpperLimit(float limit)
 {
-	joint->SetLimits(joint->GetLowerLimit(), Physics::scaleDown(limit));
+  joint->SetLimits(joint->GetLowerLimit(), Physics::scaleDown(limit));
 }
 
 void PrismaticJoint::setLowerLimit(float limit)
 {
-	joint->SetLimits(Physics::scaleDown(limit), joint->GetUpperLimit());
+  joint->SetLimits(Physics::scaleDown(limit), joint->GetUpperLimit());
 }
 
 void PrismaticJoint::setLimits(float lower, float upper)
 {
-	joint->SetLimits(Physics::scaleDown(lower), Physics::scaleDown(upper));
+  joint->SetLimits(Physics::scaleDown(lower), Physics::scaleDown(upper));
 }
 
-float PrismaticJoint::getLowerLimit() const
-{
-	return Physics::scaleUp(joint->GetLowerLimit());
-}
+float PrismaticJoint::getLowerLimit() const { return Physics::scaleUp(joint->GetLowerLimit()); }
 
-float PrismaticJoint::getUpperLimit() const
-{
-	return Physics::scaleUp(joint->GetUpperLimit());
-}
+float PrismaticJoint::getUpperLimit() const { return Physics::scaleUp(joint->GetUpperLimit()); }
 
 int PrismaticJoint::getLimits(lua_State *L)
 {
-	lua_pushnumber(L, Physics::scaleUp(joint->GetLowerLimit()));
-	lua_pushnumber(L, Physics::scaleUp(joint->GetUpperLimit()));
-	return 2;
+  lua_pushnumber(L, Physics::scaleUp(joint->GetLowerLimit()));
+  lua_pushnumber(L, Physics::scaleUp(joint->GetUpperLimit()));
+  return 2;
 }
 
 int PrismaticJoint::getAxis(lua_State *L)
 {
-	b2Vec2 axis = joint->GetLocalAxisA();
-	getBodyA()->getWorldVector(axis.x, axis.y, axis.x, axis.y);
-	lua_pushnumber(L, axis.x);
-	lua_pushnumber(L, axis.y);
-	return 2;
+  b2Vec2 axis = joint->GetLocalAxisA();
+  getBodyA()->getWorldVector(axis.x, axis.y, axis.x, axis.y);
+  lua_pushnumber(L, axis.x);
+  lua_pushnumber(L, axis.y);
+  return 2;
 }
 
-float PrismaticJoint::getReferenceAngle() const
-{
-	return joint->GetReferenceAngle();
-}
+float PrismaticJoint::getReferenceAngle() const { return joint->GetReferenceAngle(); }
 
-} // box2d
-} // physics
-} // love
+}  // namespace box2d
+}  // namespace physics
+}  // namespace love

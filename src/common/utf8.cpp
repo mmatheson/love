@@ -27,56 +27,57 @@ namespace love
 
 std::string to_utf8(LPCWSTR wstr)
 {
-	size_t wide_len = wcslen(wstr)+1;
+  size_t wide_len = wcslen(wstr) + 1;
 
-	// Get size in UTF-8.
-	int utf8_size = WideCharToMultiByte(CP_UTF8, 0, wstr, wide_len, 0, 0, 0, 0);
+  // Get size in UTF-8.
+  int utf8_size = WideCharToMultiByte(CP_UTF8, 0, wstr, wide_len, 0, 0, 0, 0);
 
-	char *utf8_str = new char[utf8_size];
+  char *utf8_str = new char[utf8_size];
 
-	// Convert to UTF-8.
-	int ok = WideCharToMultiByte(CP_UTF8, 0, wstr, wide_len, utf8_str, utf8_size, 0, 0);
+  // Convert to UTF-8.
+  int ok = WideCharToMultiByte(CP_UTF8, 0, wstr, wide_len, utf8_str, utf8_size, 0, 0);
 
-	std::string ret;
-	if (ok)
-		ret = utf8_str;
+  std::string ret;
+  if (ok)
+    ret = utf8_str;
 
-	delete[] utf8_str;
-	return ret;
+  delete[] utf8_str;
+  return ret;
 }
 
 std::wstring to_widestr(const std::string &str)
 {
-	if (str.empty())
-		return std::wstring();
+  if (str.empty())
+    return std::wstring();
 
-	int wide_size = MultiByteToWideChar(CP_UTF8, 0, str.c_str(), (int) str.length(), nullptr, 0);
+  int wide_size = MultiByteToWideChar(CP_UTF8, 0, str.c_str(), (int) str.length(), nullptr, 0);
 
-	if (wide_size == 0)
-		return std::wstring();
+  if (wide_size == 0)
+    return std::wstring();
 
-	std::wstring widestr;
-	widestr.resize(wide_size);
+  std::wstring widestr;
+  widestr.resize(wide_size);
 
-	int ok = MultiByteToWideChar(CP_UTF8, 0, str.c_str(), (int) str.length(), &widestr[0], widestr.length());
+  int ok = MultiByteToWideChar(CP_UTF8, 0, str.c_str(), (int) str.length(), &widestr[0],
+                               widestr.length());
 
-	if (!ok)
-		return std::wstring();
+  if (!ok)
+    return std::wstring();
 
-	return widestr;
+  return widestr;
 }
 
 void replace_char(std::string &str, char find, char replace)
 {
-	int length = str.length();
+  int length = str.length();
 
-	for (int i = 0; i<length; i++)
-	{
-		if (str[i] == find)
-			str[i] = replace;
-	}
+  for (int i = 0; i < length; i++)
+  {
+    if (str[i] == find)
+      str[i] = replace;
+  }
 }
 
-} // love
+}  // namespace love
 
-#endif // LOVE_WINDOWS
+#endif  // LOVE_WINDOWS

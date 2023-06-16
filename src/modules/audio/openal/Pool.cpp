@@ -30,163 +30,152 @@ namespace openal
 {
 
 Pool::Pool()
-	: sources()
-	, totalSources(0)
+    : sources(),
+      totalSources(0)
 {
-	// Clear errors.
-	alGetError();
+  // Clear errors.
+  alGetError();
 
-	// Generate sources.
-	for (int i = 0; i < MAX_SOURCES; i++)
-	{
-		alGenSources(1, &sources[i]);
+  // Generate sources.
+  for (int i = 0; i < MAX_SOURCES; i++)
+  {
+    alGenSources(1, &sources[i]);
 
-		// We might hit an implementation-dependent limit on the total number
-		// of sources before reaching MAX_SOURCES.
-		if (alGetError() != AL_NO_ERROR)
-			break;
+    // We might hit an implementation-dependent limit on the total number
+    // of sources before reaching MAX_SOURCES.
+    if (alGetError() != AL_NO_ERROR)
+      break;
 
-		totalSources++;
-	}
+    totalSources++;
+  }
 
-	if (totalSources < 4)
-		throw love::Exception("Could not generate sources.");
+  if (totalSources < 4)
+    throw love::Exception("Could not generate sources.");
 
 #ifdef AL_SOFT_direct_channels
-	ALboolean hasext = alIsExtensionPresent("AL_SOFT_direct_channels");
+  ALboolean hasext = alIsExtensionPresent("AL_SOFT_direct_channels");
 #endif
 
-	// Make all sources available initially.
-	for (int i = 0; i < totalSources; i++)
-	{
+  // Make all sources available initially.
+  for (int i = 0; i < totalSources; i++)
+  {
 #ifdef AL_SOFT_direct_channels
-		if (hasext)
-		{
-			// Bypass virtualization of speakers for multi-channel sources in OpenAL Soft.
-			alSourcei(sources[i], AL_DIRECT_CHANNELS_SOFT, AL_TRUE);
-		}
+    if (hasext)
+    {
+      // Bypass virtualization of speakers for multi-channel sources in OpenAL Soft.
+      alSourcei(sources[i], AL_DIRECT_CHANNELS_SOFT, AL_TRUE);
+    }
 #endif
 
-		available.push(sources[i]);
-	}
+    available.push(sources[i]);
+  }
 }
 
 Pool::~Pool()
 {
-	Source::stop(this);
+  Source::stop(this);
 
-	// Free all sources.
-	alDeleteSources(totalSources, sources);
+  // Free all sources.
+  alDeleteSources(totalSources, sources);
 }
 
 bool Pool::isAvailable() const
 {
-	bool has = false;
-	{
-		thread::Lock lock(mutex);
-		has = !available.empty();
-	}
-	return has;
+  bool has = false;
+  {
+    thread::Lock lock(mutex);
+    has = !available.empty();
+  }
+  return has;
 }
 
 bool Pool::isPlaying(Source *s)
 {
-	bool p = false;
-	{
-		thread::Lock lock(mutex);
-		p = (playing.find(s) != playing.end());
-	}
-	return p;
+  bool p = false;
+  {
+    thread::Lock lock(mutex);
+    p = (playing.find(s) != playing.end());
+  }
+  return p;
 }
 
 void Pool::update()
 {
-	thread::Lock lock(mutex);
+  thread::Lock lock(mutex);
 
-	std::vector<Source *> torelease;
+  std::vector<Source *> torelease;
 
-	for (const auto &i : playing)
-	{
-		if (!i.first->update())
-			torelease.push_back(i.first);
-	}
+  for (const auto &i : playing)
+  {
+    if (!i.first->update())
+      torelease.push_back(i.first);
+  }
 
-	for (Source *s : torelease)
-		releaseSource(s);
+  for (Source *s : torelease) releaseSource(s);
 }
 
-int Pool::getActiveSourceCount() const
-{
-	return (int) playing.size();
-}
+int Pool::getActiveSourceCount() const { return (int) playing.size(); }
 
-int Pool::getMaxSources() const
-{
-	return totalSources;
-}
+int Pool::getMaxSources() const { return totalSources; }
 
 bool Pool::assignSource(Source *source, ALuint &out, char &wasPlaying)
 {
-	out = 0;
+  out = 0;
 
-	if (findSource(source, out))
-		return wasPlaying = true;
+  if (findSource(source, out))
+    return wasPlaying = true;
 
-	wasPlaying = false;
+  wasPlaying = false;
 
-	if (available.empty())
-		return false;
+  if (available.empty())
+    return false;
 
-	out = available.front();
-	available.pop();
+  out = available.front();
+  available.pop();
 
-	playing.insert(std::make_pair(source, out));
-	source->retain();
-	return true;
+  playing.insert(std::make_pair(source, out));
+  source->retain();
+  return true;
 }
 
 bool Pool::releaseSource(Source *source, bool stop)
 {
-	ALuint s;
+  ALuint s;
 
-	if (findSource(source, s))
-	{
-		if (stop)
-			source->stopAtomic();
-		source->release();
-		available.push(s);
-		playing.erase(source);
-		return true;
-	}
+  if (findSource(source, s))
+  {
+    if (stop)
+      source->stopAtomic();
+    source->release();
+    available.push(s);
+    playing.erase(source);
+    return true;
+  }
 
-	return false;
+  return false;
 }
 
 bool Pool::findSource(Source *source, ALuint &out)
 {
-	std::map<Source *, ALuint>::const_iterator i = playing.find(source);
+  std::map<Source *, ALuint>::const_iterator i = playing.find(source);
 
-	if (i == playing.end())
-		return false;
+  if (i == playing.end())
+    return false;
 
-	out = i->second;
-	return true;
+  out = i->second;
+  return true;
 }
 
-thread::Lock Pool::lock()
+thread::Lock Pool::lock() { return thread::Lock(mutex); }
+
+std::vector<love::audio::Source *> Pool::getPlayingSources()
 {
-	return thread::Lock(mutex);
+  std::vector<love::audio::Source *> sources;
+  sources.reserve(playing.size());
+  for (auto &i : playing) sources.push_back(i.first);
+  return sources;
 }
 
-std::vector<love::audio::Source*> Pool::getPlayingSources()
-{
-	std::vector<love::audio::Source*> sources;
-	sources.reserve(playing.size());
-	for (auto &i : playing)
-		sources.push_back(i.first);
-	return sources;
-}
-
-} // openal
-} // audio
-} // love
+}  // namespace openal
+}  // namespace audio
+}  // namespace love

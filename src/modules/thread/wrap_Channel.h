@@ -32,7 +32,7 @@ namespace thread
 Channel *luax_checkchannel(lua_State *L, int idx);
 extern "C" int luaopen_channel(lua_State *L);
 
-} // thread
-} // love
+}  // namespace thread
+}  // namespace love
 
-#endif // LOVE_THREAD_WRAP_CHANNEL_H
+#endif  // LOVE_THREAD_WRAP_CHANNEL_H

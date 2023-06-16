@@ -27,120 +27,100 @@ namespace filesystem
 
 love::Type File::type("File", &Object::type);
 
-File::~File()
-{
-}
+File::~File() {}
 
 FileData *File::read(int64 size)
 {
-	bool isopen = isOpen();
+  bool isopen = isOpen();
 
-	if (!isopen && !open(MODE_READ))
-		throw love::Exception("Could not read file %s.", getFilename().c_str());
+  if (!isopen && !open(MODE_READ))
+    throw love::Exception("Could not read file %s.", getFilename().c_str());
 
-	int64 max = getSize();
-	int64 cur = tell();
-	size = (size == ALL) ? max : size;
+  int64 max = getSize();
+  int64 cur = tell();
+  size = (size == ALL) ? max : size;
 
-	if (size < 0)
-		throw love::Exception("Invalid read size.");
+  if (size < 0)
+    throw love::Exception("Invalid read size.");
 
-	// Clamping because the file offset may be in a weird position.
-	if (cur < 0)
-		cur = 0;
-	else if (cur > max)
-		cur = max;
+  // Clamping because the file offset may be in a weird position.
+  if (cur < 0)
+    cur = 0;
+  else if (cur > max)
+    cur = max;
 
-	if (cur + size > max)
-		size = max - cur;
+  if (cur + size > max)
+    size = max - cur;
 
-	FileData *fileData = new FileData(size, getFilename());
-	int64 bytesRead = read(fileData->getData(), size);
+  FileData *fileData = new FileData(size, getFilename());
+  int64 bytesRead = read(fileData->getData(), size);
 
-	if (bytesRead < 0 || (bytesRead == 0 && bytesRead != size))
-	{
-		delete fileData;
-		throw love::Exception("Could not read from file.");
-	}
+  if (bytesRead < 0 || (bytesRead == 0 && bytesRead != size))
+  {
+    delete fileData;
+    throw love::Exception("Could not read from file.");
+  }
 
-	if (bytesRead < size)
-	{
-		FileData *tmpFileData = new FileData(bytesRead, getFilename());
-		memcpy(tmpFileData->getData(), fileData->getData(), (size_t) bytesRead);
-		fileData->release();
-		fileData = tmpFileData;
-	}
+  if (bytesRead < size)
+  {
+    FileData *tmpFileData = new FileData(bytesRead, getFilename());
+    memcpy(tmpFileData->getData(), fileData->getData(), (size_t) bytesRead);
+    fileData->release();
+    fileData = tmpFileData;
+  }
 
-	if (!isopen)
-		close();
+  if (!isopen)
+    close();
 
-	return fileData;
+  return fileData;
 }
 
 bool File::write(const Data *data, int64 size)
 {
-	return write(data->getData(), (size == ALL) ? data->getSize() : size);
+  return write(data->getData(), (size == ALL) ? data->getSize() : size);
 }
 
 std::string File::getExtension() const
 {
-	const std::string &filename = getFilename();
-	std::string::size_type idx = filename.rfind('.');
+  const std::string &filename = getFilename();
+  std::string::size_type idx = filename.rfind('.');
 
-	if (idx != std::string::npos)
-		return filename.substr(idx+1);
-	else
-		return std::string();
+  if (idx != std::string::npos)
+    return filename.substr(idx + 1);
+  else
+    return std::string();
 }
 
-bool File::getConstant(const char *in, Mode &out)
-{
-	return modes.find(in, out);
-}
+bool File::getConstant(const char *in, Mode &out) { return modes.find(in, out); }
 
-bool File::getConstant(Mode in, const char *&out)
-{
-	return modes.find(in, out);
-}
+bool File::getConstant(Mode in, const char *&out) { return modes.find(in, out); }
 
-std::vector<std::string> File::getConstants(Mode)
-{
-	return modes.getNames();
-}
+std::vector<std::string> File::getConstants(Mode) { return modes.getNames(); }
 
-bool File::getConstant(const char *in, BufferMode &out)
-{
-	return bufferModes.find(in, out);
-}
+bool File::getConstant(const char *in, BufferMode &out) { return bufferModes.find(in, out); }
 
-bool File::getConstant(BufferMode in, const char *&out)
-{
-	return bufferModes.find(in, out);
-}
+bool File::getConstant(BufferMode in, const char *&out) { return bufferModes.find(in, out); }
 
-std::vector<std::string> File::getConstants(BufferMode)
-{
-	return bufferModes.getNames();
-}
+std::vector<std::string> File::getConstants(BufferMode) { return bufferModes.getNames(); }
 
-StringMap<File::Mode, File::MODE_MAX_ENUM>::Entry File::modeEntries[] =
-{
-	{ "c", MODE_CLOSED },
-	{ "r", MODE_READ   },
-	{ "w", MODE_WRITE  },
-	{ "a", MODE_APPEND },
+StringMap<File::Mode, File::MODE_MAX_ENUM>::Entry File::modeEntries[] = {
+    {"c", MODE_CLOSED},
+    {"r", MODE_READ},
+    {"w", MODE_WRITE},
+    {"a", MODE_APPEND},
 };
 
-StringMap<File::Mode, File::MODE_MAX_ENUM> File::modes(File::modeEntries, sizeof(File::modeEntries));
+StringMap<File::Mode, File::MODE_MAX_ENUM> File::modes(File::modeEntries,
+                                                       sizeof(File::modeEntries));
 
-StringMap<File::BufferMode, File::BUFFER_MAX_ENUM>::Entry File::bufferModeEntries[] =
-{
-	{ "none", BUFFER_NONE },
-	{ "line", BUFFER_LINE },
-	{ "full", BUFFER_FULL },
+StringMap<File::BufferMode, File::BUFFER_MAX_ENUM>::Entry File::bufferModeEntries[] = {
+    {"none", BUFFER_NONE},
+    {"line", BUFFER_LINE},
+    {"full", BUFFER_FULL},
 };
 
-StringMap<File::BufferMode, File::BUFFER_MAX_ENUM> File::bufferModes(File::bufferModeEntries, sizeof(File::bufferModeEntries));
+StringMap<File::BufferMode, File::BUFFER_MAX_ENUM> File::bufferModes(
+    File::bufferModeEntries, sizeof(File::bufferModeEntries));
 
-} // filesystem
-} // love
+}  // namespace filesystem
+}  // namespace love

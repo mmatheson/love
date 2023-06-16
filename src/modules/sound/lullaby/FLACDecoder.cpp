@@ -22,6 +22,7 @@
 #include "FLACDecoder.h"
 
 #include <set>
+
 #include "common/Exception.h"
 
 namespace love
@@ -32,96 +33,73 @@ namespace lullaby
 {
 
 FLACDecoder::FLACDecoder(Data *data, int nbufferSize)
-: Decoder(data, nbufferSize)
+    : Decoder(data, nbufferSize)
 {
-	flac = drflac_open_memory(data->getData(), data->getSize(), nullptr);
-	if (flac == nullptr)
-		throw love::Exception("Could not load FLAC file");
+  flac = drflac_open_memory(data->getData(), data->getSize(), nullptr);
+  if (flac == nullptr)
+    throw love::Exception("Could not load FLAC file");
 }
 
-FLACDecoder::~FLACDecoder()
-{
-	drflac_close(flac);
-}
+FLACDecoder::~FLACDecoder() { drflac_close(flac); }
 
 bool FLACDecoder::accepts(const std::string &ext)
 {
-	// dr_flac supports FLAC encapsulated in Ogg, but unfortunately
-	// LOVE detects .ogg extension as Vorbis. It would be a good idea
-	// to always probe in the future (see #1487 and commit ccf9e63).
-	// Please remove once it's no longer the case.
-	static const std::string supported[] =
-	{
-		"flac", "ogg", ""
-	};
+  // dr_flac supports FLAC encapsulated in Ogg, but unfortunately
+  // LOVE detects .ogg extension as Vorbis. It would be a good idea
+  // to always probe in the future (see #1487 and commit ccf9e63).
+  // Please remove once it's no longer the case.
+  static const std::string supported[] = {"flac", "ogg", ""};
 
-	for (int i = 0; !(supported[i].empty()); i++)
-	{
-		if (supported[i].compare(ext) == 0)
-			return true;
-	}
+  for (int i = 0; !(supported[i].empty()); i++)
+  {
+    if (supported[i].compare(ext) == 0)
+      return true;
+  }
 
-	return false;
+  return false;
 }
 
-love::sound::Decoder *FLACDecoder::clone()
-{
-	return new FLACDecoder(data.get(), bufferSize);
-}
+love::sound::Decoder *FLACDecoder::clone() { return new FLACDecoder(data.get(), bufferSize); }
 
 int FLACDecoder::decode()
 {
-	// `bufferSize` is in bytes, so divide by 2.
-	drflac_uint64 read = drflac_read_pcm_frames_s16(flac, bufferSize / 2 / flac->channels, (drflac_int16 *) buffer);
-	read *= 2 * flac->channels;
+  // `bufferSize` is in bytes, so divide by 2.
+  drflac_uint64 read =
+      drflac_read_pcm_frames_s16(flac, bufferSize / 2 / flac->channels, (drflac_int16 *) buffer);
+  read *= 2 * flac->channels;
 
-	if ((int) read < bufferSize)
-		eof = true;
+  if ((int) read < bufferSize)
+    eof = true;
 
-	return (int) read;
+  return (int) read;
 }
 
 bool FLACDecoder::seek(double s)
 {
-	drflac_uint64 seekPosition = (drflac_uint64) (s * flac->sampleRate);
+  drflac_uint64 seekPosition = (drflac_uint64) (s * flac->sampleRate);
 
-	drflac_bool32 result = drflac_seek_to_pcm_frame(flac, seekPosition);
-	if (result)
-		eof = false;
+  drflac_bool32 result = drflac_seek_to_pcm_frame(flac, seekPosition);
+  if (result)
+    eof = false;
 
-	return result;
+  return result;
 }
 
-bool FLACDecoder::rewind()
-{
-	return seek(0);
-}
+bool FLACDecoder::rewind() { return seek(0); }
 
-bool FLACDecoder::isSeekable()
-{
-	return true;
-}
+bool FLACDecoder::isSeekable() { return true; }
 
-int FLACDecoder::getChannelCount() const
-{
-	return flac->channels;
-}
+int FLACDecoder::getChannelCount() const { return flac->channels; }
 
-int FLACDecoder::getBitDepth() const
-{
-	return 16;
-}
+int FLACDecoder::getBitDepth() const { return 16; }
 
-int FLACDecoder::getSampleRate() const
-{
-	return flac->sampleRate;
-}
+int FLACDecoder::getSampleRate() const { return flac->sampleRate; }
 
 double FLACDecoder::getDuration()
 {
-	return ((double) flac->totalPCMFrameCount) / ((double) flac->sampleRate);
+  return ((double) flac->totalPCMFrameCount) / ((double) flac->sampleRate);
 }
 
-} // lullaby
-} // sound
-} // love
+}  // namespace lullaby
+}  // namespace sound
+}  // namespace love

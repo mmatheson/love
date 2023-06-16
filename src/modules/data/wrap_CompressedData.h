@@ -21,8 +21,8 @@
 #pragma once
 
 // LOVE
-#include "common/runtime.h"
 #include "CompressedData.h"
+#include "common/runtime.h"
 
 namespace love
 {
@@ -32,5 +32,5 @@ namespace data
 CompressedData *luax_checkcompresseddata(lua_State *L, int idx);
 extern "C" int luaopen_compresseddata(lua_State *L);
 
-} // data
-} // love
+}  // namespace data
+}  // namespace love

@@ -37,45 +37,41 @@ namespace freetype
 
 Font::Font()
 {
-	if (FT_Init_FreeType(&library))
-		throw love::Exception("TrueTypeFont Loading error: FT_Init_FreeType failed");
+  if (FT_Init_FreeType(&library))
+    throw love::Exception("TrueTypeFont Loading error: FT_Init_FreeType failed");
 }
 
-Font::~Font()
-{
-	FT_Done_FreeType(library);
-}
+Font::~Font() { FT_Done_FreeType(library); }
 
 Rasterizer *Font::newRasterizer(love::filesystem::FileData *data)
 {
-	if (TrueTypeRasterizer::accepts(library, data))
-		return newTrueTypeRasterizer(data, 12, TrueTypeRasterizer::HINTING_NORMAL);
-	else if (BMFontRasterizer::accepts(data))
-		return newBMFontRasterizer(data, {}, 1.0f);
+  if (TrueTypeRasterizer::accepts(library, data))
+    return newTrueTypeRasterizer(data, 12, TrueTypeRasterizer::HINTING_NORMAL);
+  else if (BMFontRasterizer::accepts(data))
+    return newBMFontRasterizer(data, {}, 1.0f);
 
-	throw love::Exception("Invalid font file: %s", data->getFilename().c_str());
+  throw love::Exception("Invalid font file: %s", data->getFilename().c_str());
 }
 
-Rasterizer *Font::newTrueTypeRasterizer(love::Data *data, int size, TrueTypeRasterizer::Hinting hinting)
+Rasterizer *Font::newTrueTypeRasterizer(love::Data *data, int size,
+                                        TrueTypeRasterizer::Hinting hinting)
 {
-	float dpiscale = 1.0f;
-	auto window = Module::getInstance<window::Window>(Module::M_WINDOW);
-	if (window != nullptr)
-		dpiscale = window->getDPIScale();
+  float dpiscale = 1.0f;
+  auto window = Module::getInstance<window::Window>(Module::M_WINDOW);
+  if (window != nullptr)
+    dpiscale = window->getDPIScale();
 
-	return newTrueTypeRasterizer(data, size, dpiscale, hinting);
+  return newTrueTypeRasterizer(data, size, dpiscale, hinting);
 }
 
-Rasterizer *Font::newTrueTypeRasterizer(love::Data *data, int size, float dpiscale, TrueTypeRasterizer::Hinting hinting)
+Rasterizer *Font::newTrueTypeRasterizer(love::Data *data, int size, float dpiscale,
+                                        TrueTypeRasterizer::Hinting hinting)
 {
-	return new TrueTypeRasterizer(library, data, size, dpiscale, hinting);
+  return new TrueTypeRasterizer(library, data, size, dpiscale, hinting);
 }
 
-const char *Font::getName() const
-{
-	return "love.font.freetype";
-}
+const char *Font::getName() const { return "love.font.freetype"; }
 
-} // freetype
-} // font
-} // love
+}  // namespace freetype
+}  // namespace font
+}  // namespace love

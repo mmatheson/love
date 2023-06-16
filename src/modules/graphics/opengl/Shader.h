@@ -21,14 +21,14 @@
 #pragma once
 
 // LOVE
-#include "graphics/Shader.h"
-#include "graphics/Graphics.h"
-#include "graphics/Volatile.h"
 #include "OpenGL.h"
+#include "graphics/Graphics.h"
+#include "graphics/Shader.h"
+#include "graphics/Volatile.h"
 
 // STL
-#include <string>
 #include <map>
+#include <string>
 #include <vector>
 
 namespace love
@@ -41,94 +41,92 @@ namespace opengl
 // A GLSL shader
 class Shader final : public love::graphics::Shader, public Volatile
 {
-public:
+ public:
+  /**
+   * Creates a new Shader using a list of source codes.
+   * Source must contain either vertex or pixel shader code, or both.
+   **/
+  Shader(love::graphics::ShaderStage *vertex, love::graphics::ShaderStage *pixel);
+  virtual ~Shader();
 
-	/**
-	 * Creates a new Shader using a list of source codes.
-	 * Source must contain either vertex or pixel shader code, or both.
-	 **/
-	Shader(love::graphics::ShaderStage *vertex, love::graphics::ShaderStage *pixel);
-	virtual ~Shader();
+  // Implements Volatile
+  bool loadVolatile() override;
+  void unloadVolatile() override;
 
-	// Implements Volatile
-	bool loadVolatile() override;
-	void unloadVolatile() override;
+  // Implements Shader.
+  void attach() override;
+  std::string getWarnings() const override;
+  int getVertexAttributeIndex(const std::string &name) override;
+  const UniformInfo *getUniformInfo(const std::string &name) const override;
+  const UniformInfo *getUniformInfo(BuiltinUniform builtin) const override;
+  void updateUniform(const UniformInfo *info, int count) override;
+  void sendTextures(const UniformInfo *info, Texture **textures, int count) override;
+  bool hasUniform(const std::string &name) const override;
+  ptrdiff_t getHandle() const override;
+  void setVideoTextures(Texture *ytexture, Texture *cbtexture, Texture *crtexture) override;
 
-	// Implements Shader.
-	void attach() override;
-	std::string getWarnings() const override;
-	int getVertexAttributeIndex(const std::string &name) override;
-	const UniformInfo *getUniformInfo(const std::string &name) const override;
-	const UniformInfo *getUniformInfo(BuiltinUniform builtin) const override;
-	void updateUniform(const UniformInfo *info, int count) override;
-	void sendTextures(const UniformInfo *info, Texture **textures, int count) override;
-	bool hasUniform(const std::string &name) const override;
-	ptrdiff_t getHandle() const override;
-	void setVideoTextures(Texture *ytexture, Texture *cbtexture, Texture *crtexture) override;
+  void updateScreenParams();
+  void updatePointSize(float size);
+  void updateBuiltinUniforms();
 
-	void updateScreenParams();
-	void updatePointSize(float size);
-	void updateBuiltinUniforms();
+  static std::string getGLSLVersion();
+  static bool isSupported();
 
-	static std::string getGLSLVersion();
-	static bool isSupported();
+ private:
+  struct TextureUnit
+  {
+    GLuint texture = 0;
+    TextureType type = TEXTURE_2D;
+    bool active = false;
+  };
 
-private:
+  // Map active uniform names to their locations.
+  void mapActiveUniforms();
 
-	struct TextureUnit
-	{
-		GLuint texture = 0;
-		TextureType type = TEXTURE_2D;
-		bool active = false;
-	};
+  void updateUniform(const UniformInfo *info, int count, bool internalupdate);
+  void sendTextures(const UniformInfo *info, Texture **textures, int count, bool internalupdate);
 
-	// Map active uniform names to their locations.
-	void mapActiveUniforms();
+  int getUniformTypeComponents(GLenum type) const;
+  MatrixSize getMatrixSize(GLenum type) const;
+  UniformType getUniformBaseType(GLenum type) const;
+  TextureType getUniformTextureType(GLenum type) const;
+  bool isDepthTextureType(GLenum type) const;
 
-	void updateUniform(const UniformInfo *info, int count, bool internalupdate);
-	void sendTextures(const UniformInfo *info, Texture **textures, int count, bool internalupdate);
+  void flushStreamDraws() const;
 
-	int getUniformTypeComponents(GLenum type) const;
-	MatrixSize getMatrixSize(GLenum type) const;
-	UniformType getUniformBaseType(GLenum type) const;
-	TextureType getUniformTextureType(GLenum type) const;
-	bool isDepthTextureType(GLenum type) const;
+  // Get any warnings or errors generated only by the shader program object.
+  std::string getProgramWarnings() const;
 
-	void flushStreamDraws() const;
+  // volatile
+  GLuint program;
 
-	// Get any warnings or errors generated only by the shader program object.
-	std::string getProgramWarnings() const;
+  // Location values for any built-in uniform variables.
+  GLint builtinUniforms[BUILTIN_MAX_ENUM];
+  UniformInfo *builtinUniformInfo[BUILTIN_MAX_ENUM];
 
-	// volatile
-	GLuint program;
+  // Location values for any generic vertex attribute variables.
+  GLint builtinAttributes[ATTRIB_MAX_ENUM];
 
-	// Location values for any built-in uniform variables.
-	GLint builtinUniforms[BUILTIN_MAX_ENUM];
-	UniformInfo *builtinUniformInfo[BUILTIN_MAX_ENUM];
+  std::map<std::string, GLint> attributes;
 
-	// Location values for any generic vertex attribute variables.
-	GLint builtinAttributes[ATTRIB_MAX_ENUM];
+  // Uniform location buffer map
+  std::map<std::string, UniformInfo> uniforms;
 
-	std::map<std::string, GLint> attributes;
+  // Texture unit pool for setting images
+  std::vector<TextureUnit> textureUnits;
 
-	// Uniform location buffer map
-	std::map<std::string, UniformInfo> uniforms;
+  std::vector<std::pair<const UniformInfo *, int>> pendingUniformUpdates;
 
-	// Texture unit pool for setting images
-	std::vector<TextureUnit> textureUnits;
+  bool canvasWasActive;
+  Rect lastViewport;
 
-	std::vector<std::pair<const UniformInfo *, int>> pendingUniformUpdates;
+  float lastPointSize;
 
-	bool canvasWasActive;
-	Rect lastViewport;
+  Matrix4 lastTransformMatrix;
+  Matrix4 lastProjectionMatrix;
 
-	float lastPointSize;
+};  // Shader
 
-	Matrix4 lastTransformMatrix;
-	Matrix4 lastProjectionMatrix;
-
-}; // Shader
-
-} // opengl
-} // graphics
-} // love
+}  // namespace opengl
+}  // namespace graphics
+}  // namespace love

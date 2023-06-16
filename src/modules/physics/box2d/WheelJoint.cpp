@@ -22,8 +22,8 @@
 
 // Module
 #include "Body.h"
-#include "World.h"
 #include "Physics.h"
+#include "World.h"
 
 namespace love
 {
@@ -34,96 +34,68 @@ namespace box2d
 
 love::Type WheelJoint::type("WheelJoint", &Joint::type);
 
-WheelJoint::WheelJoint(Body *body1, Body *body2, float xA, float yA, float xB, float yB, float ax, float ay, bool collideConnected)
-	: Joint(body1, body2)
-	, joint(NULL)
+WheelJoint::WheelJoint(Body *body1, Body *body2, float xA, float yA, float xB, float yB, float ax,
+                       float ay, bool collideConnected)
+    : Joint(body1, body2),
+      joint(NULL)
 {
-	b2WheelJointDef def;
+  b2WheelJointDef def;
 
-	def.Initialize(body1->body, body2->body, Physics::scaleDown(b2Vec2(xA,yA)), b2Vec2(ax,ay));
-	def.localAnchorB = body2->body->GetLocalPoint(Physics::scaleDown(b2Vec2(xB, yB)));
-	def.collideConnected = collideConnected;
-	joint = (b2WheelJoint *)createJoint(&def);
+  def.Initialize(body1->body, body2->body, Physics::scaleDown(b2Vec2(xA, yA)), b2Vec2(ax, ay));
+  def.localAnchorB = body2->body->GetLocalPoint(Physics::scaleDown(b2Vec2(xB, yB)));
+  def.collideConnected = collideConnected;
+  joint = (b2WheelJoint *) createJoint(&def);
 }
 
-WheelJoint::~WheelJoint()
-{
-}
+WheelJoint::~WheelJoint() {}
 
 float WheelJoint::getJointTranslation() const
 {
-	return Physics::scaleUp(joint->GetJointTranslation());
+  return Physics::scaleUp(joint->GetJointTranslation());
 }
 
-float WheelJoint::getJointSpeed() const
-{
-	return Physics::scaleUp(joint->GetJointSpeed());
-}
+float WheelJoint::getJointSpeed() const { return Physics::scaleUp(joint->GetJointSpeed()); }
 
-void WheelJoint::setMotorEnabled(bool enable)
-{
-	return joint->EnableMotor(enable);
-}
+void WheelJoint::setMotorEnabled(bool enable) { return joint->EnableMotor(enable); }
 
-bool WheelJoint::isMotorEnabled() const
-{
-	return joint->IsMotorEnabled();
-}
+bool WheelJoint::isMotorEnabled() const { return joint->IsMotorEnabled(); }
 
-void WheelJoint::setMotorSpeed(float speed)
-{
-	joint->SetMotorSpeed(speed);
-}
+void WheelJoint::setMotorSpeed(float speed) { joint->SetMotorSpeed(speed); }
 
-float WheelJoint::getMotorSpeed() const
-{
-	return joint->GetMotorSpeed();
-}
+float WheelJoint::getMotorSpeed() const { return joint->GetMotorSpeed(); }
 
 void WheelJoint::setMaxMotorTorque(float torque)
 {
-	joint->SetMaxMotorTorque(Physics::scaleDown(Physics::scaleDown(torque)));
+  joint->SetMaxMotorTorque(Physics::scaleDown(Physics::scaleDown(torque)));
 }
 
 float WheelJoint::getMaxMotorTorque() const
 {
-	return Physics::scaleUp(Physics::scaleUp(joint->GetMaxMotorTorque()));
+  return Physics::scaleUp(Physics::scaleUp(joint->GetMaxMotorTorque()));
 }
 
 float WheelJoint::getMotorTorque(float inv_dt) const
 {
-	return Physics::scaleUp(Physics::scaleUp(joint->GetMotorTorque(inv_dt)));
+  return Physics::scaleUp(Physics::scaleUp(joint->GetMotorTorque(inv_dt)));
 }
 
-void WheelJoint::setSpringFrequency(float hz)
-{
-	joint->SetSpringFrequencyHz(hz);
-}
+void WheelJoint::setSpringFrequency(float hz) { joint->SetSpringFrequencyHz(hz); }
 
-float WheelJoint::getSpringFrequency() const
-{
-	return joint->GetSpringFrequencyHz();
-}
+float WheelJoint::getSpringFrequency() const { return joint->GetSpringFrequencyHz(); }
 
-void WheelJoint::setSpringDampingRatio(float ratio)
-{
-	joint->SetSpringDampingRatio(ratio);
-}
+void WheelJoint::setSpringDampingRatio(float ratio) { joint->SetSpringDampingRatio(ratio); }
 
-float WheelJoint::getSpringDampingRatio() const
-{
-	return joint->GetSpringDampingRatio();
-}
+float WheelJoint::getSpringDampingRatio() const { return joint->GetSpringDampingRatio(); }
 
 int WheelJoint::getAxis(lua_State *L)
 {
-	b2Vec2 axis = joint->GetLocalAxisA();
-	getBodyA()->getWorldVector(axis.x, axis.y, axis.x, axis.y);
-	lua_pushnumber(L, axis.x);
-	lua_pushnumber(L, axis.y);
-	return 2;
+  b2Vec2 axis = joint->GetLocalAxisA();
+  getBodyA()->getWorldVector(axis.x, axis.y, axis.x, axis.y);
+  lua_pushnumber(L, axis.x);
+  lua_pushnumber(L, axis.y);
+  return 2;
 }
 
-} // box2d
-} // physics
-} // love
+}  // namespace box2d
+}  // namespace physics
+}  // namespace love

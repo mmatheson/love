@@ -39,45 +39,45 @@ namespace box2d
  **/
 class PulleyJoint : public Joint
 {
-public:
+ public:
+  static love::Type type;
 
-	static love::Type type;
+  /**
+   * Creates a PulleyJoint connecting bodyA to bodyB.
+   **/
+  PulleyJoint(Body *bodyA, Body *bodyB, b2Vec2 groundAnchorA, b2Vec2 groundAnchorB, b2Vec2 anchorA,
+              b2Vec2 anchorB, float ratio, bool collideConnected);
 
-	/**
-	 * Creates a PulleyJoint connecting bodyA to bodyB.
-	 **/
-	PulleyJoint(Body *bodyA, Body *bodyB, b2Vec2 groundAnchorA, b2Vec2 groundAnchorB, b2Vec2 anchorA, b2Vec2 anchorB, float ratio, bool collideConnected);
+  virtual ~PulleyJoint();
 
-	virtual ~PulleyJoint();
+  /**
+   * Gets the ground anchors position in world
+   * coordinates.
+   **/
+  int getGroundAnchors(lua_State *L);
 
-	/**
-	 * Gets the ground anchors position in world
-	 * coordinates.
-	 **/
-	int getGroundAnchors(lua_State *L);
+  /**
+   * Gets the current length of the segment attached to bodyA.
+   **/
+  float getLengthA() const;
 
-	/**
-	 * Gets the current length of the segment attached to bodyA.
-	 **/
-	float getLengthA() const;
+  /**
+   * Gets the current length of the segment attached to bodyB.
+   **/
+  float getLengthB() const;
 
-	/**
-	 * Gets the current length of the segment attached to bodyB.
-	 **/
-	float getLengthB() const;
+  /**
+   * Gets the pulley ratio.
+   **/
+  float getRatio() const;
 
-	/**
-	 * Gets the pulley ratio.
-	 **/
-	float getRatio() const;
-
-private:
-	// The Box2D DistanceJoint object.
-	b2PulleyJoint *joint;
+ private:
+  // The Box2D DistanceJoint object.
+  b2PulleyJoint *joint;
 };
 
-} // box2d
-} // physics
-} // love
+}  // namespace box2d
+}  // namespace physics
+}  // namespace love
 
-#endif // LOVE_PHYSICS_BOX2D_PULLEY_JOINT_H
+#endif  // LOVE_PHYSICS_BOX2D_PULLEY_JOINT_H

@@ -21,8 +21,8 @@
 #pragma once
 
 // LOVE
-#include "common/runtime.h"
 #include "Font.h"
+#include "common/runtime.h"
 
 namespace love
 {
@@ -33,5 +33,5 @@ Font *luax_checkfont(lua_State *L, int idx);
 void luax_checkcoloredstring(lua_State *L, int idx, std::vector<Font::ColoredString> &strings);
 extern "C" int luaopen_font(lua_State *L);
 
-} // graphics
-} // love
+}  // namespace graphics
+}  // namespace love

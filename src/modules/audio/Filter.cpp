@@ -25,97 +25,65 @@ namespace love
 namespace audio
 {
 
-Filter::Filter()
-{
-}
+Filter::Filter() {}
 
-Filter::~Filter()
-{
-}
+Filter::~Filter() {}
 
-Filter::Type Filter::getType() const
-{
-	return type;
-}
+Filter::Type Filter::getType() const { return type; }
 
-bool Filter::getConstant(const char *in, Type &out)
-{
-	return types.find(in, out);
-}
+bool Filter::getConstant(const char *in, Type &out) { return types.find(in, out); }
 
-bool Filter::getConstant(Type in, const char *&out)
-{
-	return types.find(in, out);
-}
+bool Filter::getConstant(Type in, const char *&out) { return types.find(in, out); }
 
-std::vector<std::string> Filter::getConstants(Type)
-{
-	return types.getNames();
-}
+std::vector<std::string> Filter::getConstants(Type) { return types.getNames(); }
 
 bool Filter::getConstant(const char *in, Parameter &out, Type t)
 {
-	return parameterNames[t].find(in, out);
+  return parameterNames[t].find(in, out);
 }
 
 bool Filter::getConstant(Parameter in, const char *&out, Type t)
 {
-	return parameterNames[t].find(in, out);
+  return parameterNames[t].find(in, out);
 }
 
-Filter::ParameterType Filter::getParameterType(Parameter in)
-{
-	return parameterTypes[in];
-}
+Filter::ParameterType Filter::getParameterType(Parameter in) { return parameterTypes[in]; }
 
-StringMap<Filter::Type, Filter::TYPE_MAX_ENUM>::Entry Filter::typeEntries[] =
-{
-	{"lowpass", Filter::TYPE_LOWPASS},
-	{"highpass", Filter::TYPE_HIGHPASS},
-	{"bandpass", Filter::TYPE_BANDPASS},
+StringMap<Filter::Type, Filter::TYPE_MAX_ENUM>::Entry Filter::typeEntries[] = {
+    {"lowpass", Filter::TYPE_LOWPASS},
+    {"highpass", Filter::TYPE_HIGHPASS},
+    {"bandpass", Filter::TYPE_BANDPASS},
 };
 
-StringMap<Filter::Type, Filter::TYPE_MAX_ENUM> Filter::types(Filter::typeEntries, sizeof(Filter::typeEntries));
+StringMap<Filter::Type, Filter::TYPE_MAX_ENUM> Filter::types(Filter::typeEntries,
+                                                             sizeof(Filter::typeEntries));
 
 #define StringMap LazierAndSlowerButEasilyArrayableStringMap2
-std::vector<StringMap<Filter::Parameter>::Entry> Filter::basicParameters =
-{
-	{"type", Filter::FILTER_TYPE},
-	{"volume", Filter::FILTER_VOLUME}
-};
+std::vector<StringMap<Filter::Parameter>::Entry> Filter::basicParameters = {
+    {"type", Filter::FILTER_TYPE}, {"volume", Filter::FILTER_VOLUME}};
 
-std::vector<StringMap<Filter::Parameter>::Entry> Filter::lowpassParameters =
-{
-	{"highgain", Filter::FILTER_HIGHGAIN}
-};
+std::vector<StringMap<Filter::Parameter>::Entry> Filter::lowpassParameters = {
+    {"highgain", Filter::FILTER_HIGHGAIN}};
 
-std::vector<StringMap<Filter::Parameter>::Entry> Filter::highpassParameters =
-{
-	{"lowgain", Filter::FILTER_LOWGAIN}
-};
+std::vector<StringMap<Filter::Parameter>::Entry> Filter::highpassParameters = {
+    {"lowgain", Filter::FILTER_LOWGAIN}};
 
-std::vector<StringMap<Filter::Parameter>::Entry> Filter::bandpassParameters =
-{
-	{"lowgain", Filter::FILTER_LOWGAIN},
-	{"highgain", Filter::FILTER_HIGHGAIN}
-};
+std::vector<StringMap<Filter::Parameter>::Entry> Filter::bandpassParameters = {
+    {"lowgain", Filter::FILTER_LOWGAIN}, {"highgain", Filter::FILTER_HIGHGAIN}};
 
-std::map<Filter::Type, StringMap<Filter::Parameter>> Filter::parameterNames =
-{
-	{Filter::TYPE_BASIC, Filter::basicParameters},
-	{Filter::TYPE_LOWPASS, Filter::lowpassParameters},
-	{Filter::TYPE_HIGHPASS, Filter::highpassParameters},
-	{Filter::TYPE_BANDPASS, Filter::bandpassParameters},
+std::map<Filter::Type, StringMap<Filter::Parameter>> Filter::parameterNames = {
+    {Filter::TYPE_BASIC, Filter::basicParameters},
+    {Filter::TYPE_LOWPASS, Filter::lowpassParameters},
+    {Filter::TYPE_HIGHPASS, Filter::highpassParameters},
+    {Filter::TYPE_BANDPASS, Filter::bandpassParameters},
 };
 #undef StringMap
 
-std::map<Filter::Parameter, Filter::ParameterType> Filter::parameterTypes =
-{
-	{Filter::FILTER_TYPE, Filter::PARAM_TYPE},
-	{Filter::FILTER_VOLUME, Filter::PARAM_FLOAT},
-	{Filter::FILTER_LOWGAIN, Filter::PARAM_FLOAT},
-	{Filter::FILTER_HIGHGAIN, Filter::PARAM_FLOAT}
-};
+std::map<Filter::Parameter, Filter::ParameterType> Filter::parameterTypes = {
+    {Filter::FILTER_TYPE, Filter::PARAM_TYPE},
+    {Filter::FILTER_VOLUME, Filter::PARAM_FLOAT},
+    {Filter::FILTER_LOWGAIN, Filter::PARAM_FLOAT},
+    {Filter::FILTER_HIGHGAIN, Filter::PARAM_FLOAT}};
 
-} //audio
-} //love
+}  // namespace audio
+}  // namespace love

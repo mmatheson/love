@@ -32,20 +32,18 @@ class Font;
 
 class Deprecations
 {
-public:
+ public:
+  Deprecations();
+  ~Deprecations();
 
-	Deprecations();
-	~Deprecations();
+  void draw(Graphics *gfx);
 
-	void draw(Graphics *gfx);
+ private:
+  int currentDeprecationCount;
+  double lastUpdatedTime;
+  StrongRef<Font> font;
 
-private:
+};  // Deprecations
 
-	int currentDeprecationCount;
-	double lastUpdatedTime;
-	StrongRef<Font> font;
-
-}; // Deprecations
-
-} // graphics
-} // love
+}  // namespace graphics
+}  // namespace love

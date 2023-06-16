@@ -33,19 +33,18 @@ namespace magpie
 
 class PVRHandler : public FormatHandler
 {
-public:
+ public:
+  virtual ~PVRHandler() {}
 
-	virtual ~PVRHandler() {}
+  // Implements FormatHandler.
+  bool canParseCompressed(Data *data) override;
 
-	// Implements FormatHandler.
-	bool canParseCompressed(Data *data) override;
+  StrongRef<CompressedMemory> parseCompressed(Data *filedata,
+                                              std::vector<StrongRef<CompressedSlice>> &images,
+                                              PixelFormat &format, bool &sRGB) override;
 
-	StrongRef<CompressedMemory> parseCompressed(Data *filedata,
-	        std::vector<StrongRef<CompressedSlice>> &images,
-	        PixelFormat &format, bool &sRGB) override;
+};  // PVRHandler
 
-}; // PVRHandler
-
-} // magpie
-} // image
-} // love
+}  // namespace magpie
+}  // namespace image
+}  // namespace love

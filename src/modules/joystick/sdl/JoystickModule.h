@@ -25,10 +25,10 @@
 #include "joystick/JoystickModule.h"
 
 // C++
-#include <string>
-#include <vector>
 #include <list>
 #include <map>
+#include <string>
+#include <vector>
 
 namespace love
 {
@@ -39,52 +39,51 @@ namespace sdl
 
 class JoystickModule : public love::joystick::JoystickModule
 {
-public:
+ public:
+  JoystickModule();
+  virtual ~JoystickModule();
 
-	JoystickModule();
-	virtual ~JoystickModule();
+  // Implements Module.
+  const char *getName() const override;
 
-	// Implements Module.
-	const char *getName() const override;
+  // Implements JoystickModule.
+  love::joystick::Joystick *addJoystick(int deviceindex) override;
+  void removeJoystick(love::joystick::Joystick *joystick) override;
+  love::joystick::Joystick *getJoystickFromID(int instanceid) override;
+  love::joystick::Joystick *getJoystick(int joyindex) override;
+  int getIndex(const love::joystick::Joystick *joystick) override;
+  int getJoystickCount() const override;
 
-	// Implements JoystickModule.
-	love::joystick::Joystick *addJoystick(int deviceindex) override;
-	void removeJoystick(love::joystick::Joystick *joystick) override;
-	love::joystick::Joystick *getJoystickFromID(int instanceid) override;
-	love::joystick::Joystick *getJoystick(int joyindex) override;
-	int getIndex(const love::joystick::Joystick *joystick) override;
-	int getJoystickCount() const override;
+  bool setGamepadMapping(const std::string &guid, Joystick::GamepadInput gpinput,
+                         Joystick::JoystickInput joyinput) override;
+  void loadGamepadMappings(const std::string &mappings) override;
 
-	bool setGamepadMapping(const std::string &guid, Joystick::GamepadInput gpinput, Joystick::JoystickInput joyinput) override;
-	void loadGamepadMappings(const std::string &mappings) override;
+  std::string getGamepadMappingString(const std::string &guid) const override;
+  std::string saveGamepadMappings() override;
 
-	std::string getGamepadMappingString(const std::string &guid) const override;
-	std::string saveGamepadMappings() override;
+ private:
+  std::string stringFromGamepadInput(Joystick::GamepadInput gpinput) const;
+  void removeBindFromMapString(std::string &mapstr, const std::string &joybindstr) const;
 
-private:
+  void checkGamepads(const std::string &guid) const;
 
-	std::string stringFromGamepadInput(Joystick::GamepadInput gpinput) const;
-	void removeBindFromMapString(std::string &mapstr, const std::string &joybindstr) const;
+  // SDL2's GUIDs identify *classes* of devices, instead of unique devices.
+  std::string getDeviceGUID(int deviceindex) const;
 
-	void checkGamepads(const std::string &guid) const;
+  // Lists of currently connected Joysticks.
+  std::vector<Joystick *> activeSticks;
 
-	// SDL2's GUIDs identify *classes* of devices, instead of unique devices.
-	std::string getDeviceGUID(int deviceindex) const;
+  // Persistent list of all Joysticks which have been connected at some point.
+  std::list<Joystick *> joysticks;
 
-	// Lists of currently connected Joysticks.
-	std::vector<Joystick *> activeSticks;
+  // Persistent map indicating GUIDs for Gamepads which have been connected or
+  // modified at some point.
+  std::map<std::string, bool> recentGamepadGUIDs;
 
-	// Persistent list of all Joysticks which have been connected at some point.
-	std::list<Joystick *> joysticks;
+};  // JoystickModule
 
-	// Persistent map indicating GUIDs for Gamepads which have been connected or
-	// modified at some point.
-	std::map<std::string, bool> recentGamepadGUIDs;
+}  // namespace sdl
+}  // namespace joystick
+}  // namespace love
 
-}; // JoystickModule
-
-} // sdl
-} // joystick
-} // love
-
-#endif // LOVE_JOYSTICK_SDL_JOYSTICK_MODULE_H
+#endif  // LOVE_JOYSTICK_SDL_JOYSTICK_MODULE_H

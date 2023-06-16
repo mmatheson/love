@@ -22,8 +22,8 @@
 #define LOVE_FONT_WRAP_RASTERIZER_H
 
 // LOVE
-#include "common/runtime.h"
 #include "Rasterizer.h"
+#include "common/runtime.h"
 
 namespace love
 {
@@ -33,7 +33,7 @@ namespace font
 Rasterizer *luax_checkrasterizer(lua_State *L, int idx);
 extern "C" int luaopen_rasterizer(lua_State *L);
 
-} // font
-} // love
+}  // namespace font
+}  // namespace love
 
-#endif // LOVE_FONT_WRAP_RASTERIZER_H
+#endif  // LOVE_FONT_WRAP_RASTERIZER_H

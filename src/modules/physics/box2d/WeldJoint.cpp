@@ -24,8 +24,8 @@
 
 // Module
 #include "Body.h"
-#include "World.h"
 #include "Physics.h"
+#include "World.h"
 
 namespace love
 {
@@ -36,61 +36,47 @@ namespace box2d
 
 love::Type WeldJoint::type("WeldJoint", &Joint::type);
 
-WeldJoint::WeldJoint(Body *body1, Body *body2, float xA, float yA, float xB, float yB, bool collideConnected)
-	: Joint(body1, body2)
-	, joint(NULL)
+WeldJoint::WeldJoint(Body *body1, Body *body2, float xA, float yA, float xB, float yB,
+                     bool collideConnected)
+    : Joint(body1, body2),
+      joint(NULL)
 {
-	b2WeldJointDef def;
-	init(def, body1, body2, xA, yA, xB, yB, collideConnected);
-	joint = (b2WeldJoint *)createJoint(&def);
+  b2WeldJointDef def;
+  init(def, body1, body2, xA, yA, xB, yB, collideConnected);
+  joint = (b2WeldJoint *) createJoint(&def);
 }
 
-WeldJoint::WeldJoint(Body *body1, Body *body2, float xA, float yA, float xB, float yB, bool collideConnected, float referenceAngle)
-	: Joint(body1, body2)
-	, joint(NULL)
+WeldJoint::WeldJoint(Body *body1, Body *body2, float xA, float yA, float xB, float yB,
+                     bool collideConnected, float referenceAngle)
+    : Joint(body1, body2),
+      joint(NULL)
 {
-	b2WeldJointDef def;
-	init(def, body1, body2, xA, yA, xB, yB, collideConnected);
-	def.referenceAngle = referenceAngle;
-	joint = (b2WeldJoint *)createJoint(&def);
+  b2WeldJointDef def;
+  init(def, body1, body2, xA, yA, xB, yB, collideConnected);
+  def.referenceAngle = referenceAngle;
+  joint = (b2WeldJoint *) createJoint(&def);
 }
 
-WeldJoint::~WeldJoint()
+WeldJoint::~WeldJoint() {}
+
+void WeldJoint::init(b2WeldJointDef &def, Body *body1, Body *body2, float xA, float yA, float xB,
+                     float yB, bool collideConnected)
 {
+  def.Initialize(body1->body, body2->body, Physics::scaleDown(b2Vec2(xA, yA)));
+  def.localAnchorB = body2->body->GetLocalPoint(Physics::scaleDown(b2Vec2(xB, yB)));
+  def.collideConnected = collideConnected;
 }
 
-void WeldJoint::init(b2WeldJointDef &def, Body *body1, Body *body2, float xA, float yA, float xB, float yB, bool collideConnected)
-{
-	def.Initialize(body1->body, body2->body, Physics::scaleDown(b2Vec2(xA,yA)));
-	def.localAnchorB = body2->body->GetLocalPoint(Physics::scaleDown(b2Vec2(xB, yB)));
-	def.collideConnected = collideConnected;
-}
+void WeldJoint::setFrequency(float hz) { joint->SetFrequency(hz); }
 
-void WeldJoint::setFrequency(float hz)
-{
-	joint->SetFrequency(hz);
-}
+float WeldJoint::getFrequency() const { return joint->GetFrequency(); }
 
-float WeldJoint::getFrequency() const
-{
-	return joint->GetFrequency();
-}
+void WeldJoint::setDampingRatio(float d) { joint->SetDampingRatio(d); }
 
-void WeldJoint::setDampingRatio(float d)
-{
-	joint->SetDampingRatio(d);
-}
+float WeldJoint::getDampingRatio() const { return joint->GetDampingRatio(); }
 
-float WeldJoint::getDampingRatio() const
-{
-	return joint->GetDampingRatio();
-}
+float WeldJoint::getReferenceAngle() const { return joint->GetReferenceAngle(); }
 
-float WeldJoint::getReferenceAngle() const
-{
-	return joint->GetReferenceAngle();
-}
-
-} // box2d
-} // physics
-} // love
+}  // namespace box2d
+}  // namespace physics
+}  // namespace love

@@ -22,8 +22,8 @@
 #define LOVE_THREAD_THREADS_H
 
 // LOVE
-#include "common/config.h"
 #include "Thread.h"
+#include "common/config.h"
 
 // C++
 #include <string>
@@ -35,94 +35,92 @@ namespace thread
 
 class Mutex
 {
-public:
-	virtual ~Mutex() {}
+ public:
+  virtual ~Mutex() {}
 
-	virtual void lock() = 0;
-	virtual void unlock() = 0;
+  virtual void lock() = 0;
+  virtual void unlock() = 0;
 };
 
 class Conditional
 {
-public:
-	virtual ~Conditional() {}
+ public:
+  virtual ~Conditional() {}
 
-	virtual void signal() = 0;
-	virtual void broadcast() = 0;
-	virtual bool wait(Mutex *mutex, int timeout=-1) = 0;
+  virtual void signal() = 0;
+  virtual void broadcast() = 0;
+  virtual bool wait(Mutex *mutex, int timeout = -1) = 0;
 };
 
 class Lock
 {
-public:
-	Lock(Mutex *m);
-	Lock(Mutex &m);
-	Lock(Lock &&other);
-	~Lock();
+ public:
+  Lock(Mutex *m);
+  Lock(Mutex &m);
+  Lock(Lock &&other);
+  ~Lock();
 
-private:
-	Mutex *mutex;
+ private:
+  Mutex *mutex;
 };
 
 class EmptyLock
 {
-public:
-	EmptyLock();
-	~EmptyLock();
+ public:
+  EmptyLock();
+  ~EmptyLock();
 
-	void setLock(Mutex *m);
-	void setLock(Mutex &m);
+  void setLock(Mutex *m);
+  void setLock(Mutex &m);
 
-private:
-	Mutex *mutex;
+ private:
+  Mutex *mutex;
 };
 
 class Threadable : public love::Object
 {
-public:
-	static love::Type type;
+ public:
+  static love::Type type;
 
-	Threadable();
-	virtual ~Threadable();
+  Threadable();
+  virtual ~Threadable();
 
-	virtual void threadFunction() = 0;
+  virtual void threadFunction() = 0;
 
-	bool start();
-	void wait();
-	bool isRunning() const;
-	const char *getThreadName() const;
+  bool start();
+  void wait();
+  bool isRunning() const;
+  const char *getThreadName() const;
 
-protected:
-
-	Thread *owner;
-	std::string threadName;
-
+ protected:
+  Thread *owner;
+  std::string threadName;
 };
 
 class MutexRef
 {
-public:
-	MutexRef();
-	~MutexRef();
+ public:
+  MutexRef();
+  ~MutexRef();
 
-	operator Mutex*() const;
-	Mutex *operator->() const;
+  operator Mutex *() const;
+  Mutex *operator->() const;
 
-private:
-	Mutex *mutex;
+ private:
+  Mutex *mutex;
 };
 
 class ConditionalRef
 {
-public:
-	ConditionalRef();
-	~ConditionalRef();
+ public:
+  ConditionalRef();
+  ~ConditionalRef();
 
-	operator Conditional*() const;
-	Conditional *operator->() const;
+  operator Conditional *() const;
+  Conditional *operator->() const;
 
-private:
-	Conditional *conditional;
+ private:
+  Conditional *conditional;
 };
 
 Mutex *newMutex();
@@ -135,12 +133,12 @@ void reenableSignals();
 
 struct ScopedDisableSignals
 {
-	ScopedDisableSignals() { disableSignals(); }
-	~ScopedDisableSignals() { reenableSignals(); }
+  ScopedDisableSignals() { disableSignals(); }
+  ~ScopedDisableSignals() { reenableSignals(); }
 };
 #endif
 
-} // thread
-} // love
+}  // namespace thread
+}  // namespace love
 
 #endif /* LOVE_THREAD_THREADS_H */

@@ -27,33 +27,22 @@ namespace physics
 
 love::Type Body::type("Body", &Object::type);
 
-Body::~Body()
-{
-}
+Body::~Body() {}
 
-bool Body::getConstant(const char *in, Type &out)
-{
-	return types.find(in, out);
-}
+bool Body::getConstant(const char *in, Type &out) { return types.find(in, out); }
 
-bool Body::getConstant(Type in, const char *&out)
-{
-	return types.find(in, out);
-}
+bool Body::getConstant(Type in, const char *&out) { return types.find(in, out); }
 
-std::vector<std::string> Body::getConstants(Type)
-{
-	return types.getNames();
-}
+std::vector<std::string> Body::getConstants(Type) { return types.getNames(); }
 
-StringMap<Body::Type, Body::BODY_MAX_ENUM>::Entry Body::typeEntries[] =
-{
-	{"static", Body::BODY_STATIC},
-	{"dynamic", Body::BODY_DYNAMIC},
-	{"kinematic", Body::BODY_KINEMATIC},
+StringMap<Body::Type, Body::BODY_MAX_ENUM>::Entry Body::typeEntries[] = {
+    {"static", Body::BODY_STATIC},
+    {"dynamic", Body::BODY_DYNAMIC},
+    {"kinematic", Body::BODY_KINEMATIC},
 };
 
-StringMap<Body::Type, Body::BODY_MAX_ENUM> Body::types(Body::typeEntries, sizeof(Body::typeEntries));
+StringMap<Body::Type, Body::BODY_MAX_ENUM> Body::types(Body::typeEntries,
+                                                       sizeof(Body::typeEntries));
 
-} // physics
-} // love
+}  // namespace physics
+}  // namespace love

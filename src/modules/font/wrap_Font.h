@@ -37,7 +37,7 @@ int w_newImageRasterizer(lua_State *L);
 int w_newGlyphData(lua_State *L);
 extern "C" LOVE_EXPORT int luaopen_love_font(lua_State *L);
 
-} // font
-} // love
+}  // namespace font
+}  // namespace love
 
-#endif // LOVE_FONT_WRAP_FONT_H
+#endif  // LOVE_FONT_WRAP_FONT_H

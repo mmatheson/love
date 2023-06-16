@@ -28,5 +28,5 @@ namespace graphics
 
 love::Type Drawable::type("Drawable", &Object::type);
 
-} // graphics
-} // love
+}  // namespace graphics
+}  // namespace love

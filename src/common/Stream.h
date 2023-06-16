@@ -23,6 +23,7 @@
 
 // LOVE
 #include <stddef.h>
+
 #include "Object.h"
 
 namespace love
@@ -30,37 +31,37 @@ namespace love
 
 class Stream : public Object
 {
-public:
-	static love::Type type;
+ public:
+  static love::Type type;
 
-	virtual ~Stream() {}
+  virtual ~Stream() {}
 
-	// getData and getSize are assumed to talk about
-	// the buffer
+  // getData and getSize are assumed to talk about
+  // the buffer
 
-	/**
-	 * A callback, gets called when some Stream consumer exhausts the data
-	 **/
-	virtual void fillBackBuffer() {}
+  /**
+   * A callback, gets called when some Stream consumer exhausts the data
+   **/
+  virtual void fillBackBuffer() {}
 
-	/**
-	 * Get the front buffer, Streams are supposed to be (at least) double-buffered
-	 **/
-	virtual const void *getFrontBuffer() const = 0;
+  /**
+   * Get the front buffer, Streams are supposed to be (at least) double-buffered
+   **/
+  virtual const void *getFrontBuffer() const = 0;
 
-	/**
-	 * Get the size of any (and in particular the front) buffer
-	 **/
-	virtual size_t getSize() const = 0;
+  /**
+   * Get the size of any (and in particular the front) buffer
+   **/
+  virtual size_t getSize() const = 0;
 
-	/**
-	 * Swap buffers. Returns true if there is new data in the front buffer,
-     * false otherwise.
-	 * NOTE: If there is no back buffer ready, this call must be ignored
-	 **/
-	virtual bool swapBuffers() = 0;
-}; // Stream
+  /**
+   * Swap buffers. Returns true if there is new data in the front buffer,
+   * false otherwise.
+   * NOTE: If there is no back buffer ready, this call must be ignored
+   **/
+  virtual bool swapBuffers() = 0;
+};  // Stream
 
-} // love
+}  // namespace love
 
-#endif // LOVE_STREAM_H
+#endif  // LOVE_STREAM_H

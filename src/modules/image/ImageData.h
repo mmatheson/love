@@ -21,16 +21,16 @@
 #pragma once
 
 // LOVE
+#include "FormatHandler.h"
+#include "ImageDataBase.h"
+#include "common/Color.h"
 #include "common/Data.h"
 #include "common/StringMap.h"
+#include "common/floattypes.h"
 #include "common/int.h"
 #include "common/pixelformat.h"
-#include "common/floattypes.h"
-#include "common/Color.h"
 #include "filesystem/FileData.h"
 #include "thread/threads.h"
-#include "ImageDataBase.h"
-#include "FormatHandler.h"
 
 using love::thread::Mutex;
 
@@ -44,119 +44,119 @@ namespace image
  **/
 class ImageData : public ImageDataBase
 {
-public:
+ public:
+  union Pixel
+  {
+    uint8 rgba8[4];
+    uint16 rgba16[4];
+    float16 rgba16f[4];
+    float rgba32f[4];
+    uint16 packed16;
+    uint32 packed32;
+  };
 
-	union Pixel
-	{
-		uint8   rgba8[4];
-		uint16  rgba16[4];
-		float16 rgba16f[4];
-		float   rgba32f[4];
-		uint16  packed16;
-		uint32  packed32;
-	};
+  typedef void (*PixelSetFunction)(const Colorf &c, Pixel *p);
+  typedef void (*PixelGetFunction)(const Pixel *p, Colorf &c);
 
-	typedef void (*PixelSetFunction)(const Colorf &c, Pixel *p);
-	typedef void (*PixelGetFunction)(const Pixel *p, Colorf &c);
+  static love::Type type;
 
-	static love::Type type;
+  ImageData(Data *data);
+  ImageData(int width, int height, PixelFormat format = PIXELFORMAT_RGBA8);
+  ImageData(int width, int height, PixelFormat format, void *data, bool own);
+  ImageData(const ImageData &c);
+  virtual ~ImageData();
 
-	ImageData(Data *data);
-	ImageData(int width, int height, PixelFormat format = PIXELFORMAT_RGBA8);
-	ImageData(int width, int height, PixelFormat format, void *data, bool own);
-	ImageData(const ImageData &c);
-	virtual ~ImageData();
+  /**
+   * Paste part of one ImageData onto another. The subregion defined by the top-left
+   * corner (sx, sy) and the size (sw,sh) will be pasted to (dx,dy) in this ImageData.
+   * @param dx The destination x-coordinate.
+   * @param dy The destination y-coordinate.
+   * @param sx The source x-coordinate.
+   * @param sy The source y-coordinate.
+   * @param sw The source width.
+   * @param sh The source height.
+   **/
+  void paste(ImageData *src, int dx, int dy, int sx, int sy, int sw, int sh);
 
-	/**
-	 * Paste part of one ImageData onto another. The subregion defined by the top-left
-	 * corner (sx, sy) and the size (sw,sh) will be pasted to (dx,dy) in this ImageData.
-	 * @param dx The destination x-coordinate.
-	 * @param dy The destination y-coordinate.
-	 * @param sx The source x-coordinate.
-	 * @param sy The source y-coordinate.
-	 * @param sw The source width.
-	 * @param sh The source height.
-	 **/
-	void paste(ImageData *src, int dx, int dy, int sx, int sy, int sw, int sh);
+  /**
+   * Checks whether a position is inside this ImageData. Useful for checking bounds.
+   * @param x The position along the x-axis.
+   * @param y The position along the y-axis.
+   **/
+  bool inside(int x, int y) const;
 
-	/**
-	 * Checks whether a position is inside this ImageData. Useful for checking bounds.
-	 * @param x The position along the x-axis.
-	 * @param y The position along the y-axis.
-	 **/
-	bool inside(int x, int y) const;
+  /**
+   * Sets the pixel at location (x,y).
+   * @param x The location along the x-axis.
+   * @param y The location along the y-axis.
+   * @param p The color to use for the given location.
+   **/
+  void setPixel(int x, int y, const Colorf &p);
 
-	/**
-	 * Sets the pixel at location (x,y).
-	 * @param x The location along the x-axis.
-	 * @param y The location along the y-axis.
-	 * @param p The color to use for the given location.
-	 **/
-	void setPixel(int x, int y, const Colorf &p);
+  /**
+   * Gets the pixel at location (x,y).
+   * @param x The location along the x-axis.
+   * @param y The location along the y-axis.
+   * @return The color for the given location.
+   **/
+  void getPixel(int x, int y, Colorf &c) const;
+  Colorf getPixel(int x, int y) const;
 
-	/**
-	 * Gets the pixel at location (x,y).
-	 * @param x The location along the x-axis.
-	 * @param y The location along the y-axis.
-	 * @return The color for the given location.
-	 **/
-	void getPixel(int x, int y, Colorf &c) const;
-	Colorf getPixel(int x, int y) const;
+  /**
+   * Encodes raw pixel data into a given format.
+   * @param f The file to save the encoded image data to.
+   * @param format The format of the encoded data.
+   **/
+  love::filesystem::FileData *encode(FormatHandler::EncodedFormat format, const char *filename,
+                                     bool writefile) const;
 
-	/**
-	 * Encodes raw pixel data into a given format.
-	 * @param f The file to save the encoded image data to.
-	 * @param format The format of the encoded data.
-	 **/
-	love::filesystem::FileData *encode(FormatHandler::EncodedFormat format, const char *filename, bool writefile) const;
+  love::thread::Mutex *getMutex() const;
 
-	love::thread::Mutex *getMutex() const;
+  // Implements ImageDataBase.
+  ImageData *clone() const override;
+  void *getData() const override;
+  size_t getSize() const override;
+  bool isSRGB() const override;
 
-	// Implements ImageDataBase.
-	ImageData *clone() const override;
-	void *getData() const override;
-	size_t getSize() const override;
-	bool isSRGB() const override;
+  size_t getPixelSize() const;
 
-	size_t getPixelSize() const;
+  PixelSetFunction getPixelSetFunction() const { return pixelSetFunction; }
+  PixelGetFunction getPixelGetFunction() const { return pixelGetFunction; }
 
-	PixelSetFunction getPixelSetFunction() const { return pixelSetFunction; }
-	PixelGetFunction getPixelGetFunction() const { return pixelGetFunction; }
+  static bool validPixelFormat(PixelFormat format);
+  static bool canPaste(PixelFormat src, PixelFormat dst);
 
-	static bool validPixelFormat(PixelFormat format);
-	static bool canPaste(PixelFormat src, PixelFormat dst);
+  static PixelSetFunction getPixelSetFunction(PixelFormat format);
+  static PixelGetFunction getPixelGetFunction(PixelFormat format);
 
-	static PixelSetFunction getPixelSetFunction(PixelFormat format);
-	static PixelGetFunction getPixelGetFunction(PixelFormat format);
+  static bool getConstant(const char *in, FormatHandler::EncodedFormat &out);
+  static bool getConstant(FormatHandler::EncodedFormat in, const char *&out);
+  static std::vector<std::string> getConstants(FormatHandler::EncodedFormat);
 
-	static bool getConstant(const char *in, FormatHandler::EncodedFormat &out);
-	static bool getConstant(FormatHandler::EncodedFormat in, const char *&out);
-	static std::vector<std::string> getConstants(FormatHandler::EncodedFormat);
+ private:
+  // Create imagedata. Initialize with data if not null.
+  void create(int width, int height, PixelFormat format, void *data = nullptr);
 
-private:
+  // Decode and load an encoded format.
+  void decode(Data *data);
 
-	// Create imagedata. Initialize with data if not null.
-	void create(int width, int height, PixelFormat format, void *data = nullptr);
+  // The actual data.
+  unsigned char *data = nullptr;
 
-	// Decode and load an encoded format.
-	void decode(Data *data);
+  love::thread::MutexRef mutex;
 
-	// The actual data.
-	unsigned char *data = nullptr;
+  // The format handler that was used to decode the ImageData. We need to know
+  // this so we can properly delete memory allocated by the decoder.
+  StrongRef<FormatHandler> decodeHandler;
 
-	love::thread::MutexRef mutex;
+  PixelSetFunction pixelSetFunction;
+  PixelGetFunction pixelGetFunction;
 
-	// The format handler that was used to decode the ImageData. We need to know
-	// this so we can properly delete memory allocated by the decoder.
-	StrongRef<FormatHandler> decodeHandler;
+  static StringMap<FormatHandler::EncodedFormat, FormatHandler::ENCODED_MAX_ENUM>::Entry
+      encodedFormatEntries[];
+  static StringMap<FormatHandler::EncodedFormat, FormatHandler::ENCODED_MAX_ENUM> encodedFormats;
 
-	PixelSetFunction pixelSetFunction;
-	PixelGetFunction pixelGetFunction;
+};  // ImageData
 
-	static StringMap<FormatHandler::EncodedFormat, FormatHandler::ENCODED_MAX_ENUM>::Entry encodedFormatEntries[];
-	static StringMap<FormatHandler::EncodedFormat, FormatHandler::ENCODED_MAX_ENUM> encodedFormats;
-
-}; // ImageData
-
-} // image
-} // love
+}  // namespace image
+}  // namespace love

@@ -21,9 +21,9 @@
 #pragma once
 
 // LOVE
+#include "Resource.h"
 #include "common/int.h"
 #include "vertex.h"
-#include "Resource.h"
 
 // C
 #include <cstddef>
@@ -35,42 +35,41 @@ namespace graphics
 
 class StreamBuffer : public Resource
 {
-public:
+ public:
+  struct MapInfo
+  {
+    uint8 *data = nullptr;
+    size_t size = 0;
 
-	struct MapInfo
-	{
-		uint8 *data = nullptr;
-		size_t size = 0;
+    MapInfo() {}
 
-		MapInfo() {}
+    MapInfo(uint8 *data, size_t size)
+        : data(data),
+          size(size)
+    {
+    }
+  };
 
-		MapInfo(uint8 *data, size_t size)
-			: data(data)
-			, size(size)
-		{}
-	};
+  virtual ~StreamBuffer() {}
 
-	virtual ~StreamBuffer() {}
+  size_t getSize() const { return bufferSize; }
+  BufferType getMode() const { return mode; }
+  size_t getUsableSize() const { return bufferSize - frameGPUReadOffset; }
 
-	size_t getSize() const { return bufferSize; }
-	BufferType getMode() const { return mode; }
-	size_t getUsableSize() const { return bufferSize - frameGPUReadOffset; }
+  virtual MapInfo map(size_t minsize) = 0;
+  virtual size_t unmap(size_t usedsize) = 0;
+  virtual void markUsed(size_t usedsize) = 0;
 
-	virtual MapInfo map(size_t minsize) = 0;
-	virtual size_t unmap(size_t usedsize) = 0;
-	virtual void markUsed(size_t usedsize) = 0;
+  virtual void nextFrame() {}
 
-	virtual void nextFrame() {}
+ protected:
+  StreamBuffer(BufferType mode, size_t size);
 
-protected:
+  size_t bufferSize;
+  size_t frameGPUReadOffset;
+  BufferType mode;
 
-	StreamBuffer(BufferType mode, size_t size);
+};  // StreamBuffer
 
-	size_t bufferSize;
-	size_t frameGPUReadOffset;
-	BufferType mode;
-
-}; // StreamBuffer
-
-} // graphics
-} // love
+}  // namespace graphics
+}  // namespace love

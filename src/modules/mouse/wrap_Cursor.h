@@ -22,8 +22,8 @@
 #define LOVE_MOUSE_WRAP_CURSOR_H
 
 // LOVE
-#include "common/runtime.h"
 #include "Cursor.h"
+#include "common/runtime.h"
 
 namespace love
 {
@@ -33,8 +33,7 @@ namespace mouse
 Cursor *luax_checkcursor(lua_State *L, int idx);
 extern "C" int luaopen_cursor(lua_State *L);
 
-} // mouse
-} // love
+}  // namespace mouse
+}  // namespace love
 
-
-#endif // LOVE_MOUSE_WRAP_CURSOR_H
+#endif  // LOVE_MOUSE_WRAP_CURSOR_H

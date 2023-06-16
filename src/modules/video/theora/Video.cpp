@@ -35,94 +35,85 @@ namespace theora
 
 Video::Video()
 {
-	workerThread = new Worker();
-	workerThread->start();
+  workerThread = new Worker();
+  workerThread->start();
 }
 
-Video::~Video()
-{
-	delete workerThread;
-}
+Video::~Video() { delete workerThread; }
 
 VideoStream *Video::newVideoStream(love::filesystem::File *file)
 {
-	TheoraVideoStream *stream = new TheoraVideoStream(file);
-	workerThread->addStream(stream);
-	return stream;
+  TheoraVideoStream *stream = new TheoraVideoStream(file);
+  workerThread->addStream(stream);
+  return stream;
 }
 
-const char *Video::getName() const
-{
-	return "love.video.theora";
-}
+const char *Video::getName() const { return "love.video.theora"; }
 
 Worker::Worker()
-	: stopping(false)
+    : stopping(false)
 {
-	threadName = "VideoWorker";
+  threadName = "VideoWorker";
 }
 
-Worker::~Worker()
-{
-	stop();
-}
+Worker::~Worker() { stop(); }
 
 void Worker::addStream(TheoraVideoStream *stream)
 {
-	love::thread::Lock l(mutex);
-	streams.push_back(stream);
-	cond->broadcast();
+  love::thread::Lock l(mutex);
+  streams.push_back(stream);
+  cond->broadcast();
 }
 
 void Worker::stop()
 {
-	{
-		love::thread::Lock l(mutex);
-		stopping = true;
-		cond->broadcast();
-	}
+  {
+    love::thread::Lock l(mutex);
+    stopping = true;
+    cond->broadcast();
+  }
 
-	owner->wait();
+  owner->wait();
 }
 
 void Worker::threadFunction()
 {
-	double lastFrame = love::timer::Timer::getTime();
+  double lastFrame = love::timer::Timer::getTime();
 
-	while (true)
-	{
-		love::sleep(2);
+  while (true)
+  {
+    love::sleep(2);
 
-		love::thread::Lock l(mutex);
+    love::thread::Lock l(mutex);
 
-		while (!stopping && streams.empty())
-		{
-			cond->wait(mutex);
-			lastFrame = love::timer::Timer::getTime();
-		}
+    while (!stopping && streams.empty())
+    {
+      cond->wait(mutex);
+      lastFrame = love::timer::Timer::getTime();
+    }
 
-		if (stopping)
-			return;
+    if (stopping)
+      return;
 
-		double curFrame = love::timer::Timer::getTime();
-		double dt = curFrame-lastFrame;
-		lastFrame = curFrame;
+    double curFrame = love::timer::Timer::getTime();
+    double dt = curFrame - lastFrame;
+    lastFrame = curFrame;
 
-		for (auto it = streams.begin(); it != streams.end(); ++it)
-		{
-			TheoraVideoStream *stream = *it;
-			if (stream->getReferenceCount() == 1)
-			{
-				// We're the only ones left
-				streams.erase(it);
-				break;
-			}
+    for (auto it = streams.begin(); it != streams.end(); ++it)
+    {
+      TheoraVideoStream *stream = *it;
+      if (stream->getReferenceCount() == 1)
+      {
+	// We're the only ones left
+	streams.erase(it);
+	break;
+      }
 
-			stream->threadedFillBackBuffer(dt);
-		}
-	}
+      stream->threadedFillBackBuffer(dt);
+    }
+  }
 }
 
-} // theora
-} // video
-} // love
+}  // namespace theora
+}  // namespace video
+}  // namespace love

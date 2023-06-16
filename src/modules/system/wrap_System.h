@@ -32,7 +32,7 @@ namespace system
 
 extern "C" LOVE_EXPORT int luaopen_love_system(lua_State *L);
 
-} // system
-} // love
+}  // namespace system
+}  // namespace love
 
-#endif // LOVE_WRAP_SYSTEM_H
+#endif  // LOVE_WRAP_SYSTEM_H

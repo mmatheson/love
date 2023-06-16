@@ -33,7 +33,7 @@ namespace math
 BezierCurve *luax_checkbeziercurve(lua_State *L, int idx);
 extern "C" int luaopen_beziercurve(lua_State *L);
 
-} // math
-} // love
+}  // namespace math
+}  // namespace love
 
-#endif // LOVE_MATH_WRAP_RANDOM_GENERATOR_H
+#endif  // LOVE_MATH_WRAP_RANDOM_GENERATOR_H

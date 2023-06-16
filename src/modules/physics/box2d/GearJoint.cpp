@@ -34,60 +34,52 @@ namespace box2d
 love::Type GearJoint::type("GearJoint", &Joint::type);
 
 GearJoint::GearJoint(Joint *joint1, Joint *joint2, float ratio, bool collideConnected)
-	: Joint(joint1->body2, joint2->body2)
-	, joint(NULL)
+    : Joint(joint1->body2, joint2->body2),
+      joint(NULL)
 {
-	b2GearJointDef def;
-	def.joint1 = joint1->joint;
-	def.joint2 = joint2->joint;
-	def.bodyA = joint1->body2->body;
-	def.bodyB = joint2->body2->body;
-	def.ratio = ratio;
-	def.collideConnected = collideConnected;
+  b2GearJointDef def;
+  def.joint1 = joint1->joint;
+  def.joint2 = joint2->joint;
+  def.bodyA = joint1->body2->body;
+  def.bodyB = joint2->body2->body;
+  def.ratio = ratio;
+  def.collideConnected = collideConnected;
 
-	joint = (b2GearJoint *)createJoint(&def);
+  joint = (b2GearJoint *) createJoint(&def);
 }
 
-GearJoint::~GearJoint()
-{
-}
+GearJoint::~GearJoint() {}
 
-void GearJoint::setRatio(float ratio)
-{
-	joint->SetRatio(ratio);
-}
+void GearJoint::setRatio(float ratio) { joint->SetRatio(ratio); }
 
-float GearJoint::getRatio() const
-{
-	return joint->GetRatio();
-}
+float GearJoint::getRatio() const { return joint->GetRatio(); }
 
 Joint *GearJoint::getJointA() const
 {
-	b2Joint *b2joint = joint->GetJoint1();
-	if (b2joint == nullptr)
-		return nullptr;
+  b2Joint *b2joint = joint->GetJoint1();
+  if (b2joint == nullptr)
+    return nullptr;
 
-	Joint *j = (Joint *) world->findObject(b2joint);
-	if (j == nullptr)
-		throw love::Exception("A joint has escaped Memoizer!");
+  Joint *j = (Joint *) world->findObject(b2joint);
+  if (j == nullptr)
+    throw love::Exception("A joint has escaped Memoizer!");
 
-	return j;
+  return j;
 }
 
 Joint *GearJoint::getJointB() const
 {
-	b2Joint *b2joint = joint->GetJoint2();
-	if (b2joint == nullptr)
-		return nullptr;
+  b2Joint *b2joint = joint->GetJoint2();
+  if (b2joint == nullptr)
+    return nullptr;
 
-	Joint *j = (Joint *) world->findObject(b2joint);
-	if (j == nullptr)
-		throw love::Exception("A joint has escaped Memoizer!");
+  Joint *j = (Joint *) world->findObject(b2joint);
+  if (j == nullptr)
+    throw love::Exception("A joint has escaped Memoizer!");
 
-	return j;
+  return j;
 }
 
-} // box2d
-} // physics
-} // love
+}  // namespace box2d
+}  // namespace physics
+}  // namespace love

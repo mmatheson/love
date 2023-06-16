@@ -20,9 +20,9 @@
 
 #pragma once
 
-#include "common/runtime.h"
-#include "common/config.h"
 #include "Shader.h"
+#include "common/config.h"
+#include "common/runtime.h"
 
 namespace love
 {
@@ -32,5 +32,5 @@ namespace graphics
 Shader *luax_checkshader(lua_State *L, int idx);
 extern "C" int luaopen_shader(lua_State *L);
 
-} // graphics
-} // love
+}  // namespace graphics
+}  // namespace love

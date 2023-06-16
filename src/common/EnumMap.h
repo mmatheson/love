@@ -26,75 +26,76 @@
 namespace love
 {
 
-template<typename T, typename U, unsigned int PEAK>
+template <typename T, typename U, unsigned int PEAK>
 class EnumMap
 {
-public:
+ public:
+  struct Entry
+  {
+    T t;
+    U u;
+  };
 
-	struct Entry
-	{
-		T t;
-		U u;
-	};
+  EnumMap(const Entry *entries, unsigned int size)
+  {
+    unsigned int n = size / sizeof(Entry);
 
-	EnumMap(const Entry *entries, unsigned int size)
-	{
-		unsigned int n = size / sizeof(Entry);
+    for (unsigned int i = 0; i < n; ++i)
+    {
+      unsigned int e_t = (unsigned int) entries[i].t;
+      unsigned int e_u = (unsigned int) entries[i].u;
 
-		for (unsigned int i = 0; i < n; ++i)
-		{
-			unsigned int e_t = (unsigned int) entries[i].t;
-			unsigned int e_u = (unsigned int) entries[i].u;
+      if (e_t < PEAK)
+      {
+	values_u[e_t].v = e_u;
+	values_u[e_t].set = true;
+      }
+      if (e_u < PEAK)
+      {
+	values_t[e_u].v = e_t;
+	values_t[e_u].set = true;
+      }
+    }
+  }
 
-			if (e_t < PEAK)
-			{
-				values_u[e_t].v = e_u;
-				values_u[e_t].set = true;
-			}
-			if (e_u < PEAK)
-			{
-				values_t[e_u].v = e_t;
-				values_t[e_u].set = true;
-			}
-		}
-	}
+  bool find(T t, U &u)
+  {
+    if ((unsigned int) t < PEAK && values_u[(unsigned int) t].set)
+    {
+      u = (U) values_u[(unsigned int) t].v;
+      return true;
+    }
 
-	bool find(T t, U &u)
-	{
-		if ((unsigned int) t < PEAK && values_u[(unsigned int) t].set)
-		{
-			u = (U) values_u[(unsigned int) t].v;
-			return true;
-		}
+    return false;
+  }
 
-		return false;
-	}
+  bool find(U u, T &t)
+  {
+    if ((unsigned int) u < PEAK && values_t[(unsigned int) u].set)
+    {
+      t = (T) values_t[(unsigned int) u].v;
+      return true;
+    }
 
-	bool find(U u, T &t)
-	{
-		if ((unsigned int) u < PEAK && values_t[(unsigned int) u].set)
-		{
-			t = (T) values_t[(unsigned int) u].v;
-			return true;
-		}
+    return false;
+  }
 
-		return false;
-	}
+ private:
+  struct Value
+  {
+    unsigned v;
+    bool set;
+    Value()
+        : set(false)
+    {
+    }
+  };
 
-private:
+  Value values_t[PEAK];
+  Value values_u[PEAK];
 
-	struct Value
-	{
-		unsigned v;
-		bool set;
-		Value() : set(false) {}
-	};
+};  // EnumMap
 
-	Value values_t[PEAK];
-	Value values_u[PEAK];
+}  // namespace love
 
-}; // EnumMap
-
-} // love
-
-#endif // LOVE_ENUM_MAP_H
+#endif  // LOVE_ENUM_MAP_H

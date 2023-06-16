@@ -7,10 +7,11 @@
 #include "lua.h"
 
 /* timeout control structure */
-typedef struct t_timeout_ {
-    double block;          /* maximum time for blocking calls */
-    double total;          /* total number of miliseconds for operation */
-    double start;          /* time of start of operation */
+typedef struct t_timeout_
+{
+  double block; /* maximum time for blocking calls */
+  double total; /* total number of miliseconds for operation */
+  double start; /* time of start of operation */
 } t_timeout;
 typedef t_timeout *p_timeout;
 
@@ -24,6 +25,6 @@ double timeout_gettime(void);
 int timeout_meth_settimeout(lua_State *L, p_timeout tm);
 int timeout_meth_gettimeout(lua_State *L, p_timeout tm);
 
-#define timeout_iszero(tm)   ((tm)->block == 0.0)
+#define timeout_iszero(tm) ((tm)->block == 0.0)
 
 #endif /* TIMEOUT_H */

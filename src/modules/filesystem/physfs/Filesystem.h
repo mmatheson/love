@@ -38,101 +38,100 @@ namespace physfs
 
 class Filesystem final : public love::filesystem::Filesystem
 {
-public:
+ public:
+  Filesystem();
+  virtual ~Filesystem();
 
-	Filesystem();
-	virtual ~Filesystem();
+  // Implements Module.
+  const char *getName() const override;
 
-	// Implements Module.
-	const char *getName() const override;
+  void init(const char *arg0) override;
 
-	void init(const char *arg0) override;
+  void setFused(bool fused) override;
+  bool isFused() const override;
 
-	void setFused(bool fused) override;
-	bool isFused() const override;
+  bool setupWriteDirectory() override;
 
-	bool setupWriteDirectory() override;
+  bool setIdentity(const char *ident, bool appendToPath = false) override;
+  const char *getIdentity() const override;
 
-	bool setIdentity(const char *ident, bool appendToPath = false) override;
-	const char *getIdentity() const override;
+  bool setSource(const char *source) override;
 
-	bool setSource(const char *source) override;
+  const char *getSource() const override;
 
-	const char *getSource() const override;
+  bool mount(const char *archive, const char *mountpoint, bool appendToPath = false) override;
+  bool mount(Data *data, const char *archivename, const char *mountpoint,
+             bool appendToPath = false) override;
 
-	bool mount(const char *archive, const char *mountpoint, bool appendToPath = false) override;
-	bool mount(Data *data, const char *archivename, const char *mountpoint, bool appendToPath = false) override;
+  bool unmount(const char *archive) override;
+  bool unmount(Data *data) override;
 
-	bool unmount(const char *archive) override;
-	bool unmount(Data *data) override;
+  love::filesystem::File *newFile(const char *filename) const override;
 
-	love::filesystem::File *newFile(const char *filename) const override;
+  const char *getWorkingDirectory() override;
+  std::string getUserDirectory() override;
+  std::string getAppdataDirectory() override;
+  const char *getSaveDirectory() override;
+  std::string getSourceBaseDirectory() const override;
 
-	const char *getWorkingDirectory() override;
-	std::string getUserDirectory() override;
-	std::string getAppdataDirectory() override;
-	const char *getSaveDirectory() override;
-	std::string getSourceBaseDirectory() const override;
+  std::string getRealDirectory(const char *filename) const override;
 
-	std::string getRealDirectory(const char *filename) const override;
+  bool getInfo(const char *filepath, Info &info) const override;
 
-	bool getInfo(const char *filepath, Info &info) const override;
+  bool createDirectory(const char *dir) override;
 
-	bool createDirectory(const char *dir) override;
+  bool remove(const char *file) override;
 
-	bool remove(const char *file) override;
+  FileData *read(const char *filename, int64 size = File::ALL) const override;
+  void write(const char *filename, const void *data, int64 size) const override;
+  void append(const char *filename, const void *data, int64 size) const override;
 
-	FileData *read(const char *filename, int64 size = File::ALL) const override;
-	void write(const char *filename, const void *data, int64 size) const override;
-	void append(const char *filename, const void *data, int64 size) const override;
+  void getDirectoryItems(const char *dir, std::vector<std::string> &items) override;
 
-	void getDirectoryItems(const char *dir, std::vector<std::string> &items) override;
+  void setSymlinksEnabled(bool enable) override;
+  bool areSymlinksEnabled() const override;
 
-	void setSymlinksEnabled(bool enable) override;
-	bool areSymlinksEnabled() const override;
+  std::vector<std::string> &getRequirePath() override;
+  std::vector<std::string> &getCRequirePath() override;
 
-	std::vector<std::string> &getRequirePath() override;
-	std::vector<std::string> &getCRequirePath() override;
+  void allowMountingForPath(const std::string &path) override;
 
-	void allowMountingForPath(const std::string &path) override;
+ private:
+  // Contains the current working directory (UTF8).
+  std::string cwd;
 
-private:
+  // %APPDATA% on Windows.
+  std::string appdata;
 
-	// Contains the current working directory (UTF8).
-	std::string cwd;
+  // This name will be used to create the folder
+  // in the appdata/userdata folder.
+  std::string save_identity;
 
-	// %APPDATA% on Windows.
-	std::string appdata;
+  // Full and relative paths of the game save folder.
+  // (Relative to the %APPDATA% folder, meaning that the
+  // relative string will look something like: ./LOVE/game)
+  std::string save_path_relative, save_path_full;
 
-	// This name will be used to create the folder
-	// in the appdata/userdata folder.
-	std::string save_identity;
+  // The full path to the source of the game.
+  std::string game_source;
 
-	// Full and relative paths of the game save folder.
-	// (Relative to the %APPDATA% folder, meaning that the
-	// relative string will look something like: ./LOVE/game)
-	std::string save_path_relative, save_path_full;
+  // Allow saving outside of the LOVE_APPDATA_FOLDER
+  // for release 'builds'
+  bool fused;
+  bool fusedSet;
 
-	// The full path to the source of the game.
-	std::string game_source;
+  // Search path for require
+  std::vector<std::string> requirePath;
+  std::vector<std::string> cRequirePath;
 
-	// Allow saving outside of the LOVE_APPDATA_FOLDER
-	// for release 'builds'
-	bool fused;
-	bool fusedSet;
+  std::vector<std::string> allowedMountPaths;
 
-	// Search path for require
-	std::vector<std::string> requirePath;
-	std::vector<std::string> cRequirePath;
+  std::map<std::string, StrongRef<Data>> mountedData;
 
-	std::vector<std::string> allowedMountPaths;
+};  // Filesystem
 
-	std::map<std::string, StrongRef<Data>> mountedData;
+}  // namespace physfs
+}  // namespace filesystem
+}  // namespace love
 
-}; // Filesystem
-
-} // physfs
-} // filesystem
-} // love
-
-#endif // LOVE_FILESYSTEM_PHYSFS_FILESYSTEM_H
+#endif  // LOVE_FILESYSTEM_PHYSFS_FILESYSTEM_H

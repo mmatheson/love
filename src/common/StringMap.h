@@ -21,10 +21,10 @@
 #ifndef LOVE_STRING_MAP_H
 #define LOVE_STRING_MAP_H
 
-#include "Exception.h"
-
 #include <string>
 #include <vector>
+
+#include "Exception.h"
 
 // As StringMap instantiates std::vector<std::string> for instances that use
 // getNames(), we end up with multiple copies in the object files. This
@@ -34,154 +34,151 @@ extern template class std::vector<std::string>;
 namespace love
 {
 
-template<typename T, unsigned int SIZE>
+template <typename T, unsigned int SIZE>
 class StringMap
 {
-public:
+ public:
+  struct Entry
+  {
+    const char *key;
+    T value;
+  };
 
-	struct Entry
-	{
-		const char *key;
-		T value;
-	};
+  StringMap(const Entry *entries, unsigned int num)
+  {
+    for (unsigned int i = 0; i < SIZE; ++i) reverse[i] = nullptr;
 
-	StringMap(const Entry *entries, unsigned int num)
-	{
+    unsigned int n = num / sizeof(Entry);
 
-		for (unsigned int i = 0; i < SIZE; ++i)
-			reverse[i] = nullptr;
+    for (unsigned int i = 0; i < n; ++i) add(entries[i].key, entries[i].value);
+  }
 
-		unsigned int n = num / sizeof(Entry);
+  bool streq(const char *a, const char *b)
+  {
+    while (*a != 0 && *b != 0)
+    {
+      if (*a != *b)
+	return false;
 
-		for (unsigned int i = 0; i < n; ++i)
-			add(entries[i].key, entries[i].value);
-	}
+      ++a;
+      ++b;
+    }
 
-	bool streq(const char *a, const char *b)
-	{
-		while (*a != 0 && *b != 0)
-		{
-			if (*a != *b)
-				return false;
+    return (*a == 0 && *b == 0);
+  }
 
-			++a;
-			++b;
-		}
+  bool find(const char *key, T &t)
+  {
+    unsigned int str_hash = djb2(key);
 
-		return (*a == 0 && *b == 0);
-	}
+    for (unsigned int i = 0; i < MAX; ++i)
+    {
+      unsigned int str_i = (str_hash + i) % MAX;
 
-	bool find(const char *key, T &t)
-	{
-		unsigned int str_hash = djb2(key);
+      if (!records[str_i].set)
+	return false;
 
-		for (unsigned int i = 0; i < MAX; ++i)
-		{
-			unsigned int str_i = (str_hash + i) % MAX;
+      if (streq(records[str_i].key, key))
+      {
+	t = records[str_i].value;
+	return true;
+      }
+    }
 
-			if (!records[str_i].set)
-				return false;
+    return false;
+  }
 
-			if (streq(records[str_i].key, key))
-			{
-				t = records[str_i].value;
-				return true;
-			}
-		}
+  bool find(T key, const char *&str)
+  {
+    unsigned int index = (unsigned int) key;
 
-		return false;
-	}
+    if (index >= SIZE)
+      return false;
 
-	bool find(T key, const char *&str)
-	{
-		unsigned int index = (unsigned int) key;
+    if (reverse[index] != nullptr)
+    {
+      str = reverse[index];
+      return true;
+    }
+    else
+    {
+      return false;
+    }
+  }
 
-		if (index >= SIZE)
-			return false;
+  bool add(const char *key, T value)
+  {
+    unsigned int str_hash = djb2(key);
+    bool inserted = false;
 
-		if (reverse[index] != nullptr)
-		{
-			str = reverse[index];
-			return true;
-		}
-		else
-		{
-			return false;
-		}
-	}
+    for (unsigned int i = 0; i < MAX; ++i)
+    {
+      unsigned int str_i = (str_hash + i) % MAX;
 
-	bool add(const char *key, T value)
-	{
-		unsigned int str_hash = djb2(key);
-		bool inserted = false;
+      if (!records[str_i].set)
+      {
+	inserted = true;
+	records[str_i].set = true;
+	records[str_i].key = key;
+	records[str_i].value = value;
+	break;
+      }
+    }
 
-		for (unsigned int i = 0; i < MAX; ++i)
-		{
-			unsigned int str_i = (str_hash + i) % MAX;
+    unsigned int index = (unsigned int) value;
 
-			if (!records[str_i].set)
-			{
-				inserted = true;
-				records[str_i].set = true;
-				records[str_i].key = key;
-				records[str_i].value = value;
-				break;
-			}
-		}
+    if (index >= SIZE)
+    {
+      printf("Constant %s out of bounds with %u!\n", key, index);
+      return false;
+    }
 
-		unsigned int index = (unsigned int) value;
+    reverse[index] = key;
 
-		if (index >= SIZE)
-		{
-			printf("Constant %s out of bounds with %u!\n", key, index);
-			return false;
-		}
+    return inserted;
+  }
 
-		reverse[index] = key;
+  unsigned int djb2(const char *key)
+  {
+    unsigned int hash = 5381;
+    int c;
 
-		return inserted;
-	}
+    while ((c = *key++)) hash = ((hash << 5) + hash) + c;
 
-	unsigned int djb2(const char *key)
-	{
-		unsigned int hash = 5381;
-		int c;
+    return hash;
+  }
 
-		while ((c = *key++))
-			hash = ((hash << 5) + hash) + c;
+  std::vector<std::string> getNames() const
+  {
+    std::vector<std::string> names;
+    names.reserve(SIZE);
 
-		return hash;
-	}
+    for (unsigned int i = 0; i < SIZE; ++i)
+      if (reverse[i] != nullptr)
+	names.emplace_back(reverse[i]);
 
-	std::vector<std::string> getNames() const
-	{
-		std::vector<std::string> names;
-		names.reserve(SIZE);
+    return names;
+  }
 
-		for (unsigned int i = 0; i < SIZE; ++i)
-			if (reverse[i] != nullptr)
-				names.emplace_back(reverse[i]);
+ private:
+  struct Record
+  {
+    const char *key;
+    T value;
+    bool set;
+    Record()
+        : set(false)
+    {
+    }
+  };
 
-		return names;
-	}
+  static const unsigned int MAX = SIZE * 2;
 
-private:
+  Record records[MAX];
+  const char *reverse[SIZE];
 
-	struct Record
-	{
-		const char *key;
-		T value;
-		bool set;
-		Record() : set(false) {}
-	};
+};  // StringMap
 
-	static const unsigned int MAX = SIZE * 2;
+}  // namespace love
 
-	Record records[MAX];
-	const char *reverse[SIZE];
-
-}; // StringMap
-
-} // love
-
-#endif // LOVE_STRING_MAP_H
+#endif  // LOVE_STRING_MAP_H

@@ -22,10 +22,9 @@
 #define LOVE_AUDIO_NULL_AUDIO_H
 
 // LOVE
-#include "audio/Audio.h"
-
 #include "RecordingDevice.h"
 #include "Source.h"
+#include "audio/Audio.h"
 
 namespace love
 {
@@ -36,68 +35,67 @@ namespace null
 
 class Audio : public love::audio::Audio
 {
-public:
+ public:
+  Audio();
+  virtual ~Audio();
 
-	Audio();
-	virtual ~Audio();
+  // Implements Module.
+  const char *getName() const;
 
-	// Implements Module.
-	const char *getName() const;
+  // Implements Audio.
+  love::audio::Source *newSource(love::sound::Decoder *decoder);
+  love::audio::Source *newSource(love::sound::SoundData *soundData);
+  love::audio::Source *newSource(int sampleRate, int bitDepth, int channels, int buffers);
+  int getActiveSourceCount() const;
+  int getMaxSources() const;
+  bool play(love::audio::Source *source);
+  bool play(const std::vector<love::audio::Source *> &sources);
+  void stop(love::audio::Source *source);
+  void stop(const std::vector<love::audio::Source *> &sources);
+  void stop();
+  void pause(love::audio::Source *source);
+  void pause(const std::vector<love::audio::Source *> &sources);
+  std::vector<love::audio::Source *> pause();
+  void setVolume(float volume);
+  float getVolume() const;
 
-	// Implements Audio.
-	love::audio::Source *newSource(love::sound::Decoder *decoder);
-	love::audio::Source *newSource(love::sound::SoundData *soundData);
-	love::audio::Source *newSource(int sampleRate, int bitDepth, int channels, int buffers);
-	int getActiveSourceCount() const;
-	int getMaxSources() const;
-	bool play(love::audio::Source *source);
-	bool play(const std::vector<love::audio::Source*> &sources);
-	void stop(love::audio::Source *source);
-	void stop(const std::vector<love::audio::Source*> &sources);
-	void stop();
-	void pause(love::audio::Source *source);
-	void pause(const std::vector<love::audio::Source*> &sources);
-	std::vector<love::audio::Source*> pause();
-	void setVolume(float volume);
-	float getVolume() const;
+  void getPosition(float *v) const;
+  void setPosition(float *v);
+  void getOrientation(float *v) const;
+  void setOrientation(float *v);
+  void getVelocity(float *v) const;
+  void setVelocity(float *v);
 
-	void getPosition(float *v) const;
-	void setPosition(float *v);
-	void getOrientation(float *v) const;
-	void setOrientation(float *v);
-	void getVelocity(float *v) const;
-	void setVelocity(float *v);
+  void setDopplerScale(float scale);
+  float getDopplerScale() const;
+  // void setMeter(float scale);
+  // float getMeter() const;
 
-	void setDopplerScale(float scale);
-	float getDopplerScale() const;
-	//void setMeter(float scale);
-	//float getMeter() const;
+  const std::vector<love::audio::RecordingDevice *> &getRecordingDevices();
 
-	const std::vector<love::audio::RecordingDevice*> &getRecordingDevices();
+  DistanceModel getDistanceModel() const;
+  void setDistanceModel(DistanceModel distanceModel);
 
-	DistanceModel getDistanceModel() const;
-	void setDistanceModel(DistanceModel distanceModel);
+  bool setEffect(const char *, std::map<Effect::Parameter, float> &params);
+  bool unsetEffect(const char *);
+  bool getEffect(const char *, std::map<Effect::Parameter, float> &params);
+  bool getActiveEffects(std::vector<std::string> &list) const;
+  int getMaxSceneEffects() const;
+  int getMaxSourceEffects() const;
+  bool isEFXsupported() const;
 
-	bool setEffect(const char *, std::map<Effect::Parameter, float> &params);
-	bool unsetEffect(const char *);
-	bool getEffect(const char *, std::map<Effect::Parameter, float> &params);
-	bool getActiveEffects(std::vector<std::string> &list) const;
-	int getMaxSceneEffects() const;
-	int getMaxSourceEffects() const;
-	bool isEFXsupported() const;
+  void pauseContext();
+  void resumeContext();
 
-	void pauseContext();
-	void resumeContext();
+ private:
+  float volume;
+  DistanceModel distanceModel;
+  std::vector<love::audio::RecordingDevice *> capture;
 
-private:
-	float volume;
-	DistanceModel distanceModel;
-	std::vector<love::audio::RecordingDevice*> capture;
+};  // Audio
 
-}; // Audio
+}  // namespace null
+}  // namespace audio
+}  // namespace love
 
-} // null
-} // audio
-} // love
-
-#endif // LOVE_AUDIO_NULL_AUDIO_H
+#endif  // LOVE_AUDIO_NULL_AUDIO_H

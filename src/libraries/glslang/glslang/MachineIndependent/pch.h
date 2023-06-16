@@ -33,17 +33,17 @@
 // ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 //
-#include <sstream>
-#include <cstdlib>
-#include <cstring>
 #include <cctype>
 #include <climits>
+#include <cstdlib>
+#include <cstring>
 #include <iostream>
-#include <sstream>
 #include <memory>
-#include "SymbolTable.h"
+#include <sstream>
+
 #include "ParseHelper.h"
 #include "Scan.h"
 #include "ScanContext.h"
+#include "SymbolTable.h"
 
 #endif /* _PCH_H */

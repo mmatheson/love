@@ -43,39 +43,37 @@ namespace box2d
  **/
 class Shape : public love::physics::Shape
 {
-public:
+ public:
+  friend class Fixture;
 
-	friend class Fixture;
+  /**
+   * Creates a Shape.
+   **/
+  Shape();
+  Shape(b2Shape *shape, bool own = true);
 
-	/**
-	 * Creates a Shape.
-	 **/
-	Shape();
-	Shape(b2Shape *shape, bool own = true);
+  virtual ~Shape();
 
-	virtual ~Shape();
+  /**
+   * Gets the type of Shape. Useful for
+   * debug drawing.
+   **/
+  Type getType() const;
+  float getRadius() const;
+  int getChildCount() const;
+  bool testPoint(float x, float y, float r, float px, float py) const;
+  int rayCast(lua_State *L) const;
+  int computeAABB(lua_State *L) const;
+  int computeMass(lua_State *L) const;
 
-	/**
-	 * Gets the type of Shape. Useful for
-	 * debug drawing.
-	 **/
-	Type getType() const;
-	float getRadius() const;
-	int getChildCount() const;
-	bool testPoint(float x, float y, float r, float px, float py) const;
-	int rayCast(lua_State *L) const;
-	int computeAABB(lua_State *L) const;
-	int computeMass(lua_State *L) const;
-
-protected:
-
-	// The Box2D shape.
-	b2Shape *shape;
-	bool own;
+ protected:
+  // The Box2D shape.
+  b2Shape *shape;
+  bool own;
 };
 
-} // box2d
-} // physics
-} // love
+}  // namespace box2d
+}  // namespace physics
+}  // namespace love
 
-#endif // LOVE_PHYSICS_BOX2D_SHAPE_H
+#endif  // LOVE_PHYSICS_BOX2D_SHAPE_H

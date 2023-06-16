@@ -21,109 +21,105 @@
 #ifndef LOVE_VARIANT_H
 #define LOVE_VARIANT_H
 
-#include "common/runtime.h"
-#include "common/Object.h"
-#include "common/int.h"
-
 #include <cstring>
+#include <set>
 #include <string>
 #include <vector>
-#include <set>
+
+#include "common/Object.h"
+#include "common/int.h"
+#include "common/runtime.h"
 
 namespace love
 {
 
 class Variant
 {
-public:
+ public:
+  static const int MAX_SMALL_STRING_LENGTH = 15;
 
-	static const int MAX_SMALL_STRING_LENGTH = 15;
+  enum Type
+  {
+    UNKNOWN = 0,
+    BOOLEAN,
+    NUMBER,
+    STRING,
+    SMALLSTRING,
+    LUSERDATA,
+    LOVEOBJECT,
+    NIL,
+    TABLE
+  };
 
-	enum Type
-	{
-		UNKNOWN = 0,
-		BOOLEAN,
-		NUMBER,
-		STRING,
-		SMALLSTRING,
-		LUSERDATA,
-		LOVEOBJECT,
-		NIL,
-		TABLE
-	};
+  class SharedString : public love::Object
+  {
+   public:
+    SharedString(const char *string, size_t len)
+        : len(len)
+    {
+      str = new char[len + 1];
+      str[len] = '\0';
+      memcpy(str, string, len);
+    }
+    virtual ~SharedString() { delete[] str; }
 
-	class SharedString : public love::Object
-	{
-	public:
+    char *str;
+    size_t len;
+  };
 
-		SharedString(const char *string, size_t len)
-			: len(len)
-		{
-			str = new char[len+1];
-			str[len] = '\0';
-			memcpy(str, string, len);
-		}
-		virtual ~SharedString() { delete[] str; }
+  class SharedTable : public love::Object
+  {
+   public:
+    SharedTable(std::vector<std::pair<Variant, Variant>> *table)
+        : table(table)
+    {
+    }
 
-		char *str;
-		size_t len;
-	};
+    virtual ~SharedTable() { delete table; }
 
-	class SharedTable : public love::Object
-	{
-	public:
+    std::vector<std::pair<Variant, Variant>> *table;
+  };
 
-		SharedTable(std::vector<std::pair<Variant, Variant>> *table)
-			: table(table)
-		{
-		}
+  union Data
+  {
+    bool boolean;
+    double number;
+    SharedString *string;
+    void *userdata;
+    Proxy objectproxy;
+    SharedTable *table;
+    struct
+    {
+      char str[MAX_SMALL_STRING_LENGTH];
+      uint8 len;
+    } smallstring;
+  };
 
-		virtual ~SharedTable() { delete table; }
+  Variant();
+  Variant(bool boolean);
+  Variant(double number);
+  Variant(const char *str, size_t len);
+  Variant(const std::string &str);
+  Variant(void *lightuserdata);
+  Variant(love::Type *type, love::Object *object);
+  Variant(std::vector<std::pair<Variant, Variant>> *table);
+  Variant(const Variant &v);
+  Variant(Variant &&v);
+  ~Variant();
 
-		std::vector<std::pair<Variant, Variant>> *table;
-	};
+  Variant &operator=(const Variant &v);
 
-	union Data
-	{
-		bool boolean;
-		double number;
-		SharedString *string;
-		void *userdata;
-		Proxy objectproxy;
-		SharedTable *table;
-		struct
-		{
-			char str[MAX_SMALL_STRING_LENGTH];
-			uint8 len;
-		} smallstring;
-	};
+  Type getType() const { return type; }
+  const Data &getData() const { return data; }
 
-	Variant();
-	Variant(bool boolean);
-	Variant(double number);
-	Variant(const char *str, size_t len);
-	Variant(const std::string &str);
-	Variant(void *lightuserdata);
-	Variant(love::Type *type, love::Object *object);
-	Variant(std::vector<std::pair<Variant, Variant>> *table);
-	Variant(const Variant &v);
-	Variant(Variant &&v);
-	~Variant();
+  static Variant fromLua(lua_State *L, int n, std::set<const void *> *tableSet = nullptr);
+  void toLua(lua_State *L) const;
 
-	Variant &operator = (const Variant &v);
+ private:
+  Type type;
+  Data data;
 
-	Type getType() const { return type; }
-	const Data &getData() const { return data; }
+};  // Variant
+}  // namespace love
 
-	static Variant fromLua(lua_State *L, int n, std::set<const void*> *tableSet = nullptr);
-	void toLua(lua_State *L) const;
-
-private:
-
-	Type type;
-	Data data;
-
-}; // Variant
-} // love
-
-#endif // LOVE_VARIANT_H
+#endif  // LOVE_VARIANT_H

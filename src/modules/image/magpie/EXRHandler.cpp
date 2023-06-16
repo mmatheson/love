@@ -20,8 +20,9 @@
 
 // LOVE
 #include "EXRHandler.h"
-#include "common/floattypes.h"
+
 #include "common/Exception.h"
+#include "common/floattypes.h"
 
 // zlib (for tinyexr)
 #include <zlib.h>
@@ -43,173 +44,173 @@ namespace magpie
 
 bool EXRHandler::canDecode(Data *data)
 {
-	EXRVersion version;
-	return ParseEXRVersionFromMemory(&version, (const unsigned char *) data->getData(), data->getSize()) == TINYEXR_SUCCESS;
+  EXRVersion version;
+  return ParseEXRVersionFromMemory(&version, (const unsigned char *) data->getData(),
+                                   data->getSize()) == TINYEXR_SUCCESS;
 }
 
 bool EXRHandler::canEncode(PixelFormat /*rawFormat*/, EncodedFormat /*encodedFormat*/)
 {
-	return false;
+  return false;
 }
 
 template <typename T>
 static void getEXRChannels(const EXRHeader &header, const EXRImage &image, T *rgba[4])
 {
-	for (int i = 0; i < header.num_channels; i++)
-	{
-		switch (*header.channels[i].name)
-		{
-		case 'R':
-			rgba[0] = (T *) image.images[i];
-			break;
-		case 'G':
-			rgba[1] = (T *) image.images[i];
-			break;
-		case 'B':
-			rgba[2] = (T *) image.images[i];
-			break;
-		case 'A':
-			rgba[3] = (T *) image.images[i];
-			break;
-		}
-	}
+  for (int i = 0; i < header.num_channels; i++)
+  {
+    switch (*header.channels[i].name)
+    {
+      case 'R':
+	rgba[0] = (T *) image.images[i];
+	break;
+      case 'G':
+	rgba[1] = (T *) image.images[i];
+	break;
+      case 'B':
+	rgba[2] = (T *) image.images[i];
+	break;
+      case 'A':
+	rgba[3] = (T *) image.images[i];
+	break;
+    }
+  }
 }
 
 template <typename T>
 static T *loadEXRChannels(int width, int height, T *rgba[4], T one)
 {
-	T *data = nullptr;
+  T *data = nullptr;
 
-	try
-	{
-		data = new T[width * height * 4];
-	}
-	catch (std::exception &)
-	{
-		throw love::Exception("Out of memory.");
-	}
+  try
+  {
+    data = new T[width * height * 4];
+  }
+  catch (std::exception &)
+  {
+    throw love::Exception("Out of memory.");
+  }
 
-	for (int y = 0; y < height; y++)
-	{
-		for (int x = 0; x < width; x++)
-		{
-			size_t offset = y * width + x;
+  for (int y = 0; y < height; y++)
+  {
+    for (int x = 0; x < width; x++)
+    {
+      size_t offset = y * width + x;
 
-			data[offset * 4 + 0] = rgba[0] != nullptr ? rgba[0][offset] : 0;
-			data[offset * 4 + 1] = rgba[1] != nullptr ? rgba[1][offset] : 0;
-			data[offset * 4 + 2] = rgba[2] != nullptr ? rgba[2][offset] : 0;
-			data[offset * 4 + 3] = rgba[3] != nullptr ? rgba[3][offset] : one;
-		}
-	}
+      data[offset * 4 + 0] = rgba[0] != nullptr ? rgba[0][offset] : 0;
+      data[offset * 4 + 1] = rgba[1] != nullptr ? rgba[1][offset] : 0;
+      data[offset * 4 + 2] = rgba[2] != nullptr ? rgba[2][offset] : 0;
+      data[offset * 4 + 3] = rgba[3] != nullptr ? rgba[3][offset] : one;
+    }
+  }
 
-	return data;
+  return data;
 }
 
 FormatHandler::DecodedImage EXRHandler::decode(Data *data)
 {
-	const char *err = "unknown error";
-	auto mem = (const unsigned char *) data->getData();
-	size_t memsize = data->getSize();
-	DecodedImage img;
+  const char *err = "unknown error";
+  auto mem = (const unsigned char *) data->getData();
+  size_t memsize = data->getSize();
+  DecodedImage img;
 
-	EXRHeader exrHeader;
-	InitEXRHeader(&exrHeader);
+  EXRHeader exrHeader;
+  InitEXRHeader(&exrHeader);
 
-	EXRImage exrImage;
-	InitEXRImage(&exrImage);
+  EXRImage exrImage;
+  InitEXRImage(&exrImage);
 
-	try
-	{
-		EXRVersion exrVersion;
-		if (ParseEXRVersionFromMemory(&exrVersion, mem, memsize) != TINYEXR_SUCCESS)
-			throw love::Exception("Could not parse EXR image header.");
+  try
+  {
+    EXRVersion exrVersion;
+    if (ParseEXRVersionFromMemory(&exrVersion, mem, memsize) != TINYEXR_SUCCESS)
+      throw love::Exception("Could not parse EXR image header.");
 
-		if (exrVersion.multipart || exrVersion.non_image || exrVersion.tiled)
-			throw love::Exception("Multi-part, tiled, and non-image EXR files are not supported.");
+    if (exrVersion.multipart || exrVersion.non_image || exrVersion.tiled)
+      throw love::Exception("Multi-part, tiled, and non-image EXR files are not supported.");
 
-		if (ParseEXRHeaderFromMemory(&exrHeader, &exrVersion, mem, memsize, &err) != TINYEXR_SUCCESS)
-			throw love::Exception("Could not parse EXR image header: %s", err);
+    if (ParseEXRHeaderFromMemory(&exrHeader, &exrVersion, mem, memsize, &err) != TINYEXR_SUCCESS)
+      throw love::Exception("Could not parse EXR image header: %s", err);
 
-		if (LoadEXRImageFromMemory(&exrImage, &exrHeader, mem, memsize, &err) != TINYEXR_SUCCESS)
-			throw love::Exception("Could not decode EXR image: %s", err);
-	}
-	catch (love::Exception &)
-	{
-		FreeEXRErrorMessage(err);
-		throw;
-	}
+    if (LoadEXRImageFromMemory(&exrImage, &exrHeader, mem, memsize, &err) != TINYEXR_SUCCESS)
+      throw love::Exception("Could not decode EXR image: %s", err);
+  }
+  catch (love::Exception &)
+  {
+    FreeEXRErrorMessage(err);
+    throw;
+  }
 
-	int pixelType = exrHeader.pixel_types[0];
+  int pixelType = exrHeader.pixel_types[0];
 
-	for (int i = 1; i < exrHeader.num_channels; i++)
-	{
-		if (pixelType != exrHeader.pixel_types[i])
-		{
-			FreeEXRImage(&exrImage);
-			throw love::Exception("Could not decode EXR image: all channels must have the same data type.");
-		}
-	}
+  for (int i = 1; i < exrHeader.num_channels; i++)
+  {
+    if (pixelType != exrHeader.pixel_types[i])
+    {
+      FreeEXRImage(&exrImage);
+      throw love::Exception(
+          "Could not decode EXR image: all channels must have the same data type.");
+    }
+  }
 
-	img.width  = exrImage.width;
-	img.height = exrImage.height;
+  img.width = exrImage.width;
+  img.height = exrImage.height;
 
-	if (pixelType == TINYEXR_PIXELTYPE_HALF)
-	{
-		img.format = PIXELFORMAT_RGBA16F;
+  if (pixelType == TINYEXR_PIXELTYPE_HALF)
+  {
+    img.format = PIXELFORMAT_RGBA16F;
 
-		float16 *rgba[4] = {nullptr};
-		getEXRChannels(exrHeader, exrImage, rgba);
+    float16 *rgba[4] = {nullptr};
+    getEXRChannels(exrHeader, exrImage, rgba);
 
-		try
-		{
-			img.data = (unsigned char *) loadEXRChannels(img.width, img.height, rgba, float32to16(1.0f));
-		}
-		catch (love::Exception &)
-		{
-			FreeEXRImage(&exrImage);
-			throw;
-		}
-	}
-	else if (pixelType == TINYEXR_PIXELTYPE_FLOAT)
-	{
-		img.format = PIXELFORMAT_RGBA32F;
+    try
+    {
+      img.data = (unsigned char *) loadEXRChannels(img.width, img.height, rgba, float32to16(1.0f));
+    }
+    catch (love::Exception &)
+    {
+      FreeEXRImage(&exrImage);
+      throw;
+    }
+  }
+  else if (pixelType == TINYEXR_PIXELTYPE_FLOAT)
+  {
+    img.format = PIXELFORMAT_RGBA32F;
 
-		float *rgba[4] = {nullptr};
-		getEXRChannels(exrHeader, exrImage, rgba);
+    float *rgba[4] = {nullptr};
+    getEXRChannels(exrHeader, exrImage, rgba);
 
-		try
-		{
-			img.data = (unsigned char *) loadEXRChannels(img.width, img.height, rgba, 1.0f);
-		}
-		catch (love::Exception &)
-		{
-			FreeEXRImage(&exrImage);
-			throw;
-		}
-	}
-	else
-	{
-		FreeEXRImage(&exrImage);
-		throw love::Exception("Could not decode EXR image: unknown pixel format.");
-	}
+    try
+    {
+      img.data = (unsigned char *) loadEXRChannels(img.width, img.height, rgba, 1.0f);
+    }
+    catch (love::Exception &)
+    {
+      FreeEXRImage(&exrImage);
+      throw;
+    }
+  }
+  else
+  {
+    FreeEXRImage(&exrImage);
+    throw love::Exception("Could not decode EXR image: unknown pixel format.");
+  }
 
-	img.size = img.width * img.height * getPixelFormatSize(img.format);
+  img.size = img.width * img.height * getPixelFormatSize(img.format);
 
-	FreeEXRImage(&exrImage);
+  FreeEXRImage(&exrImage);
 
-	return img;
+  return img;
 }
 
-FormatHandler::EncodedImage EXRHandler::encode(const DecodedImage & /*img*/, EncodedFormat /*encodedFormat*/)
+FormatHandler::EncodedImage EXRHandler::encode(const DecodedImage & /*img*/,
+                                               EncodedFormat /*encodedFormat*/)
 {
-	throw love::Exception("Invalid format.");
+  throw love::Exception("Invalid format.");
 }
 
-void EXRHandler::freeRawPixels(unsigned char *mem)
-{
-	delete[] mem;
-}
+void EXRHandler::freeRawPixels(unsigned char *mem) { delete[] mem; }
 
-} // magpie
-} // image
-} // love
+}  // namespace magpie
+}  // namespace image
+}  // namespace love

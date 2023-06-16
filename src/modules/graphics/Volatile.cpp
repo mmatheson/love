@@ -30,31 +30,29 @@ std::list<Volatile *> Volatile::all;
 
 Volatile::Volatile()
 {
-	// Insert this object into "all".
-	all.push_back(this);
+  // Insert this object into "all".
+  all.push_back(this);
 }
 
 Volatile::~Volatile()
 {
-	// Remove the pointer to this object.
-	all.remove(this);
+  // Remove the pointer to this object.
+  all.remove(this);
 }
 
 bool Volatile::loadAll()
 {
-	bool success = true;
+  bool success = true;
 
-	for (Volatile *v : all)
-		success = success && v->loadVolatile();
+  for (Volatile *v : all) success = success && v->loadVolatile();
 
-	return success;
+  return success;
 }
 
 void Volatile::unloadAll()
 {
-	for (Volatile *v : all)
-		v->unloadVolatile();
+  for (Volatile *v : all) v->unloadVolatile();
 }
 
-} // graphics
-} // love
+}  // namespace graphics
+}  // namespace love

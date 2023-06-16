@@ -20,9 +20,9 @@
 
 // LOVE
 #include "Font.h"
+
 #include "BMFontRasterizer.h"
 #include "ImageRasterizer.h"
-
 #include "libraries/utf8/utf8.h"
 
 namespace love
@@ -35,76 +35,75 @@ namespace font
 
 class DefaultFontData : public love::Data
 {
-public:
-
-	Data *clone() const override { return new DefaultFontData(); }
-	void *getData() const override { return Vera_ttf; }
-	size_t getSize() const override { return sizeof(Vera_ttf); }
+ public:
+  Data *clone() const override { return new DefaultFontData(); }
+  void *getData() const override { return Vera_ttf; }
+  size_t getSize() const override { return sizeof(Vera_ttf); }
 };
 
 Rasterizer *Font::newTrueTypeRasterizer(int size, TrueTypeRasterizer::Hinting hinting)
 {
-	StrongRef<DefaultFontData> data(new DefaultFontData, Acquire::NORETAIN);
-	return newTrueTypeRasterizer(data.get(), size, hinting);
+  StrongRef<DefaultFontData> data(new DefaultFontData, Acquire::NORETAIN);
+  return newTrueTypeRasterizer(data.get(), size, hinting);
 }
 
-Rasterizer *Font::newTrueTypeRasterizer(int size, float dpiscale, TrueTypeRasterizer::Hinting hinting)
+Rasterizer *Font::newTrueTypeRasterizer(int size, float dpiscale,
+                                        TrueTypeRasterizer::Hinting hinting)
 {
-	StrongRef<DefaultFontData> data(new DefaultFontData, Acquire::NORETAIN);
-	return newTrueTypeRasterizer(data.get(), size, dpiscale, hinting);
+  StrongRef<DefaultFontData> data(new DefaultFontData, Acquire::NORETAIN);
+  return newTrueTypeRasterizer(data.get(), size, dpiscale, hinting);
 }
 
-Rasterizer *Font::newBMFontRasterizer(love::filesystem::FileData *fontdef, const std::vector<image::ImageData *> &images, float dpiscale)
+Rasterizer *Font::newBMFontRasterizer(love::filesystem::FileData *fontdef,
+                                      const std::vector<image::ImageData *> &images, float dpiscale)
 {
-	return new BMFontRasterizer(fontdef, images, dpiscale);
+  return new BMFontRasterizer(fontdef, images, dpiscale);
 }
 
-Rasterizer *Font::newImageRasterizer(love::image::ImageData *data, const std::string &text, int extraspacing, float dpiscale)
+Rasterizer *Font::newImageRasterizer(love::image::ImageData *data, const std::string &text,
+                                     int extraspacing, float dpiscale)
 {
-	std::vector<uint32> glyphs;
-	glyphs.reserve(text.size());
+  std::vector<uint32> glyphs;
+  glyphs.reserve(text.size());
 
-	try
-	{
-		utf8::iterator<std::string::const_iterator> i(text.begin(), text.begin(), text.end());
-		utf8::iterator<std::string::const_iterator> end(text.end(), text.begin(), text.end());
+  try
+  {
+    utf8::iterator<std::string::const_iterator> i(text.begin(), text.begin(), text.end());
+    utf8::iterator<std::string::const_iterator> end(text.end(), text.begin(), text.end());
 
-		while (i != end)
-			glyphs.push_back(*i++);
-	}
-	catch (utf8::exception &e)
-	{
-		throw love::Exception("UTF-8 decoding error: %s", e.what());
-	}
+    while (i != end) glyphs.push_back(*i++);
+  }
+  catch (utf8::exception &e)
+  {
+    throw love::Exception("UTF-8 decoding error: %s", e.what());
+  }
 
-	return newImageRasterizer(data, &glyphs[0], (int) glyphs.size(), extraspacing, dpiscale);
+  return newImageRasterizer(data, &glyphs[0], (int) glyphs.size(), extraspacing, dpiscale);
 }
 
-Rasterizer *Font::newImageRasterizer(love::image::ImageData *data, uint32 *glyphs, int numglyphs, int extraspacing, float dpiscale)
+Rasterizer *Font::newImageRasterizer(love::image::ImageData *data, uint32 *glyphs, int numglyphs,
+                                     int extraspacing, float dpiscale)
 {
-	return new ImageRasterizer(data, glyphs, numglyphs, extraspacing, dpiscale);
+  return new ImageRasterizer(data, glyphs, numglyphs, extraspacing, dpiscale);
 }
 
 GlyphData *Font::newGlyphData(Rasterizer *r, const std::string &text)
 {
-	uint32 codepoint = 0;
+  uint32 codepoint = 0;
 
-	try
-	{
-		codepoint = utf8::peek_next(text.begin(), text.end());
-	}
-	catch (utf8::exception &e)
-	{
-		throw love::Exception("UTF-8 decoding error: %s", e.what());
-	}
+  try
+  {
+    codepoint = utf8::peek_next(text.begin(), text.end());
+  }
+  catch (utf8::exception &e)
+  {
+    throw love::Exception("UTF-8 decoding error: %s", e.what());
+  }
 
-	return r->getGlyphData(codepoint);
+  return r->getGlyphData(codepoint);
 }
 
-GlyphData *Font::newGlyphData(Rasterizer *r, uint32 glyph)
-{
-	return r->getGlyphData(glyph);
-}
+GlyphData *Font::newGlyphData(Rasterizer *r, uint32 glyph) { return r->getGlyphData(glyph); }
 
-} // font
-} // love
+}  // namespace font
+}  // namespace love

@@ -30,40 +30,28 @@ namespace sound
 love::Type Decoder::type("Decoder", &Object::type);
 
 Decoder::Decoder(Data *data, int bufferSize)
-	: data(data)
-	, bufferSize(bufferSize)
-	, sampleRate(DEFAULT_SAMPLE_RATE)
-	, buffer(0)
-	, eof(false)
+    : data(data),
+      bufferSize(bufferSize),
+      sampleRate(DEFAULT_SAMPLE_RATE),
+      buffer(0),
+      eof(false)
 {
-	buffer = new char[bufferSize];
+  buffer = new char[bufferSize];
 }
 
 Decoder::~Decoder()
 {
-	if (buffer != 0)
-		delete [](char *) buffer;
+  if (buffer != 0)
+    delete[](char *) buffer;
 }
 
-void *Decoder::getBuffer() const
-{
-	return buffer;
-}
+void *Decoder::getBuffer() const { return buffer; }
 
-int Decoder::getSize() const
-{
-	return bufferSize;
-}
+int Decoder::getSize() const { return bufferSize; }
 
-int Decoder::getSampleRate() const
-{
-	return sampleRate;
-}
+int Decoder::getSampleRate() const { return sampleRate; }
 
-bool Decoder::isFinished()
-{
-	return eof;
-}
+bool Decoder::isFinished() { return eof; }
 
-} // sound
-} // love
+}  // namespace sound
+}  // namespace love

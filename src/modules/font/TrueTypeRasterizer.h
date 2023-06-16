@@ -32,32 +32,30 @@ namespace font
 
 class TrueTypeRasterizer : public Rasterizer
 {
-public:
+ public:
+  // Types of hinting for TrueType font glyphs.
+  enum Hinting
+  {
+    HINTING_NORMAL,
+    HINTING_LIGHT,
+    HINTING_MONO,
+    HINTING_NONE,
+    HINTING_MAX_ENUM
+  };
 
-	// Types of hinting for TrueType font glyphs.
-	enum Hinting
-	{
-		HINTING_NORMAL,
-		HINTING_LIGHT,
-		HINTING_MONO,
-		HINTING_NONE,
-		HINTING_MAX_ENUM
-	};
+  virtual ~TrueTypeRasterizer() {}
 
-	virtual ~TrueTypeRasterizer() {}
+  static bool getConstant(const char *in, Hinting &out);
+  static bool getConstant(Hinting in, const char *&out);
+  static std::vector<std::string> getConstants(Hinting);
 
-	static bool getConstant(const char *in, Hinting &out);
-	static bool getConstant(Hinting in, const char *&out);
-	static std::vector<std::string> getConstants(Hinting);
+ private:
+  static StringMap<Hinting, HINTING_MAX_ENUM>::Entry hintingEntries[];
+  static StringMap<Hinting, HINTING_MAX_ENUM> hintings;
 
-private:
+};  // TrueTypeRasterizer
 
-	static StringMap<Hinting, HINTING_MAX_ENUM>::Entry hintingEntries[];
-	static StringMap<Hinting, HINTING_MAX_ENUM> hintings;
+}  // namespace font
+}  // namespace love
 
-}; // TrueTypeRasterizer
-
-} // font
-} // love
-
-#endif // LOVE_FONT_TRUE_TYPE_RASTERIZER_H
+#endif  // LOVE_FONT_TRUE_TYPE_RASTERIZER_H

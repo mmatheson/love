@@ -22,8 +22,8 @@
 #define LOVE_PHYSICS_BOX2D_WRAP_JOINT_H
 
 // LOVE
-#include "common/runtime.h"
 #include "Joint.h"
+#include "common/runtime.h"
 
 namespace love
 {
@@ -38,8 +38,8 @@ extern "C" int luaopen_joint(lua_State *L);
 
 extern const luaL_Reg w_Joint_functions[];
 
-} // box2d
-} // physics
-} // love
+}  // namespace box2d
+}  // namespace physics
+}  // namespace love
 
-#endif // LOVE_PHYSICS_BOX2D_WRAP_JOINT_H
+#endif  // LOVE_PHYSICS_BOX2D_WRAP_JOINT_H
